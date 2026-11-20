@@ -1,207 +1,161 @@
+# TIBON PROJECT — AGENTS.md
 
-# TIBON PROJECT — GLOBAL INSTRUCTIONS
+## 1. Project Goal
 
-## Project goal
+Build a modern, premium culinary studio website inspired by https://ti-bon.ru/.
 
-Build a modern, premium culinary studio website inspired by ti-bon.ru.
-
-The project includes:
-- Public multi-page website.
-- Responsive design.
-- FastAPI backend.
-- PostgreSQL database.
-- Admin dashboard / CMS.
+Project scope:
+- Responsive multi-page website.
+- SEO-friendly public pages with SSR.
+- FastAPI backend and PostgreSQL database.
+- Telegram notifications for saved leads.
 - Lead management.
-- SEO.
-- Automated tests.
+- Automated testing.
 - Docker deployment.
 
-## Architecture
+Do not copy the reference website's code, content, or design verbatim.
+
+## 2. Technology Stack
 
 Frontend:
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- Framer Motion
-- React Hook Form
-- Zod
+- React 19, TypeScript, Vite.
+- React Router v7 Framework Mode with SSR.
+- Tailwind CSS.
+- Framer Motion.
+- React Hook Form and Zod.
 
 Backend:
-- Python
-- FastAPI
-- SQLAlchemy 2
-- PostgreSQL
-- Alembic
-- Pydantic
+- Python, FastAPI.
+- SQLAlchemy 2, PostgreSQL.
+- Alembic, Pydantic.
 
 Testing:
-- Vitest
-- React Testing Library
-- Pytest
-- Playwright
+- Vitest, React Testing Library.
+- Pytest, Playwright.
 
-## Development rules
+Follow existing project versions and configuration. Do not upgrade dependencies without a reason.
 
-1. Read existing code before modifying it.
-2. Never rewrite working modules without a reason.
-3. Follow established architecture.
-4. Avoid duplicated code.
-5. Use strict TypeScript.
-6. Validate all external input.
-7. Keep secrets outside Git.
-8. Never use mock data in production features.
-9. Never leave unfinished TODO implementations.
-10. Every feature must have verification.
+## 3. Development Principles
 
-## Agent coordination
+1. Read `docs/PROJECT_STATUS.md` before starting a milestone.
+2. Inspect relevant existing code before modifying it.
+3. Follow `docs/ARCHITECTURE.md` and established conventions.
+4. Reuse components and avoid duplication.
+5. Use strict TypeScript and validate external input.
+6. Keep secrets and environment files out of Git.
+7. Do not invent business information, prices, contacts, reviews, or legal details.
+8. Use temporary frontend content only when clearly identified as placeholder content.
+9. Never simulate successful production operations without a real implementation.
+10. Avoid unfinished functionality and unnecessary TODOs.
+11. Preserve existing functionality unless the task explicitly requires changing it.
+12. Implement only the assigned milestone.
 
-Project Lead coordinates all specialists.
+## 4. Design and Content
 
-Frontend Developer owns frontend implementation.
+Design requirements are defined in:
+- `docs/DESIGN_SYSTEM.md`
+- `docs/COMPONENT_SPECIFICATION.md`
+- `docs/PAGE_SPECIFICATION.md`
 
-Backend Developer owns backend implementation.
+Use licensed images and document their sources.
 
-UI/UX Designer owns design documentation and design decisions.
+Preserve:
+- Responsive behavior.
+- Accessibility and keyboard navigation.
+- Reduced-motion support.
+- SSR and SEO.
+- Existing routes and navigation.
 
-QA Reviewer checks implementation and reports defects.
+Do not introduce a new design direction without an explicit task.
 
-Avoid assigning two agents to edit the same files simultaneously.
+## 5. Agent Coordination
 
-Delegate independent tasks in parallel only when file ownership is clear.
+Use one main agent by default.
 
-## Git rules
+Subagents are optional and should be used only when:
+- Tasks are genuinely independent.
+- File ownership is clearly separated.
+- Delegation provides meaningful value.
 
-- Commit after each verified milestone.
-- Never use git reset --hard.
-- Never discard user changes.
-- Never force push.
-- Never amend existing commits without permission.
-- Inspect git diff before committing.
-- Do not commit secrets or .env files.
+Do not assign multiple agents to modify the same files concurrently.
 
-## Quality gates
+Avoid repeated repository analysis between agents.
+
+## 6. Git Safety
+
+1. Inspect `git status` before modifying files.
+2. Never discard user changes.
+3. Never use `git reset --hard` or `git clean` without explicit approval.
+4. Never force push.
+5. Never amend existing commits without permission.
+6. Inspect `git diff` before finishing.
+7. Never commit secrets or `.env` files.
+8. Do not commit or push automatically unless the user explicitly requests it.
+9. Keep milestone changes separate from unrelated modifications.
+
+## 7. Quality Gates
 
 Before declaring a milestone complete:
 
-1. Run relevant tests.
-2. Run lint.
+1. Run relevant targeted tests.
+2. Run lint and TypeScript checks.
 3. Run production build.
-4. Inspect git diff.
-5. Update documentation.
-6. Report actual results.
+4. Verify SSR when public pages are affected.
+5. Check responsive behavior when UI is affected.
+6. Inspect Git diff.
+7. Update relevant documentation.
+8. Report actual results.
 
-Never claim tests passed unless they were executed.
+Never claim a test passed unless it was executed.
 
-## Communication
+## 8. Token Efficiency
 
-Work autonomously within the assigned scope.
+1. Read only files relevant to the task.
+2. Do not repeatedly scan the repository.
+3. Do not reread unchanged files without a reason.
+4. Do not repeat project requirements already documented.
+5. Reuse existing implementations.
+6. Avoid unnecessary dependencies and abstractions.
+7. Run targeted checks during implementation.
+8. Run full checks at milestone boundaries.
+9. Keep reports concise.
+10. Do not print large source files in reports.
+11. Store persistent decisions in documentation rather than repeating them in prompts.
 
-Report:
-- What was implemented.
-- Files changed.
-- Commands executed.
-- Test results.
-- Remaining issues.
+## 9. Documentation
 
-Do not silently skip requirements.
+Maintain:
+- `docs/PROJECT_STATUS.md` — milestone status and blockers.
+- `docs/ARCHITECTURE.md` — architectural decisions.
+- `docs/API.md` — backend contracts.
+- `docs/DESIGN_SYSTEM.md` — current visual system.
+- `docs/COMPONENT_SPECIFICATION.md` — UI components.
 
+Update documentation only when implementation or decisions change.
 
+## 10. Communication
 
+Work autonomously within the approved scope.
 
-## Token Efficiency Rules
-
-The project must be developed with minimal unnecessary token usage.
-
-### General rules
-1. Do not repeat project requirements already documented in AGENTS.md or docs/.
-2. Read only files relevant to the current task.
-3. Never scan the entire repository unless explicitly required.
-4. Do not reread files that have not changed.
-5. Do not repeat large code blocks in reports.
-6. Do not explain obvious implementation details.
-7. Keep responses concise and technical.
-8. Do not generate documentation unless it is useful or requested.
-9. Avoid unnecessary abstractions, dependencies and boilerplate.
-10. Do not perform repeated research when existing documentation is sufficient.
-
-### Agent delegation
-1. Use subagents only when they provide clear value.
-2. Do not start multiple agents for simple tasks.
-3. Do not delegate tasks that can be completed directly.
-4. Parallelize only independent tasks.
-5. Give each subagent a narrowly scoped task.
-6. Require concise reports from subagents.
-7. Do not ask agents to repeat repository analysis already completed.
-
-### Development workflow
-1. Implement one milestone at a time.
-2. Before editing, inspect only relevant files.
-3. Make focused changes instead of rewriting entire modules.
-4. Run targeted tests first.
-5. Run full tests only at milestone boundaries or before release.
-6. Do not run the same command repeatedly without a reason.
-7. Fix root causes instead of adding workarounds.
-
-### Reporting
-After each task report only:
-- What was implemented.
-- Files changed.
+Final report:
+- Implemented changes.
+- Important files changed.
 - Tests executed and results.
 - Remaining blockers.
 
-Avoid lengthy progress messages.
+Do not silently skip requirements.
 
-### Context management
-1. Keep docs/PROJECT_STATUS.md updated with current project state.
-2. Store important architecture decisions in docs/ARCHITECTURE.md.
-3. Store API contracts in docs/API.md.
-4. Use documentation instead of repeating project context in prompts.
-5. If context is getting large, summarize completed work and continue from PROJECT_STATUS.md.
+## 11. Milestone Status
 
+Completed:
+- M0 — Project setup.
+- M1 — Reference audit.
+- M2 — Initial design system.
+- M3 — Frontend scaffold.
+- M4 — Homepage implementation.
+- M4.1 — Dark Culinary Redesign.
+- M5.1–M5.3 — Internal pages and public forms.
+- M6.1–M6.3 — Backend, lead submission, and integration QA.
+- M7 — Telegram Notifications and Menu Lead Capture.
 
-
-
-## Codex Workflow
-
-### Project state
-- M0 — completed.
-- M1 — completed.
-- M2 — completed (design system and SEO decision).
-- M3 — completed (frontend application scaffold).
-- M4 — completed (homepage).
-- M5 — next milestone; do not start without explicit user approval.
-- Do not repeat completed milestones.
-- Always check docs/PROJECT_STATUS.md before starting work.
-
-### Token efficiency
-- Read only files relevant to the current task.
-- Do not repeat information already documented.
-- Do not scan the entire repository unnecessarily.
-- Do not conduct repeated research.
-- Do not launch subagents unless explicitly requested or clearly necessary.
-- Prefer one agent working on one task.
-- Keep reports concise.
-- Avoid unnecessary dependencies and abstractions.
-
-### Development rules
-- Do not overwrite working code without a reason.
-- Do not invent business information, prices or contact details.
-- Do not use copyrighted images without permission.
-- Keep documentation consistent with implementation.
-- Do not claim tests passed without executing them.
-- Do not commit unrelated changes.
-- Never use destructive Git commands without approval.
-
-### Current task
-M4 — homepage is complete. Wait for explicit user approval before starting M5.
-
-Read:
-- docs/PROJECT_STATUS.md
-- docs/ARCHITECTURE.md
-- docs/REFERENCE_AUDIT.md
-- docs/PAGE_SPECIFICATION.md
-
-Do not repeat M0 or M1.
-Do not start M5 without explicit user approval.
+Do not start future milestones without explicit user approval.
