@@ -94,7 +94,7 @@
 
 | Страница | Сквозные | Секции и компоненты |
 | --- | --- | --- |
-| `/` Главная | N1, N4 | 1 hero: C8-lite (overline+H1+lead) + B1 + B2 + 3 `Badge`-факта + C7; 2 `SectionHeading` + 4 × C1 (2 крупных, 2 узких); 3 `SectionHeading` + 4 × C6; 4 C7 + C8 + `ButtonText`; 5 `SectionHeading` + rail C2; 6 mosaic C3 + `ButtonText`; 7 тёмная полоса: C8-inverse + B1 |
+| `/` Главная | N1, N4 | 1 фото hero + H1, B1 и ссылка к направлениям; 2 две карточки направлений; 3 три карточки событий; 4 C7 о студии; 5 четыре блока впечатлений; 6 три предложения в редакционной подборке; 7 мозаика из шести C3 + U1; 8 блок допуслуг + B3; 9 финальная CTA-секция + B1 |
 | `/dlya-vzroslyh/` | N1, N4, N5 | 1 hero C7 + B1; 2 C8 + 3 × C1; 3 `SectionHeading` + список (2 колонки); 4 `SectionHeading` + timeline (`FeatureBlock` numbered, вертикальная линия); 5 C7; 6 3 × C2; 7 `SectionHeading` + 3 × C6; 8 `Accordion`; 9 `LeadForm` (`type=event`) |
 | Формат (`korporativ`, `den-rozhdeniya`, `romanticheskiy-uzhin`) | N1, N4, N5 | 1 C7 + 3–4 `Badge` + B1; 2 timeline; 3 C5 compact × 3–6; 4 список; 5 2–3 × C2; 6 4–6 × C3; 7 `Accordion`; 8 `LeadForm` (`format_id` предзаполнен); 9 2 × C1 |
 | `/dlya-detey/` | N1, N4, N5 | 1 C7 + 4 `Badge` + B1; 2 2–3 карточки программ (`ServiceCard`-подобные, вариант `plain`); 3 timeline; 4 `SectionHeading` + 3–4 × C6 (безопасность); 5 C7; 6 4–6 × C3; 7 `Accordion`; 8 `LeadForm` (`type=kids`); 9 перелинковка `ButtonText` × 3 |
@@ -114,6 +114,18 @@
 
 ---
 
+### Компоненты в M4.1
+
+| Компонент | Вариант на главной |
+| --- | --- |
+| N1–N3 Header и навигация | Тёмная липкая шапка, текстовый логотип, красный CTA на десктопе. До 1024 px меню открывается в полноэкранном диалоге. Активный маршрут имеет `aria-current`. Esc закрывает меню и возвращает фокус. |
+| N4 Footer | Бренд и разделы сайта, правовые ссылки и копирайт в нижней строке. Контактные данные и соцсети выводятся при наличии. |
+| B1–B5 Button и IconButton | Красная заливка Primary, нейтральная рамка Secondary, светло-красный Outline. Общий видимый контур фокуса. |
+| C1 Карточки главной | Для направлений доступна вся площадь карточки. В карточках событий и предложений действие обозначает текстовая ссылка. У предложений фото квадратное, расположено сбоку. |
+| C3 GalleryItem | Кнопка на весь кадр с видимым знаком «+» и названием для ассистивных технологий. Наведение или фокус меняют заливку знака. |
+| C8 SectionHeading | Светло-красный надзаголовок с линией, белый H2, опциональный серый лид. |
+| U1 Modal | Центрированный тёмный диалог. Лайтбокс показывает фото целиком, подпись с номером кадра и две кнопки переключения. Стрелки и Esc также доступны с клавиатуры. |
+
 ## 4. Матрица компонент × токены
 
 Ссылки на группы DS §6. «Обязательные» — используются всегда, «по варианту» — только в указанном варианте.
@@ -122,17 +134,17 @@
 | --- | --- | --- | --- | --- | --- |
 | N1 Header | surface, border, accent-strong | text-button, body-s | space-4/5, header h 88/64 | xs (кнопка) | sm (scrolled) |
 | N2 DesktopNav | text, accent-strong, border | text-button | space-5 | — | md (dropdown) |
-| N3 MobileNav | surface-inverse, text-inverse(-muted), overlay | text-h3 (пункт), body | space-5 | lg (sheet) | lg |
-| N4 Footer | surface-inverse, text-inverse(-muted) | body-s, caption, micro | space-7/9 | — | — |
+| N3 MobileNav | surface-alt, text, accent-strong, border | text-h3 (пункт), body | space-4/5/6 | — | — |
+| N4 Footer | surface-inverse, text-inverse(-muted), border | body-s, caption | space-5/7 | — | — |
 | N5 Breadcrumbs | text-muted, text | caption | space-2 | — | — |
-| B1 Primary | accent-strong, accent-hover, #FFF | text-button | btn-*, space-2 | xs | — |
-| B2 Secondary | text, border-strong, surface-alt | text-button | btn-* | xs | — |
-| B3 Outline | accent-strong, accent-soft, border-strong | text-button | btn-* | xs | — |
+| B1 Primary | accent, accent-hover, accent-strong, white | text-button | btn-*, space-2 | xs | — |
+| B2 Secondary | text, border-strong, surface-raised | text-button | btn-* | xs | — |
+| B3 Outline | accent-strong, accent-soft | text-button | btn-* | xs | — |
 | B4 Text | text, accent-strong | text-button / body-s | 0, space-2 | — | — |
 | B5 Icon | text, text-inverse, surface-alt, overlay | — | btn-icon | xs / pill | sm (на фото) |
 | C1 EventCard | surface, border, accent-strong, text-muted | h3, body-s, micro | space-4/5, space-3 | xs | — |
 | C2 ServiceCard | surface, border, text-muted | h4, body-s, micro | space-4/5 | xs | — |
-| C3 GalleryItem | overlay, text-inverse | caption | 0 | xs | — |
+| C3 GalleryItem | surface, text, border-strong, accent, focus-ring | h4 (знак «+») | space-2, tap-min | — | — |
 | C4 PriceCard | surface(-alt), border, accent, accent-soft | h4, display-h3 (цена), body-s | space-6, space-4 | xs | — |
 | C5 MenuItem | surface, border, accent-strong, olive-soft | h4, body-s, micro | space-4, space-2 | xs | — |
 | C6 FeatureBlock | text, accent-strong, text-muted | overline, h4, body-s | space-5, space-3 | — | — |
@@ -142,7 +154,7 @@
 | F5 Checkbox / F6 Radio | border-strong, accent-strong, #FFF, error | body-s | space-3, tap-min | xs / pill | — |
 | F7 FormError | error, error-soft | caption | space-2 | xs | — |
 | F8 SuccessMessage | success-soft, success, text | h3, body, caption | space-6 | xs | — |
-| U1 Modal | surface, overlay | h3, body | space-6 | md / lg (sheet) | md / lg |
+| U1 Modal | surface-alt, border, overlay | h3, body | space-4/6 | xs | md |
 | U2 Accordion | text, border, accent-strong | h4 (триггер), body | space-4, h 56 | — | — |
 | U3 Badge | *-soft + основной токен | micro | space-2, h 24 | pill | — |
 | U4 Tabs | text, text-muted, accent-strong, border | text-button | space-5, h 44 | — | — |
@@ -252,7 +264,7 @@
 | Do | Don't |
 | --- | --- |
 | Собирать страницы из компонентов §2 в порядке §6 | Верстать секцию «с нуля» ради одного блока |
-| Один primary-CTA на зону, остальные — Secondary/Text | Три терракотовые кнопки в одном экране |
+| Один primary-CTA на зону, остальные — Secondary/Text | Три красные кнопки в одном экране |
 | Факты — чипами и списками | Факты в абзаце с ценой, выделенной цветом (ошибка референса) |
 | Фото 4:5/3:2/1:1 из §10 DS с обязательным alt | Произвольный кроп и пустой alt |
 | C8 как единственный вход в секцию | Два заголовка H2 подряд без контента между ними |
@@ -267,9 +279,9 @@
 
 ## 9. Открытые вопросы
 
-1. **Кириллица Playfair Display** — проверить на реальных H1/H2 (DS §13, пункт 8); при провале — Lora 500, шкала не меняется.
+1. **Кириллица Playfair Display** — проверена на заголовках главной. При добавлении страниц проверяйте их реальные тексты.
 2. **Число карточек в сетках** — 4 формата на главной и 3 на `/dlya-vzroslyh/`; при появлении 4-го взрослого формата раскладка 4/3/2 должна работать без правок (проверить на реальных данных CMS).
 3. **Карточка программы для детей** — вариант `plain` у `ServiceCard` не подтверждён; если программ нет, блок не выводится (PS §3.4).
-4. **Лайтбокс** — входит в `Modal` (вариант lightbox) или отдельный компонент; решение за фронтендом, поведение задано в DS §7.5 и PS §3.8.
+4. **Лайтбокс главной** использует общий `Modal` с нативным `dialog` и управлением кадрами в `GallerySection`.
 5. **Статусы заявок в админке** — маппинг на существующие токены (DS §13.2) требует подтверждения после согласования статус-модели (PS §2.4).
 6. **Тени** — DS допускает `shadow-sm` у sticky-панели; если визуально «грязнит» фото под ней, заменить на `border` (решение на прототипе).

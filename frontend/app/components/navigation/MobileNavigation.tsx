@@ -9,7 +9,9 @@ export function MobileNavigation({ items, onNavigate }: MobileNavigationProps) {
       <ul className="mobile-menu-links">
         {items.map((item) => (
           <li key={item.to}>
-            <NavLink to={item.to} onClick={onNavigate}>{item.label}</NavLink>
+            <NavLink to={item.to} onClick={onNavigate}>
+              {item.label} <span aria-hidden="true">↗</span>
+            </NavLink>
           </li>
         ))}
       </ul>

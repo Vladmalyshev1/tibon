@@ -18,7 +18,9 @@ export function PopularOffersSection() {
                 <div className="offer-card-content">
                   <h3 className="type-h3">{offer.title}</h3>
                   <p>{offer.description}</p>
-                  <Link className="button-text" to={offer.to} aria-label={`Узнать больше: ${offer.title}`}>Узнать больше</Link>
+                  <Link className="button-text" to={offer.to} aria-label={`Узнать больше: ${offer.title}`}>
+                    Узнать больше <span aria-hidden="true">↗</span>
+                  </Link>
                 </div>
               </article>
             </Reveal>

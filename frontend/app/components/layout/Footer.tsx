@@ -25,7 +25,7 @@ export function Footer({ contact, socials = [] }: FooterProps) {
       <Container className="footer-inner">
         <div className="footer-brand">
           <Link className="wordmark wordmark-inverse" to="/" aria-label="TIBON — главная">TIBON</Link>
-          <p className="footer-copyright">© TIBON</p>
+          <p>Кулинарная студия</p>
         </div>
         <nav className="footer-main-navigation" aria-label="Навигация в подвале">
           <ul className="footer-links">
@@ -48,10 +48,13 @@ export function Footer({ contact, socials = [] }: FooterProps) {
             ) : null}
           </div>
         ) : null}
-        <nav className="footer-legal" aria-label="Правовая информация">
-          <Link to="/pravila/">Правила студии</Link>
-          <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
-        </nav>
+        <div className="footer-meta">
+          <nav className="footer-legal" aria-label="Правовая информация">
+            <Link to="/pravila/">Правила студии</Link>
+            <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
+          </nav>
+          <p className="footer-copyright">© TIBON</p>
+        </div>
       </Container>
     </footer>
   );

@@ -10,6 +10,8 @@ Last updated: 2026-11-20
 **M3 — Frontend application scaffold: complete.** React Router Framework Mode SSR, shared layout/navigation/UI foundations, design tokens, tests, and documentation are implemented and verified. No backend was created.
 **M4 — Homepage: complete.** All nine sections are implemented. TypeScript, ESLint, six Vitest tests, the production build and the SSR/Chromium checks passed. See [homepage implementation](HOME_PAGE_IMPLEMENTATION.md) for image sources and launch dependencies.
 
+**M4.1 — Dark Culinary Redesign: complete.** Dark theme and responsive layouts are applied to all nine homepage sections and shared public UI. TypeScript, ESLint, six Vitest tests, production build, SSR and Chromium checks passed. See [homepage implementation](HOME_PAGE_IMPLEMENTATION.md) for verification and screenshots.
+
 ## Environment
 
 | Tool | Status |
@@ -23,7 +25,7 @@ Last updated: 2026-11-20
 
 ## Repository state
 
-- Branch `master`, M0 and M1 commits present. M2–M4 changes remain in the working copy.
+- Branch `master`. M4.1 changes are in the working copy.
 - Existing project content includes `AGENTS.md`, `opencode.jsonc`, `.opencode/`, `docs/`, `infra/`, and the root Playwright dev dependency.
 - `frontend/` now contains the independent React application and lockfile; `backend/` is not created in M3.
 
@@ -34,8 +36,8 @@ Last updated: 2026-11-20
 
 ## Design documents (M2)
 
-- `docs/DESIGN_SYSTEM.md` — единая система: концепция, палитра с производными, типографика (Playfair Display + Inter), сетка и брейкпоинты 360/480/768/1024/1280/1440, шкала отступов 4 px, токены `--color-*` / `--text-*` / `--space-*`, визуальные спеки 33 компонентов, состояния, адаптив, изображения, анимации, доступность с проверенными контрастами, правила использования (общие для сайта и админки).
-- `docs/COMPONENT_SPECIFICATION.md` — реестр 33 компонентов, композиция всех страниц, матрица компонент × токены, обязательные состояния, правила вложенности, лимиты контента, do/don't.
+- [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) records the M4.1 dark palette, typography, grid and WCAG contrast pairs.
+- [COMPONENT_SPECIFICATION.md](COMPONENT_SPECIFICATION.md) records shared components and homepage composition.
 
 ### SEO decision (M2)
 
@@ -57,8 +59,8 @@ Last updated: 2026-11-20
 ### Open questions from M2
 
 - **Шрифты:** M3 использует локальные variable-пакеты Playfair Display и Inter с SIL Open Font License. Кириллические glyph-файлы присутствуют и загружаются в браузере; визуальное решение по реальным финальным H1/H2 остаётся на проверку при создании страниц.
-- **Контраст:** `#B66C50` как заливка кнопки даёт 4.0:1 с белым текстом и не проходит AA для обычного кегля, поэтому CTA использует `#8F4E37` (6.3:1). Нужно подтвердить, что затемнённая терракота принимается как цвет кнопок; альтернатива — терракота только для крупного текста и графики.
-- **Айдентика:** логотип и фирменный стиль «ТИ-БОН» — сохраняются или редизайн? Без логотипа шапка/футер собираются на текстовом логотипе.
+- **Контраст:** в M4.1 белый текст CTA даёт 5.62:1 на красной заливке, при наведении — 7.23:1.
+- **Айдентика:** в шапке и футере используется текстовый логотип TIBON с красным акцентом.
 - **Фото:** главная использует временные иллюстрации Unsplash. Для публикации фото самой студии нужны материалы с подтверждёнными правами.
 - **SSR-инфраструктура:** production SSR проверен локально; Node-контейнер в Docker deployment не проверен, Docker на машине не установлен.
 - Перенумерация подтверждена: M2 — дизайн-система, каркас проекта — M3.
@@ -79,4 +81,5 @@ Last updated: 2026-11-20
 | M2 | Design system, component specification, SEO/rendering decision (docs only) | done |
 | M3 | Frontend scaffold, SSR, shared UI foundations, token implementation, tests | done |
 | M4 | Homepage design, content and browser verification | done |
-| M5 | Next milestone | not started |
+| M4.1 | Dark Culinary Redesign and responsive verification | done |
+| M5 | Internal pages | awaiting explicit approval |

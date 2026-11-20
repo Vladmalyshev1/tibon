@@ -37,7 +37,7 @@ export function MobileMenu({ items, onClose }: MobileMenuProps) {
       <motion.div
         className="mobile-menu-content"
         variants={mobileMenuMotion}
-        initial="hidden"
+        initial={reducedMotion ? false : "hidden"}
         animate="visible"
         transition={reducedMotion ? { duration: 0 } : undefined}
       >

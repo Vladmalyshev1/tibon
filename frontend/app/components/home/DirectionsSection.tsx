@@ -12,7 +12,9 @@ export function DirectionsSection() {
           {directions.map((direction, index) => (
             <Reveal key={direction.title} delay={index * 0.08} className={`direction-card direction-card-${direction.layout ?? "portrait"}`}>
               <Link to={direction.to} className="image-card-link">
-                <img src={direction.image.src} width={direction.image.width} height={direction.image.height} alt={direction.image.alt} loading="lazy" decoding="async" />
+                <div className="image-card-media">
+                  <img src={direction.image.src} width={direction.image.width} height={direction.image.height} alt={direction.image.alt} loading="lazy" decoding="async" />
+                </div>
                 <div className="image-card-content">
                   <h3 className="type-h3">{direction.title}</h3>
                   <p>{direction.description}</p>

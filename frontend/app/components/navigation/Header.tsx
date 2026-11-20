@@ -42,7 +42,7 @@ export function Header() {
             aria-controls="mobile-navigation-dialog"
             onClick={() => setMenuOpen(true)}
           >
-            <span aria-hidden="true">☰</span>
+            <span aria-hidden="true" />
           </button>
         </div>
       </header>

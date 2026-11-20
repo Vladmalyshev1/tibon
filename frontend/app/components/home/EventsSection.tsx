@@ -18,7 +18,9 @@ export function EventsSection() {
                 <div className="event-card-body">
                   <h3 className="type-h3">{event.title}</h3>
                   <p>{event.description}</p>
-                  <Link className="button-text" to={event.to} aria-label={`Открыть формат: ${event.title}`}>Открыть формат</Link>
+                  <Link className="button-text" to={event.to} aria-label={`Открыть формат: ${event.title}`}>
+                    Открыть формат <span aria-hidden="true">↗</span>
+                  </Link>
                 </div>
               </article>
             </Reveal>

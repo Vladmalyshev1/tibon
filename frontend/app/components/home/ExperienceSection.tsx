@@ -5,7 +5,7 @@ import { Reveal } from "./Reveal";
 export function ExperienceSection() {
   return (
     <section className="home-section experience-section" aria-labelledby="experience-title">
-      <div className="container-default">
+      <div className="container-default experience-layout">
         <Reveal><SectionHeading id="experience-title" title="Больше, чем рецепт" overline="Впечатление" /></Reveal>
         <div className="experience-grid">
           {experiences.map((item, index) => (
