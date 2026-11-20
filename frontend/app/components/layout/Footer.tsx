@@ -15,6 +15,7 @@ type FooterProps = {
     phone?: { label: string; href: string };
     email?: string;
     address?: string;
+    hours?: string;
   };
   socials?: { label: string; href: string }[];
 };
@@ -32,13 +33,14 @@ export function Footer({ contact, socials = [] }: FooterProps) {
             {footerLinks.map((item) => <li key={item.to}><Link to={item.to}>{item.label}</Link></li>)}
           </ul>
         </nav>
-        {contact && (contact.phone || contact.email || contact.address) || socials.length > 0 ? (
+        {contact || socials.length > 0 ? (
           <div className="footer-info">
-            {contact && (contact.phone || contact.email || contact.address) ? (
+            {contact ? (
               <address className="footer-contact">
                 {contact.phone ? <a href={contact.phone.href}>{contact.phone.label}</a> : null}
                 {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : null}
                 {contact.address ? <span>{contact.address}</span> : null}
+                {contact.hours ? <span>{contact.hours}</span> : null}
               </address>
             ) : null}
             {socials.length > 0 ? (

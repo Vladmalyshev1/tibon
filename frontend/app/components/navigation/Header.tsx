@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { DesktopNavigation, type NavigationItem } from "./DesktopNavigation";
 import { MobileMenu } from "./MobileMenu";
 import { ButtonLink } from "../ui/Button";
+import { requestAction, studioContact } from "../../data/business";
 
 const navigationItems: NavigationItem[] = [
   { label: "Главная", to: "/" },
@@ -32,7 +33,8 @@ export function Header() {
         <div className="header-inner container-default">
           <Link className="wordmark" to="/" aria-label="TIBON — главная">TIBON</Link>
           <DesktopNavigation items={navigationItems} />
-          <ButtonLink className="header-cta" to="/zayavka/" size="sm">Оставить заявку</ButtonLink>
+          <a className="header-phone" href={studioContact.phone.href}>{studioContact.phone.label}</a>
+          <ButtonLink className="header-cta" to={requestAction.to} size="sm">{requestAction.label}</ButtonLink>
           <button
             id="mobile-menu-trigger"
             className="menu-trigger icon-button"

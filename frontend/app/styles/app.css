@@ -1,6 +1,8 @@
 @import "@fontsource-variable/playfair-display/wght.css";
 @import "@fontsource-variable/inter/wght.css";
 @import "tailwindcss";
+@import "./pages.css";
+@import "./services.css";
 
 @theme static {
   --color-white: #FFFFFF;
@@ -175,7 +177,7 @@ a:hover { color: var(--color-accent-strong); }
 .section { padding-block: var(--spacing-space-8); }
 .section-alternate { background: var(--color-surface-alt); }
 .section-inverse { color: var(--color-text-inverse); background: var(--color-surface-inverse); }
-.page-placeholder, .error-page { min-height: 55vh; align-content: center; }
+.error-page { min-height: 55vh; align-content: center; }
 
 .site-header { position: sticky; z-index: var(--z-header); top: 0; min-height: 4rem; border-bottom: var(--border-w) solid var(--color-border); background: var(--color-surface); }
 .site-header.is-scrolled { box-shadow: var(--shadow-sm); }
@@ -252,7 +254,7 @@ a.wordmark:hover { color: var(--color-text); }
 .mobile-menu .button-primary { margin-top: auto; }
 
 .breadcrumbs ol { display: flex; flex-wrap: wrap; gap: var(--spacing-space-2); margin: 0; padding: var(--spacing-space-3) 0; color: var(--color-text-muted); list-style: none; font-size: var(--text-caption); }
-.breadcrumbs li { display: inline-flex; gap: var(--spacing-space-2); }
+.breadcrumbs li { display: inline-flex; min-width: 0; align-items: center; gap: var(--spacing-space-2); overflow-wrap: anywhere; }
 .breadcrumbs [aria-current="page"] { color: var(--color-text); }
 .breadcrumbs a { display: inline-flex; min-height: var(--tap-min); align-items: center; }
 .badge { display: inline-flex; min-height: 1.5rem; align-items: center; border-radius: var(--radius-pill); padding-inline: var(--spacing-space-2); font-size: var(--text-micro); font-weight: 500; }

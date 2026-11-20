@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { mobileMenuMotion } from "../../lib/animations";
 import { ButtonLink } from "../ui/Button";
+import { requestAction, studioContact } from "../../data/business";
 import type { NavigationItem } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
@@ -46,7 +47,10 @@ export function MobileMenu({ items, onClose }: MobileMenuProps) {
           <button className="icon-button" type="button" aria-label="Закрыть меню" onClick={onClose}>×</button>
         </div>
         <MobileNavigation items={items} onNavigate={onClose} />
-        <ButtonLink to="/zayavka/" size="lg" onClick={onClose}>Оставить заявку</ButtonLink>
+        <div className="mobile-menu-actions">
+          <a className="header-phone" href={studioContact.phone.href}>Позвонить · {studioContact.phone.label}</a>
+          <ButtonLink to={requestAction.to} size="lg" onClick={onClose}>{requestAction.label}</ButtonLink>
+        </div>
       </motion.div>
     </dialog>
   );

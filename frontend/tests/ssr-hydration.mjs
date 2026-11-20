@@ -47,15 +47,18 @@ try {
   assert.match(homeHtml, /rel="canonical" href="https:\/\/tibon\.example\/"/);
   assert.match(homeHtml, /property="og:image" content="https:\/\/tibon\.example\/images\/home\/preparation\.webp"/);
 
+  const servicePages = {
+    "/dlya-vzroslyh/": /от 3\s300\s₽ за человека/,
+    "/dlya-vzroslyh/korporativ/": /от 3\s300\s₽ за человека/,
+    "/dlya-vzroslyh/den-rozhdeniya/": /от 3\s300\s₽ за человека/,
+    "/dlya-vzroslyh/romanticheskiy-uzhin/": /от 18\s000\s₽/,
+    "/dlya-detey/": /от 2\s200\s₽ за ребёнка/,
+    "/arenda/": /6\s000\s₽ в час/,
+    "/menu/": /4\s900\s₽ за человека/,
+    "/dop-uslugi/": /от 10\s000\s₽ в час/,
+  };
   const publicPaths = [
-    "/dlya-vzroslyh/",
-    "/dlya-vzroslyh/korporativ/",
-    "/dlya-vzroslyh/den-rozhdeniya/",
-    "/dlya-vzroslyh/romanticheskiy-uzhin/",
-    "/dlya-detey/",
-    "/arenda/",
-    "/menu/",
-    "/dop-uslugi/",
+    ...Object.keys(servicePages),
     "/galereya/",
     "/o-studii/",
     "/contact/",
@@ -69,10 +72,35 @@ try {
     const html = await response.text();
     assert.equal(response.status, 200, `${path} should return HTTP 200`);
     assert.match(html, /<title>.+ — TIBON<\/title>/, `${path} should return route metadata`);
-    assert.match(html, /name="robots" content="noindex, nofollow"/, `${path} is scaffold content`);
+    assert.match(html, /name="description" content="[^"]+"/, `${path} should have a description`);
+    if (servicePages[path]) {
+      assert.match(html, servicePages[path], `${path} should render a sourced price in SSR`);
+      assert.ok(html.includes(`rel="canonical" href="https://tibon.example${path}"`));
+      assert.doesNotMatch(html, /name="robots" content="noindex/);
+      assert.doesNotMatch(html, /Структурная заготовка/);
+      assert.match(html, /href="\/zayavka\/"[^>]*>Оставить заявку/);
+    } else {
+      assert.match(html, /name="robots" content="noindex, nofollow"/, `${path} is scaffold content`);
+      assert.doesNotMatch(html, /rel="canonical"/, `${path} should not invent a canonical URL`);
+    }
+    assert.match(html, /href="tel:\+73412576990">57-69-90<\/a>/);
     assert.match(html, /TIBON — главная/, `${path} should SSR the header`);
     assert.match(html, /Навигация в подвале/, `${path} should SSR the footer`);
+    if (path !== "/zayavka/") {
+      assert.match(html, /aria-label="Навигационная цепочка"/, `${path} should SSR breadcrumbs`);
+      assert.match(html, /<span aria-current="page">/, `${path} should mark the last crumb`);
+    }
+    if (path.startsWith("/dlya-vzroslyh/") && path !== "/dlya-vzroslyh/") {
+      assert.match(html, /<a href="\/dlya-vzroslyh\/"[^>]*>Для взрослых<\/a>/, `${path} should link to its parent`);
+    }
   }
+  const kidsMenuResponse = await fetch(`${baseUrl}/menu/?type=kids`);
+  const kidsMenuHtml = await kidsMenuResponse.text();
+  assert.equal(kidsMenuResponse.status, 200);
+  assert.match(kidsMenuHtml, /<h2[^>]*>Детское меню<\/h2>/);
+  assert.match(kidsMenuHtml, /2\s200\s₽ за человека/);
+  assert.doesNotMatch(kidsMenuHtml, /Меню № 4/);
+  assert.match(kidsMenuHtml, /rel="canonical" href="https:\/\/tibon\.example\/menu\/"/);
 
   const missingResponse = await fetch(`${baseUrl}/unknown-m3-route/`);
   const missingHtml = await missingResponse.text();
@@ -100,6 +128,8 @@ try {
     for (const href of links) {
       if (href.startsWith("#")) {
         assert.equal(await page.locator(href).count(), 1);
+      } else if (href.startsWith("tel:")) {
+        assert.equal(href, "tel:+73412576990");
       } else {
         assert.equal((await fetch(new URL(href, baseUrl))).status, 200, href);
       }
@@ -148,15 +178,32 @@ try {
     const menu = page.getByRole("dialog", { name: "Мобильная навигация" });
     await menu.waitFor({ state: "visible" });
     await menu.getByRole("link", { name: "Для взрослых" }).click();
-    await page.getByRole("heading", { level: 1, name: "Для взрослых" }).waitFor();
+    await page.getByRole("heading", { level: 1, name: "Кулинарные мастер-классы для взрослых" }).waitFor();
     assert.equal(new URL(page.url()).pathname, "/dlya-vzroslyh/");
 
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.locator('.desktop-navigation a[aria-current="page"]').waitFor();
     assert.equal(await page.locator('.desktop-navigation a[aria-current="page"]').getAttribute("href"), "/dlya-vzroslyh/");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth === document.documentElement.clientWidth), true);
+
+    await page.goto(`${baseUrl}/dlya-vzroslyh/den-rozhdeniya/`, { waitUntil: "networkidle" });
+    const breadcrumbs = page.getByRole("navigation", { name: "Навигационная цепочка" });
+    assert.equal(await breadcrumbs.locator('[aria-current="page"]').innerText(), "День рождения");
+    await breadcrumbs.getByRole("link", { name: "Для взрослых" }).click();
+    await page.getByRole("heading", { level: 1, name: "Кулинарные мастер-классы для взрослых" }).waitFor();
+    assert.equal(new URL(page.url()).pathname, "/dlya-vzroslyh/");
+
+    await page.goto(`${baseUrl}/menu/`, { waitUntil: "networkidle" });
+    const menuTypes = page.getByRole("navigation", { name: "Тип меню" });
+    await menuTypes.getByRole("link", { name: "Детское" }).click();
+    await page.getByRole("heading", { name: "Детское меню", level: 2 }).waitFor();
+    assert.equal(new URL(page.url()).searchParams.get("type"), "kids");
+    assert.equal(await menuTypes.getByRole("link", { name: "Детское" }).getAttribute("aria-current"), "page");
+    await page.goBack();
+    await page.getByRole("heading", { name: "Взрослое меню", level: 2 }).waitFor();
+
     assert.deepEqual(pageErrors, []);
-    console.log("Chromium: 8 widths, image decoding, links, request CTA, keyboard gallery, fonts, mobile navigation and console pass.");
+    console.log("Chromium: 8 widths, images, links, request CTA, keyboard gallery, fonts, mobile navigation, breadcrumbs and console pass.");
   } finally {
     await browser.close();
   }

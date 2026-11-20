@@ -12,6 +12,12 @@ Last updated: 2026-11-20
 
 **M4.1 — Dark Culinary Redesign: complete.** Dark theme and responsive layouts are applied to all nine homepage sections and shared public UI. TypeScript, ESLint, six Vitest tests, production build, SSR and Chromium checks passed. See [homepage implementation](HOME_PAGE_IMPLEMENTATION.md) for verification and screenshots.
 
+**M5.1 — Internal page foundation: complete.** Reusable internal page compositions and breadcrumbs are ready for approved content. Existing scaffold routes use the text-only hero. The homepage and internal gallery share a lightbox. See [component contracts](COMPONENT_SPECIFICATION.md#основа-внутренних-страниц-m51).
+
+M5.1 verification includes 14 Vitest tests, TypeScript, ESLint, a production SSR smoke test for all registered public URLs and 404, and Chromium checks of both internal page layouts at 360, 390, 768, 1024, 1440 and 1920 px.
+
+**M5.2 — Services and events pages: complete.** Eight public routes render sourced Russian-language content and page-specific metadata. Menus are available in HTML and as linked PDFs. TypeScript, ESLint, 14 Vitest tests and production SSR passed. Playwright MCP verified all eight pages at 360, 390, 768, 1024, 1440 and 1920 px. See [business data sources](BUSINESS_DATA_SOURCES.md).
+
 ## Environment
 
 | Tool | Status |
@@ -25,7 +31,7 @@ Last updated: 2026-11-20
 
 ## Repository state
 
-- Branch `master`. M4.1 changes are in the working copy.
+- Branch `master`. M4.1 is on the remote. M5.1 and M5.2 changes are in the working copy.
 - Existing project content includes `AGENTS.md`, `opencode.jsonc`, `.opencode/`, `docs/`, `infra/`, and the root Playwright dev dependency.
 - `frontend/` now contains the independent React application and lockfile; `backend/` is not created in M3.
 
@@ -52,7 +58,7 @@ Last updated: 2026-11-20
 
 ### Open questions from M1
 
-- Цены, акции, телефон, email, мессенджеры, адрес, часы, реквизиты, вместимость, оборудование, возрастные правила — не подтверждены (полный список: `REFERENCE_AUDIT.md` §10).
+- Основной телефон, адрес, часы и опубликованные базовые цены зафиксированы в [источниках M5.2](BUSINESS_DATA_SOURCES.md). Акции, вместимость, оборудование и часть возрастных условий требуют уточнения.
 - Юридические тексты (политика ПД, оферта, согласие) — нужен источник от заказчика.
 - Канал уведомлений о заявках (email / Telegram / CRM) и SLA ответа.
 
@@ -70,7 +76,7 @@ Last updated: 2026-11-20
 - Docker is unavailable: Docker Compose / Nginx deployment cannot be verified until it is installed. The later deployment must include the Node SSR service.
 - Python `python`/`pip` on PATH are broken; use `py -m pip` when backend work begins.
 - Placeholder pages remain `noindex`; replace with approved content and page-specific SEO metadata before launch.
-- Confirm the public domain and set `PUBLIC_SITE_ORIGIN` for the homepage canonical and absolute Open Graph URLs. Request submission is pending backend integration.
+- Confirm the public domain and set `PUBLIC_SITE_ORIGIN` for canonical and absolute Open Graph URLs. Online request submission is pending backend integration. The request route displays the studio phone.
 
 ## Milestones
 
@@ -82,4 +88,6 @@ Last updated: 2026-11-20
 | M3 | Frontend scaffold, SSR, shared UI foundations, token implementation, tests | done |
 | M4 | Homepage design, content and browser verification | done |
 | M4.1 | Dark Culinary Redesign and responsive verification | done |
-| M5 | Internal pages | awaiting explicit approval |
+| M5.1 | Internal page foundations | done |
+| M5.2 | Services, event pages and menu | done |
+| M5.3 | Remaining internal pages | awaiting explicit approval |
