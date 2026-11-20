@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ButtonLink } from "../ui/Button";
 import { GalleryLightbox } from "../ui/GalleryLightbox";
 import { PhotoTile } from "../ui/PhotoTile";
 import { SectionHeading } from "../ui/SectionHeading";
@@ -19,7 +18,6 @@ export function GallerySection() {
             </Reveal>
           ))}
         </div>
-        <Reveal className="gallery-link"><ButtonLink to="/galereya/" variant="secondary">Вся галерея</ButtonLink></Reveal>
       </div>
       <GalleryLightbox images={galleryImages} index={index} onIndexChange={setIndex} />
     </section>

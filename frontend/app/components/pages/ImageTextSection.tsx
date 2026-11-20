@@ -10,16 +10,17 @@ type ImageTextSectionProps = {
   image: Photo;
   caption?: string;
   imageSide?: "left" | "right";
+  className?: string;
   children: ReactNode;
 };
 
 export function ImageTextSection({
-  title, overline, image, caption, imageSide = "left", children,
+  title, overline, image, caption, imageSide = "left", className, children,
 }: ImageTextSectionProps) {
   const headingId = useId();
 
   return (
-    <Section className="page-section" aria-labelledby={headingId}>
+    <Section className={className ? `page-section ${className}` : "page-section"} aria-labelledby={headingId}>
       <Container className={`image-text-layout image-text-${imageSide}`}>
         <div className="image-text-copy">
           <SectionHeading id={headingId} title={title} overline={overline} />

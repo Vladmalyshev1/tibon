@@ -1,6 +1,6 @@
 # TIBON — Project Status
 
-Last updated: 2026-11-20
+Last updated: 2026-11-21
 
 ## Current milestone
 
@@ -29,6 +29,12 @@ Ruff, the backend wheel build and 37 Pytest checks passed, including the migrati
 **M6.2 — Lead Submission API + Frontend Integration: complete.** The request form submits to FastAPI and confirms only a committed lead. PostgreSQL enforces one row per submission key. The form blocks duplicate clicks, preserves the draft on error, and reuses the key for unchanged retries. See the [lead API contract](API.md#m62--lead-submission).
 
 Ruff, the backend wheel build, 48 Pytest checks, frontend ESLint, TypeScript, 29 Vitest checks, the production build and the SSR/Chromium smoke test passed. Alembic upgraded a local PostgreSQL 18.3 instance to `0002_lead_idempotency` and detected no schema drift. Playwright verified form layout at 360, 390, 768 and 1440 px and retried a draft after a real API outage. The retry returned `201`, the page displayed and focused the success message, and a direct PostgreSQL query confirmed exactly one committed row.
+
+**Public-site design and content update — complete.** The home hero and sharing metadata feature Renat Ismagilov. The shared header, mobile navigation and footer use the studio logo. The services page adds «Друзья» and Alexander Podkin, the contacts page links to MAX, and the footer displays the proprietor details. The standalone gallery URL now returns HTTP 404 and is excluded from navigation and the sitemap. Embedded photo collections still open in their lightboxes.
+
+Studio assets in `frontend/public/images/studio/` came from the files supplied for this update. The web copy of `logo.png` trims transparent padding and is displayed on white for contrast. `Renat.jpg` supplies 540 px and 960 px JPEG variants without changing the source composition. `druzya.jpg` and `podkin.jpg` are unchanged copies. The MAX icon is the colored mark from the [official MAX brandbook](https://go.max.ru/brandbook).
+
+TypeScript, ESLint, 29 Vitest checks, the production build and SSR/Chromium passed on this branch. Playwright MCP verified the home, services and both contact URLs at 320, 390, 768, 1024, 1440 and 1920 px, including image decoding, 19 local links, mobile-menu keyboard handling, the gallery 404 and the external MAX profile.
 
 ## Environment
 
@@ -79,8 +85,8 @@ Ruff, the backend wheel build, 48 Pytest checks, frontend ESLint, TypeScript, 29
 
 - **Шрифты:** M3 использует локальные variable-пакеты Playfair Display и Inter с SIL Open Font License. Кириллические glyph-файлы присутствуют и загружаются в браузере; визуальное решение по реальным финальным H1/H2 остаётся на проверку при создании страниц.
 - **Контраст:** в M4.1 белый текст CTA даёт 5.62:1 на красной заливке, при наведении — 7.23:1.
-- **Айдентика:** в шапке и футере используется текстовый логотип TIBON с красным акцентом.
-- **Фото:** главная использует временные иллюстрации Unsplash. Для публикации фото самой студии нужны материалы с подтверждёнными правами.
+- **Айдентика:** в шапке, мобильном меню и футере используется предоставленный студией логотип.
+- **Фото:** первый экран использует портрет основателя. Существующие иллюстрации Unsplash используются в других секциях главной.
 - **SSR-инфраструктура:** production SSR проверен локально; Node-контейнер в Docker deployment не проверен, Docker на машине не установлен.
 - Перенумерация подтверждена: M2 — дизайн-система, каркас проекта — M3.
 
@@ -88,7 +94,7 @@ Ruff, the backend wheel build, 48 Pytest checks, frontend ESLint, TypeScript, 29
 
 - Docker is unavailable on the verification host. The local Compose PostgreSQL service still needs a container startup check. The later deployment must include the Node SSR service.
 - The studio profile and privacy policy remain `noindex` until approved content is available. The request route also uses `noindex`.
-- Set `PUBLIC_SITE_ORIGIN` only after confirming the publication domain. Without it, `robots.txt` blocks crawling and `sitemap.xml` returns 404. With it, the sitemap contains 12 canonical content pages. The contact alias, request route and unfinished pages are excluded.
+- Set `PUBLIC_SITE_ORIGIN` only after confirming the publication domain. Without it, `robots.txt` blocks crawling and `sitemap.xml` returns 404. With it, the sitemap contains 11 canonical content pages. The retired gallery URL, contact alias, request route and unfinished pages are excluded.
 - Public release of lead submission still needs the approved privacy policy. The request page offers the studio phone as a fallback.
 - Lead throttling runs per API process and resets on restart. Idempotency remains enforced in PostgreSQL across processes.
 

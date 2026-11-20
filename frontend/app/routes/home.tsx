@@ -6,8 +6,8 @@ import { ExperienceSection } from "../components/home/ExperienceSection";
 import { FinalCtaSection } from "../components/home/FinalCtaSection";
 import { GallerySection } from "../components/home/GallerySection";
 import { HeroSection } from "../components/home/HeroSection";
+import { founderImage, homeHeading } from "../data/home";
 import { PopularOffersSection } from "../components/home/PopularOffersSection";
-import { homeImages } from "../data/home";
 import type { Route } from "./+types/home";
 
 export function loader() {
@@ -18,8 +18,8 @@ export function loader() {
 }
 
 export function meta({ data }: Route.MetaArgs) {
-  const title = "TIBON — кулинарная студия";
-  const description = "Кулинарная студия TIBON: совместное приготовление, события для взрослых и детей и гастрономические впечатления.";
+  const title = `${homeHeading} — TIBON`;
+  const description = "Кулинарные мастер-классы для взрослых и детей, частные праздники и корпоративы в студии Рената Исмагилова.";
   const canonical = data?.origin ? new URL("/", data.origin).href : null;
   return [
     { title },
@@ -31,8 +31,8 @@ export function meta({ data }: Route.MetaArgs) {
     ...(canonical ? [
       { tagName: "link" as const, rel: "canonical", href: canonical },
       { property: "og:url", content: canonical },
-      { property: "og:image", content: new URL(homeImages.hero.src, canonical).href },
-      { property: "og:image:alt", content: homeImages.hero.alt },
+      { property: "og:image", content: new URL(founderImage.src, canonical).href },
+      { property: "og:image:alt", content: founderImage.alt },
     ] : []),
   ];
 }

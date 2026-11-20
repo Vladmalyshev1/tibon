@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { DesktopNavigation, type NavigationItem } from "./DesktopNavigation";
 import { MobileMenu } from "./MobileMenu";
-import { ButtonLink } from "../ui/Button";
-import { requestAction, studioContact } from "../../data/business";
+import { BrandMark } from "../ui/BrandMark";
+import { studioContact } from "../../data/business";
 
 const navigationItems: NavigationItem[] = [
   { label: "Главная", to: "/" },
@@ -12,7 +12,6 @@ const navigationItems: NavigationItem[] = [
   { label: "Аренда", to: "/arenda/" },
   { label: "Меню", to: "/menu/" },
   { label: "Услуги", to: "/dop-uslugi/" },
-  { label: "Галерея", to: "/galereya/" },
   { label: "Контакты", to: "/contact/" },
 ];
 
@@ -32,10 +31,9 @@ export function Header() {
       <a className="skip-link" href="#main-content">К содержанию</a>
       <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
         <div className="header-inner container-default">
-          <Link className="wordmark" to="/" aria-label="TIBON — главная">TIBON</Link>
+          <Link className="brand-mark" to="/" aria-label="TIBON — главная"><BrandMark /></Link>
           <DesktopNavigation items={navigationItems} />
           <a className="header-phone" href={studioContact.phone.href}>{studioContact.phone.label}</a>
-          <ButtonLink className="header-cta" to={requestAction.to} size="sm">{requestAction.label}</ButtonLink>
           <button
             id="mobile-menu-trigger"
             className="menu-trigger icon-button"

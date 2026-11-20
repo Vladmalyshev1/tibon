@@ -106,3 +106,12 @@ export const galleryImages = [
   homeImages.pasta,
   homeImages.studio,
 ];
+export const homeHeading = "Кулинарная студия Рената Исмагилова";
+export const founderImage = {
+  src: "/images/studio/renat.jpg",
+  srcSet: "/images/studio/renat-small.jpg 540w, /images/studio/renat.jpg 960w",
+  sizes: "(min-width: 84rem) 39rem, (min-width: 48rem) 50vw, 100vw",
+  alt: "Ренат Исмагилов, основатель кулинарной студии TIBON",
+  width: 960,
+  height: 1708,
+};

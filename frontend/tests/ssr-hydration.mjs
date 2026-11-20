@@ -39,13 +39,13 @@ try {
   const homeResponse = await fetch(`${baseUrl}/`);
   const homeHtml = await homeResponse.text();
   assert.equal(homeResponse.status, 200);
-  assert.match(homeHtml, /<title>TIBON — кулинарная студия<\/title>/);
+  assert.match(homeHtml, /<title>Кулинарная студия Рената Исмагилова — TIBON<\/title>/);
   assert.match(homeHtml, /TIBON — главная/);
   assert.match(homeHtml, /Навигация в подвале/);
   assert.match(homeHtml, /type="module"/);
-  assert.match(homeHtml, /<h1[^>]*>Готовить вместе — это событие<\/h1>/);
+  assert.match(homeHtml, /<h1[^>]*>Кулинарная студия Рената Исмагилова<\/h1>/);
   assert.match(homeHtml, /rel="canonical" href="https:\/\/tibon\.example\/"/);
-  assert.match(homeHtml, /property="og:image" content="https:\/\/tibon\.example\/images\/home\/preparation\.webp"/);
+  assert.match(homeHtml, /property="og:image" content="https:\/\/tibon\.example\/images\/studio\/renat\.jpg"/);
 
   const servicePages = {
     "/dlya-vzroslyh/": /от 3\s300\s₽ за человека/,
@@ -59,7 +59,6 @@ try {
   };
   const publicPaths = [
     ...Object.keys(servicePages),
-    "/galereya/",
     "/o-studii/",
     "/contact/",
     "/kontakty/",
@@ -68,7 +67,6 @@ try {
     "/politika-konfidencialnosti/",
   ];
   const informationPages = {
-    "/galereya/": ["/galereya/", /Иллюстративная подборка/],
     "/contact/": ["/contact/", /Карта проезда/],
     "/kontakty/": ["/contact/", /Карта проезда/],
     "/pravila/": ["/pravila/", /При отмене за 10 дней/],
@@ -102,6 +100,8 @@ try {
     assert.match(html, /href="tel:\+73412576990">57-69-90<\/a>/);
     assert.match(html, /TIBON — главная/, `${path} should SSR the header`);
     assert.match(html, /Навигация в подвале/, `${path} should SSR the footer`);
+    assert.match(html, /ОГРНИП: 325180000086978/);
+    assert.doesNotMatch(html, /href="\/galereya/);
     if (path !== "/zayavka/") {
       assert.match(html, /aria-label="Навигационная цепочка"/, `${path} should SSR breadcrumbs`);
       assert.match(html, /<span aria-current="page">/, `${path} should mark the last crumb`);
@@ -116,8 +116,7 @@ try {
   const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200);
   const sitemapXml = await sitemapResponse.text();
-  assert.match(sitemapXml, /<loc>https:\/\/tibon\.example\/galereya\/<\/loc>/);
-  assert.doesNotMatch(sitemapXml, /\/(kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
+  assert.doesNotMatch(sitemapXml, /\/(galereya|kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
   const kidsMenuResponse = await fetch(`${baseUrl}/menu/?type=kids`);
   const kidsMenuHtml = await kidsMenuResponse.text();
   assert.equal(kidsMenuResponse.status, 200);
@@ -126,10 +125,11 @@ try {
   assert.doesNotMatch(kidsMenuHtml, /Меню № 4/);
   assert.match(kidsMenuHtml, /rel="canonical" href="https:\/\/tibon\.example\/menu\/"/);
 
-  const missingResponse = await fetch(`${baseUrl}/unknown-m3-route/`);
-  const missingHtml = await missingResponse.text();
-  assert.equal(missingResponse.status, 404);
-  assert.match(missingHtml, /Страница не найдена/);
+  for (const path of ["/unknown-m3-route/", "/galereya/", "/galereya/?category=cooking"]) {
+    const missingResponse = await fetch(new URL(path, baseUrl));
+    assert.equal(missingResponse.status, 404, path);
+    assert.match(await missingResponse.text(), /Страница не найдена/);
+  }
   console.log("SSR: home and public route return HTML; unknown route returns 404.");
 
   const browser = await chromium.launch({ headless: true });
@@ -138,7 +138,7 @@ try {
     const pageErrors = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.goto(baseUrl, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { name: "Готовить вместе — это событие" }).waitFor();
+    await page.getByRole("heading", { name: "Кулинарная студия Рената Исмагилова" }).waitFor();
     assert.equal(await page.locator("main > section").count(), 9);
     assert.equal(await page.locator("h1").count(), 1);
     await page.locator(".hero-actions").getByRole("link", { name: "Смотреть направления" }).click();
@@ -184,7 +184,7 @@ try {
     await page.locator(".final-cta").getByRole("link", { name: "Оставить заявку" }).click();
     await page.getByRole("button", { name: "Отправить заявку" }).waitFor();
     await page.getByRole("link", { name: "Вернуться на главную" }).click();
-    await page.getByRole("heading", { level: 1, name: "Готовить вместе — это событие" }).waitFor();
+    await page.getByRole("heading", { level: 1, name: "Кулинарная студия Рената Исмагилова" }).waitFor();
     await page.setViewportSize({ width: 390, height: 844 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth === document.documentElement.clientWidth), true);
 
@@ -201,6 +201,7 @@ try {
     await page.getByRole("button", { name: "Открыть меню" }).click();
     const menu = page.getByRole("dialog", { name: "Мобильная навигация" });
     await menu.waitFor({ state: "visible" });
+    assert.equal(await menu.getByRole("link", { name: "Оставить заявку" }).count(), 0);
     await menu.getByRole("link", { name: "Для взрослых" }).click();
     await page.getByRole("heading", { level: 1, name: "Кулинарные мастер-классы для взрослых" }).waitFor();
     assert.equal(new URL(page.url()).pathname, "/dlya-vzroslyh/");

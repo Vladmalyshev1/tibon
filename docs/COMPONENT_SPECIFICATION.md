@@ -30,7 +30,7 @@
 
 | # | Компонент | Назначение | Источник | Варианты |
 | --- | --- | --- | --- | --- |
-| N1 | `Header` | Сквозная шапка: лого, навигация, телефон, CTA | CMS (`SiteSettings`) | default / scrolled / menu-open |
+| N1 | `Header` | Сквозная шапка с логотипом, навигацией и телефоном | CMS (`SiteSettings`) | default / scrolled / menu-open |
 | N2 | `DesktopNav` | Основная навигация ≥ 1024 | CMS (структура меню) | пункт / пункт с dropdown / активный |
 | N3 | `MobileNav` | Полноэкранный sheet < 1024 | CMS | default / открыт / подсписок раскрыт |
 | N4 | `Footer` | 4 колонки: форматы, услуги, студия, контакты + реквизиты | CMS | default |
@@ -100,8 +100,7 @@
 | `/dlya-detey/` | N1, N4, N5 | 1 C7 + 4 `Badge` + B1; 2 2–3 карточки программ (`ServiceCard`-подобные, вариант `plain`); 3 timeline; 4 `SectionHeading` + 3–4 × C6 (безопасность); 5 C7; 6 4–6 × C3; 7 `Accordion`; 8 `LeadForm` (`type=kids`); 9 перелинковка `ButtonText` × 3 |
 | `/arenda/` | N1, N4, N5 | 1 C7 + B1; 2 3 × C2; 3 таблица характеристик → на мобиле `FeatureBlock`; 4 2 × C4; 5 список условий; 6 6–8 × C3; 7 `Accordion`; 8 `LeadForm` (`type=rental`) |
 | `/menu/` | N1, N4, N5 | 1 C8 + B1 + B2; 2 `Tabs` (взрослое/детское); 3 `Tabs`-chips категорий; 4 сетка C5; 5 текст-формула + `ButtonText`; 6 2 × B3 (PDF); 7 тёмная полоса + `LeadForm` короткая |
-| `/dop-uslugi/` | N1, N4, N5 | 1 C7 + B1; 2 сетка C2 (2–3 колонки); 3 3 × C6; 4 список условий; 5 `Accordion`; 6 `LeadForm` (`type=service`) |
-| `/galereya/` | N1, N4, N5 | 1 C8; 2 `Tabs`-фильтры (URL-состояние); 3 mosaic C3 + `Modal`-lightbox; 4 тёмная полоса + B1 |
+| `/dop-uslugi/` | N1, N4, N5 | `ServiceHero`, редакционная секция «Друзья», `ImageTextSection` о ведущем, список дополнительных услуг и `PageCTA` |
 | `/o-studii/` | N1, N4, N5 | 1 C7 + C8; 2 2–3 абзаца (`container-narrow`); 3 3–4 портрета C3 + подпись; 4 3–4 × C3 + B4; 5 3–4 × C6; 6 3 показателя (`FeatureBlock` large); 7 тёмная полоса + B1 |
 | `/kontakty/` | N1, N4, N5 | 1 C8 + B1 (`tel:`) + B2; 2 4 карточки контактов (`FeatureBlock` icon); 3 адрес + карта + B3 «Маршрут»; 4 `LeadForm` (`type=callback`); 5 реквизиты `text-caption` |
 | `/pravila/` | N1, N4, N5 | 1 C8 + дата редакции; 2 TOC (desktop — sticky-список, mobile — `Accordion`); 3–7 разделы `container-narrow` с якорями; 8 контакты + `ButtonText` |
@@ -118,8 +117,8 @@
 
 | Компонент | Вариант на главной |
 | --- | --- |
-| N1–N3 Header и навигация | Тёмная липкая шапка, текстовый логотип, красный CTA на десктопе. До 1024 px меню открывается в полноэкранном диалоге. Активный маршрут имеет `aria-current`. Esc закрывает меню и возвращает фокус. |
-| N4 Footer | Бренд и разделы сайта, правовые ссылки и копирайт в нижней строке. Контактные данные и соцсети выводятся при наличии. |
+| N1–N3 Header и навигация | Тёмная липкая шапка с `BrandMark`. До 1024 px меню открывается в полноэкранном диалоге. Активный маршрут имеет `aria-current`. Esc закрывает меню и возвращает фокус. |
+| N4 Footer | `BrandMark`, разделы сайта, правовые ссылки, копирайт и реквизиты ИП. Контактные данные и соцсети выводятся при наличии. |
 | B1–B5 Button и IconButton | Красная заливка Primary, нейтральная рамка Secondary, светло-красный Outline. Общий видимый контур фокуса. |
 | C1 Карточки главной | Для направлений доступна вся площадь карточки. В карточках событий и предложений действие обозначает текстовая ссылка. У предложений фото квадратное, расположено сбоку. |
 | C3 GalleryItem | Кнопка на весь кадр с видимым знаком «+» и названием для ассистивных технологий. Наведение или фокус меняют заливку знака. |
@@ -212,7 +211,7 @@
 | U1 Modal | open, closing, scroll-locked, focus-trap, loading (внутри) | вложенная модалка; модалка без закрытия по Esc |
 | U2 Accordion | collapsed, expanded, focus, disabled | autoplay-раскрытие |
 | U3 Badge | 6 цветовых вариантов | больше 2 слов, перенос строки |
-| U4 Tabs | active, inactive, hover, focus, scrollable | табы без URL-состояния на `/menu/` и `/galereya/` |
+| U4 Tabs | active, inactive, hover, focus, scrollable | переиспользуемый компонент переключения вкладок |
 | U5 LoadingState | skeleton, spinner, inline-button | спиннер на всю страницу вместо skeleton |
 | U6 EmptyState | with-action, без действия | пустой блок без текста |
 | U7 ErrorState | retry, без retry | ошибка без альтернативы (телефон/повтор) |

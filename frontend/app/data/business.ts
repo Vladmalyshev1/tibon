@@ -10,6 +10,7 @@ export const studioContact = {
   socials: [
     { label: "ВКонтакте", href: "https://vk.ru/ti_bon_studio" },
     { label: "Telegram", href: "https://t.me/Tibon25" },
+    { label: "MAX", href: "https://max.ru/u/f9LHodD0cOLGJIMXMm0xJ4xy0ylfANwtci4zF38HkXVIVETBq0J01j8tbc0", icon: "/images/studio/max.svg" },
   ],
 };
 
@@ -59,7 +60,7 @@ export const servicePages = {
   },
   extras: {
     path: "/dop-uslugi/", crumb: "Дополнительные услуги", title: "Дополнительные услуги для праздника",
-    description: "Дополните мастер-класс игрой, квизом или фотосъёмкой. Для праздника с детьми можно запросить аниматоров.",
+    description: "Организация праздников с ивент-компанией «Друзья», ведущий Александр Подкин, игры, квизы и фотосъёмка в кулинарной студии TIBON.",
   },
 };
 
@@ -97,7 +98,6 @@ export const rentalUses = [
 ];
 
 export const extraServices = [
-  { id: "host", title: "Ведущий", description: "Студия сотрудничает с ведущим Александром Подкиным." },
   { id: "mafia", title: "Мафия / Бункер", description: "Игры для компании.", price: { amount: 3500, from: true, unit: "час" } },
   { id: "quiz", title: "Квиз", description: "Командная викторина.", price: { amount: 10000, from: true, unit: "час" } },
   { id: "photo", title: "Фотограф", description: "Фотосъёмка мероприятия.", price: { amount: 4000, from: true, unit: "час" } },
@@ -119,6 +119,5 @@ export const studioRules = {
 
 export const informationPages = {
   contact: { path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы кулинарной студии TIBON. Карта проезда в село Первомайский." },
-  gallery: { path: "/galereya/", title: "Галерея", description: "Кулинарная фотоподборка TIBON о приготовлении блюд, сервировке и кухонном пространстве." },
   rules: { path: "/pravila/", title: "Правила студии", description: "Условия бронирования, переноса и посещения кулинарной студии TIBON." },
 };

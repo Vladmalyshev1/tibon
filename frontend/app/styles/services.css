@@ -72,7 +72,15 @@
 }
 .format-index h3 a span { color: var(--color-accent-strong); font: inherit; }
 .format-index p, .extras-list p { max-width: 60ch; margin: 0; color: var(--color-text-muted); }
-.extras-layout { display: grid; align-items: start; gap: var(--space-5); }
+.event-company-photo img, .extras-host .image-text-media img { display: block; width: 100%; height: auto; }
+.event-company-details { display: grid; gap: var(--space-6); }
+.event-company-details h3 { margin-bottom: var(--space-4); }
+.event-company-details p { margin: var(--space-4) 0 0; color: var(--color-text-muted); }
+.event-company-facts, .event-company-formats { margin: 0; padding: 0; list-style: none; }
+.event-company-facts li, .event-company-formats li { border-top: var(--border-w) solid var(--color-border-strong); padding-block: var(--space-3); }
+.event-company-facts strong { color: var(--color-accent-strong); }
+.extras-host .image-text-media { aspect-ratio: 1; }
+.extras-host .type-lead { margin: 0; }
 .extras-list li { scroll-margin-top: calc(4rem + var(--space-3)); }
 .extras-list .extras-price { color: var(--color-text); font-weight: 600; }
 .extras-list a { max-width: 100%; justify-self: start; }
@@ -106,7 +114,9 @@
 @media (min-width: 48rem) {
   .editorial-section .page-section-inner { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); }
   .editorial-ledger > div, .format-index li { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
-  .extras-layout { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--space-7); }
+  .event-company .page-section-inner { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: start; }
+  .event-company-photo { grid-area: 1 / 2 / span 2; }
+  .extras-host .image-text-layout { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); }
   .menu-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .service-page .adult-hero .page-hero-split { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); }
   .adult-hero .page-hero-split .page-hero-media { aspect-ratio: 1; }
@@ -122,6 +132,7 @@
 
 @media (min-width: 64rem) {
   .header-inner > .header-phone { margin-left: 0; }
+  .event-company-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .extras-list li { grid-template-columns: minmax(0, 1fr) auto; }
   .extras-list h3 { grid-column: 1 / -1; }
   .menu-categories { grid-template-columns: repeat(3, minmax(0, 1fr)); }

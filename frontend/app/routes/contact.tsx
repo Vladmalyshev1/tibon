@@ -17,7 +17,14 @@ export default function Contact() {
             <p>{studioContact.address}</p>
             <p>{studioContact.hours}</p>
             <ul className="official-links" role="list">
-              {studioContact.socials.map(({ label, href }) => <li key={href}><a href={href}>{label} <span aria-hidden="true">↗</span></a></li>)}
+              {studioContact.socials.map(({ label, href, icon }) => (
+                <li key={href}>
+                  <a href={href}>
+                    {icon ? <img src={icon} width={18} height={18} alt="" /> : null}
+                    {label} <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
             </ul>
             <a className="button-outline button-md" href={studioContact.mapUrl}>Открыть в Яндекс Картах</a>
           </address>
