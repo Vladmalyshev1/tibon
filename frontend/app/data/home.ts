@@ -119,8 +119,8 @@ export const founderImage = {
 };
 export const eventCompanyImage = {
   src: "/images/studio/druzya.webp",
-  srcSet: "/images/studio/druzya-small.webp 540w, /images/studio/druzya.webp 1086w",
-  sizes: "(min-width: 80rem) 30rem, (min-width: 48rem) 40vw, calc(100vw - 2rem)",
+  srcSet: "/images/studio/druzya-small.webp 480w, /images/studio/druzya.webp 1086w",
+  sizes: "(min-width: 82rem) 45rem, (min-width: 48rem) 55vw, calc(100vw - 2rem)",
   alt: "Участники мероприятия ивент-компании «Друзья» в студии TIBON",
   width: 1086,
   height: 1448,

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { AboutStudioSection } from "../components/home/AboutStudioSection";
 import { AdditionalServicesSection } from "../components/home/AdditionalServicesSection";
 import { DirectionsSection } from "../components/home/DirectionsSection";
@@ -8,7 +9,13 @@ import { GallerySection } from "../components/home/GallerySection";
 import { HeroSection } from "../components/home/HeroSection";
 import { founderImage, homeHeading } from "../data/home";
 import { PopularOffersSection } from "../components/home/PopularOffersSection";
+import { useEditorialReveal } from "../lib/useEditorialReveal";
 import type { Route } from "./+types/home";
+
+export const links: Route.LinksFunction = () => [
+  { rel: "preload", as: "image", href: "/images/studio/home-hero-slate-mobile.webp", media: "(width < 64rem)" },
+  { rel: "preload", as: "image", href: "/images/studio/home-hero-slate.webp", media: "(width >= 64rem)" },
+];
 
 export function loader() {
   const configuredUrl = process.env.PUBLIC_SITE_ORIGIN;
@@ -38,16 +45,19 @@ export function meta({ data }: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const main = useRef<HTMLElement>(null);
+  useEditorialReveal(main);
+
   return (
-    <main id="main-content" tabIndex={-1}>
+    <main id="main-content" className="editorial-home" tabIndex={-1} ref={main}>
       <HeroSection />
-      <DirectionsSection />
       <AboutStudioSection />
+      <DirectionsSection />
       <EventsSection />
-      <GallerySection />
       <ExperienceSection />
-      <PopularOffersSection />
+      <GallerySection />
       <AdditionalServicesSection />
+      <PopularOffersSection />
       <FinalCtaSection />
     </main>
   );

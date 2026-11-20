@@ -29,7 +29,7 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
           <Link to="/menu/#menu-options" aria-current={!isKids ? "page" : undefined}>Взрослое</Link>
           <Link to="/menu/?type=kids#menu-options" aria-current={isKids ? "page" : undefined}>Детское</Link>
         </nav>
-        <div className="menu-sets">
+        <div className="menu-sets" key={type}>
           {sets.map((set, index) => (
             <Accordion key={set.id} title={
               <span className="menu-set-label">

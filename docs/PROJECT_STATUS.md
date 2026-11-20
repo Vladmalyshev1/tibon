@@ -54,6 +54,12 @@ The separate taste-skill gate returned 35 findings in its second round. These in
 
 TypeScript, ESLint, 34 Vitest tests, the production build and SSR/Chromium passed. Playwright MCP checked 17 views at 390, 768, 1280 and 1920 px, including both menu selections, the contact alias and the retired gallery URL. The 68 runs found no horizontal overflow, clipped headings, broken images or hydration errors. The Yandex map rendered at all four widths.
 
+**Creative Redesign 2.0 — Dark Editorial Gastronomy.** The homepage uses a display headline over a two-photo editorial composition. Shared public pages use Playfair Display headings, Inter for interface text, and the brand's black, graphite and red palette. The menu and event index use dark surfaces. Native CSS handles entrances and interactive states, while a scoped observer triggers one-time Web Animations on selected photos and headings. The mobile menu continues to use Framer Motion. No additional runtime dependencies were required. See the [design system](DESIGN_SYSTEM.md) and [homepage implementation](HOME_PAGE_IMPLEMENTATION.md).
+
+TypeScript, ESLint, 34 Vitest tests, production build and SSR/Chromium passed. Playwright MCP checked 17 views at 320, 390, 768, 1024, 1440 and 1920 px. It exercised keyboard navigation, menu category and history changes, accordion controls, request validation, reduced motion and content without JavaScript. Screenshots are in `frontend/test-results/creative-redesign/`.
+
+The standalone taste-skill gate reported 34 findings in the production visual audit. Its fixed section heights, grid and markup conventions, copy heuristics and contact rules differ from this implementation. The full report is in `frontend/test-results/creative-redesign/taste-gate-final.log`. The homepage pairs the restored chef portrait with a dark slate photograph. The background has separately preloaded mobile (49 KB) and desktop (175 KB) WebP assets.
+
 ## Environment
 
 | Tool | Status |

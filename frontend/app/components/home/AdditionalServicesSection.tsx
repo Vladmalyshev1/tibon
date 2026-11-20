@@ -14,7 +14,7 @@ export function AdditionalServicesSection() {
           <p>Продумайте детали вечера с учётом повода и выбранного формата.</p>
           <ButtonLink to="/dop-uslugi/" variant="outline">Все услуги</ButtonLink>
         </div>
-        <div className="services-callout-photo"><PhotoImage photo={eventCompanyImage} /></div>
+        <div className="services-callout-photo" data-editorial-reveal><PhotoImage photo={eventCompanyImage} /></div>
       </div>
     </section>
   );

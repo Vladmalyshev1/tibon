@@ -9,7 +9,7 @@ export function GallerySection() {
   return (
     <section className="home-section gallery-section" aria-labelledby="gallery-title">
       <div className="container-default">
-        <div><SectionHeading id="gallery-title" title="Вкус в деталях" overline="Галерея" lead="Иллюстрации кулинарного процесса и сервировки." /></div>
+        <div data-editorial-reveal><SectionHeading id="gallery-title" title="Вкус в деталях" overline="Галерея" lead="Иллюстрации кулинарного процесса и сервировки." /></div>
         <div className="gallery-grid">
           {galleryImages.map((image, index) => (
             <div key={image.src} className={`gallery-item gallery-item-${index + 1}`}>

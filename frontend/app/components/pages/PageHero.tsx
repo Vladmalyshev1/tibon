@@ -32,11 +32,14 @@ export function PageHero({
       <Container>
         {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
         <div className={`page-hero-layout page-hero-${image ? layout : "text"}`}>
-          <div className="page-hero-copy">
-            <SectionHeading id={headingId} title={title} level={1} lead={description} overline={overline} />
-            {details}
-            {action ? <ButtonLink to={action.to} size="lg">{action.label}</ButtonLink> : null}
-          </div>
+          <SectionHeading id={headingId} title={title} level={1} overline={overline} />
+          {description || details || action ? (
+            <div className="page-hero-copy">
+              {description ? <p className="type-lead">{description}</p> : null}
+              {details}
+              {action ? <ButtonLink to={action.to} size="lg">{action.label}</ButtonLink> : null}
+            </div>
+          ) : null}
           {image ? (
             <figure className="page-hero-figure">
               <div className="page-hero-media"><PhotoImage photo={image} priority /></div>

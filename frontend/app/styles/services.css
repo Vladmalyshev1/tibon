@@ -20,22 +20,15 @@
 .footer-contact span { color: var(--color-text-muted); }
 
 .service-page .page-hero .section-heading { gap: var(--space-4); }
-.service-page .page-hero h1 { text-wrap: balance; }
-.service-page .page-hero-media { border-top: 0; }
 .service-page .page-cta { background: var(--color-surface-alt); }
 .service-page .page-cta .button-primary { align-self: center; }
 .extras-page .page-cta { background: var(--color-brand-black); }
 .adult-hero .page-hero-media { aspect-ratio: 4 / 3; }
-.birthday-hero { background: var(--color-surface-alt); }
-.birthday-hero .type-display { font-size: clamp(2.5rem, 4.8vw, 4.5rem); }
 .romantic-hero .page-hero-media { aspect-ratio: 4 / 5; }
-.menu-hero { background: var(--color-brand-black); }
 .menu-hero .page-hero-media { aspect-ratio: 5 / 3; }
 .menu-hero .page-hero-media img { object-position: 67% center; }
-.extras-hero .page-hero-split h1 { font-size: clamp(2.25rem, 5.2vw, 5.25rem); }
-.extras-hero .page-hero-media { aspect-ratio: auto; background: transparent; }
-.extras-hero .page-hero-media img { width: auto; height: auto; max-height: 33rem; }
-.extras-hero .page-hero-figure { justify-self: end; }
+.extras-hero .page-hero-media { aspect-ratio: 5 / 4; }
+.extras-hero .page-hero-media img { object-position: center 59%; }
 
 .event-facts {
   display: flex;
@@ -101,7 +94,9 @@
   padding-inline: var(--space-4);
   border: var(--border-w) solid var(--color-border-strong);
   text-decoration: none;
+  transition: background-color var(--dur-base), border-color var(--dur-base), color var(--dur-base);
 }
+.menu-types a:hover { border-color: var(--color-accent-strong); }
 .menu-types a[aria-current="page"] { border-color: var(--color-accent); color: var(--color-white); background: var(--color-accent); }
 .menu-sets { min-width: 0; border-top: var(--border-w) solid var(--color-border); }
 .menu-sets summary { padding-block: var(--space-2); }
@@ -114,7 +109,7 @@
 .menu-download-section { background: var(--color-brand-graphite); }
 .menu-categories { display: grid; gap: var(--space-5); }
 .menu-categories section { border-top: var(--border-w) solid var(--color-border); padding-top: var(--space-3); }
-.menu-categories h3 { color: var(--color-text); font-family: var(--font-menu); font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 500; }
+.menu-categories h3 { color: var(--color-text); font-size: clamp(1.5rem, 2.5vw, 2rem); }
 .menu-categories ul { display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding-left: 1.25em; list-style: disc; }
 .menu-section .button-outline { justify-self: start; }
 .menu-price-list { margin: 0; }
@@ -129,10 +124,6 @@
 .menu-price-list dd { margin: 0; color: var(--color-text); text-align: right; font-variant-numeric: tabular-nums; }
 
 @media (min-width: 48rem) {
-  .extras-hero .page-hero-split { grid-template-columns: minmax(0, 5fr) minmax(0, 4fr); }
-  .menu-hero .page-hero-split { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); }
-  .menu-hero .page-hero-split h1 { font-size: clamp(2.5rem, 4.4vw, 5rem); }
-  .menu-hero .page-hero-split .page-hero-media { aspect-ratio: 1.75; }
   .editorial-section .page-section-inner { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); }
   .editorial-ledger > div, .format-index li { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
   .event-company-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -143,16 +134,17 @@
   .menu-section .page-section-inner { grid-template-columns: minmax(0, 1fr) auto; }
   .menu-section .menu-sets { grid-column: 1 / -1; }
   .menu-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .service-page .adult-hero .page-hero-split { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); }
-  .adult-hero .page-hero-split .page-hero-media { aspect-ratio: 1; }
-  .kids-hero .page-hero-figure, .rental-hero .page-hero-figure { order: -1; }
-  .kids-hero .page-hero-split { grid-template-columns: minmax(0, 4fr) minmax(0, 5fr); }
-  .kids-hero .page-hero-split .page-hero-media { aspect-ratio: 1; }
+  .kids-hero .page-hero-split, .romantic-hero .page-hero-split {
+    grid-template-areas: "heading heading" "copy figure";
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+  }
   .corporate-hero .page-hero-stacked .page-hero-media { aspect-ratio: 7 / 3; }
-  .birthday-hero .page-hero-split { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
-  .romantic-hero .page-hero-split { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr); }
-  .romantic-hero .page-hero-split .page-hero-media { aspect-ratio: 4 / 5; }
-  .rental-hero .page-hero-split { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .menu-section .menu-sets, .menu-sets .accordion[open] > .accordion-panel {
+    animation: editorial-enter 260ms var(--ease-standard) both;
+  }
 }
 
 @media (min-width: 64rem) {

@@ -7,12 +7,12 @@ export function AboutStudioSection() {
       <div className="container-default about-grid">
         <div className="about-copy">
           <p className="type-overline">О пространстве</p>
-          <h2 id="about-title" className="type-h2">Кухня как место встречи</h2>
+          <h2 id="about-title" className="type-h2" data-editorial-reveal>Кухня как место встречи</h2>
           <p className="type-lead">В TIBON приготовление становится поводом быть рядом: выбирать продукты, пробовать, обсуждать и создавать вечер вместе.</p>
           <ButtonLink to="#directions" variant="outline">Смотреть направления</ButtonLink>
         </div>
         <div className="about-media">
-          <figure className="about-photo">
+          <figure className="about-photo" data-editorial-reveal>
             <img src={homeImages.studio.src} width={homeImages.studio.width} height={homeImages.studio.height} alt={homeImages.studio.alt} loading="lazy" decoding="async" />
             <figcaption className="home-photo-note">Иллюстрация кухонного пространства</figcaption>
           </figure>

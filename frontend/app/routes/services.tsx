@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { extraServices, formatPrice, requestAction, servicePages } from "../data/business";
 import { eventCompanyImage } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
@@ -6,6 +7,7 @@ import { PageCTA } from "../components/pages/PageCTA";
 import { PageSection } from "../components/pages/PageSection";
 import { ButtonLink } from "../components/ui/Button";
 import { ImageTextSection } from "../components/pages/ImageTextSection";
+import { useEditorialReveal } from "../lib/useEditorialReveal";
 
 export const loader = loadPublicPage;
 export const meta = serviceMeta(servicePages.extras);
@@ -20,8 +22,11 @@ const eventFormats = [
 const hostPhoto = { src: "/images/studio/podkin.jpg", alt: "Александр Подкин", width: 1280, height: 1280 };
 
 export default function Services() {
+  const main = useRef<HTMLElement>(null);
+  useEditorialReveal(main);
+
   return (
-    <main id="main-content" className="service-page extras-page" tabIndex={-1}>
+    <main id="main-content" className="service-page extras-page" tabIndex={-1} ref={main}>
       <ServiceHero page="extras" className="extras-hero" image={eventCompanyImage} />
       <PageSection title="Весело. Оригинально. Со вкусом." overline="Ивент-компания «Друзья»"
         description="Мы создаём не просто праздники — мы создаём эмоции, которые остаются навсегда."
@@ -45,7 +50,7 @@ export default function Services() {
           </div>
         </div>
       </PageSection>
-      <ImageTextSection title="Ведущий Александр Подкин" image={hostPhoto} imageSide="right" className="extras-host">
+      <ImageTextSection title="Ведущий Александр Подкин" image={hostPhoto} imageSide="right" className="extras-host" reveal>
         <p className="type-lead">Мы сотрудничаем с проверенным ведущим.</p>
         <ButtonLink to={requestAction.to} variant="outline">Запросить ведущего</ButtonLink>
       </ImageTextSection>
