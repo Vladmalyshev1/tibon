@@ -1,5 +1,6 @@
 # deps
 node_modules/
+.react-router/
 .venv/
 __pycache__/
 *.py[cod]

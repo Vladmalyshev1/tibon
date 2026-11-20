@@ -159,3 +159,49 @@ Avoid lengthy progress messages.
 3. Store API contracts in docs/API.md.
 4. Use documentation instead of repeating project context in prompts.
 5. If context is getting large, summarize completed work and continue from PROJECT_STATUS.md.
+
+
+
+
+## Codex Workflow
+
+### Project state
+- M0 — completed.
+- M1 — completed.
+- M2 — completed (design system and SEO decision).
+- M3 — completed (frontend application scaffold).
+- M4 — completed (homepage).
+- M5 — next milestone; do not start without explicit user approval.
+- Do not repeat completed milestones.
+- Always check docs/PROJECT_STATUS.md before starting work.
+
+### Token efficiency
+- Read only files relevant to the current task.
+- Do not repeat information already documented.
+- Do not scan the entire repository unnecessarily.
+- Do not conduct repeated research.
+- Do not launch subagents unless explicitly requested or clearly necessary.
+- Prefer one agent working on one task.
+- Keep reports concise.
+- Avoid unnecessary dependencies and abstractions.
+
+### Development rules
+- Do not overwrite working code without a reason.
+- Do not invent business information, prices or contact details.
+- Do not use copyrighted images without permission.
+- Keep documentation consistent with implementation.
+- Do not claim tests passed without executing them.
+- Do not commit unrelated changes.
+- Never use destructive Git commands without approval.
+
+### Current task
+M4 — homepage is complete. Wait for explicit user approval before starting M5.
+
+Read:
+- docs/PROJECT_STATUS.md
+- docs/ARCHITECTURE.md
+- docs/REFERENCE_AUDIT.md
+- docs/PAGE_SPECIFICATION.md
+
+Do not repeat M0 or M1.
+Do not start M5 without explicit user approval.
