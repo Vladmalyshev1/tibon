@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { ButtonLink } from "../ui/Button";
 import { PhotoImage } from "../ui/PhotoTile";
-import { founderImage, founderName, studioHeading } from "../../data/home";
+import { founderImage, founderName, homeImages, studioHeading } from "../../data/home";
 
 export function HeroSection() {
   return (
@@ -12,6 +12,7 @@ export function HeroSection() {
           <PhotoImage photo={founderImage} priority />
         </figure>
         <div className="home-hero-copy">
+          <img className="home-hero-detail" src="/images/home/preparation-small.webp" width={640} height={960} alt={homeImages.hero.alt} />
           <p className="type-lead">Место для вкуса, разговора и совместного приготовления. Выберите формат, который подойдёт вашему поводу.</p>
           <div className="hero-actions">
             <ButtonLink to="/zayavka/" size="lg">Оставить заявку</ButtonLink>

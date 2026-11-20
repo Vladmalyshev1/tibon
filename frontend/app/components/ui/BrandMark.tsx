@@ -1,3 +1,3 @@
 export function BrandMark() {
-  return <img className="brand-logo" src="/images/studio/logo.png" width={540} height={171} alt="Логотип кулинарной студии TIBON" />;
+  return <img className="brand-logo" src="/images/studio/logo1.png" width={600} height={185} alt="Логотип кулинарной студии TIBON" />;
 }

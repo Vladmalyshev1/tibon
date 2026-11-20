@@ -1,16 +1,15 @@
 import { Link } from "react-router";
 import { eventFormats } from "../../data/home";
 import { SectionHeading } from "../ui/SectionHeading";
-import { Reveal } from "./Reveal";
 
 export function EventsSection() {
   return (
     <section className="home-section events-section" aria-labelledby="events-title">
       <div className="container-default">
-        <Reveal><SectionHeading id="events-title" title="Поводы собраться" overline="События" lead="Кулинарный процесс может стать естественной частью праздника или камерного вечера." /></Reveal>
+        <div><SectionHeading id="events-title" title="Поводы собраться" overline="События" lead="Кулинарный процесс может стать естественной частью праздника или камерного вечера." /></div>
         <div className="events-grid">
-          {eventFormats.map((event, index) => (
-            <Reveal key={event.title} delay={index * 0.08}>
+          {eventFormats.map((event) => (
+            <div key={event.title}>
               <article className="event-card">
                 <div className="event-card-image">
                   <img src={event.image.src} width={event.image.width} height={event.image.height} alt={event.image.alt} loading="lazy" decoding="async" />
@@ -23,7 +22,7 @@ export function EventsSection() {
                   </Link>
                 </div>
               </article>
-            </Reveal>
+            </div>
           ))}
         </div>
       </div>

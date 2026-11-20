@@ -42,11 +42,11 @@ export default function Home() {
     <main id="main-content" tabIndex={-1}>
       <HeroSection />
       <DirectionsSection />
-      <EventsSection />
       <AboutStudioSection />
+      <EventsSection />
+      <GallerySection />
       <ExperienceSection />
       <PopularOffersSection />
-      <GallerySection />
       <AdditionalServicesSection />
       <FinalCtaSection />
     </main>

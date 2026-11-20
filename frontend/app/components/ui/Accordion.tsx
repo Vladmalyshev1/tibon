@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type AccordionProps = {
-  title: string;
+  title: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
 };
@@ -9,7 +9,7 @@ type AccordionProps = {
 export function Accordion({ title, children, defaultOpen = false }: AccordionProps) {
   return (
     <details className="accordion" open={defaultOpen}>
-      <summary>{title}<span aria-hidden="true" /></summary>
+      <summary>{title}<span className="accordion-indicator" aria-hidden="true" /></summary>
       <div className="accordion-panel">{children}</div>
     </details>
   );

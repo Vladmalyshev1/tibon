@@ -32,7 +32,6 @@ export default function Contact() {
             className="studio-map"
             title="Карта проезда к кулинарной студии TIBON"
             src={studioContact.mapEmbedUrl}
-            loading="lazy"
             referrerPolicy="no-referrer"
           />
         </div>

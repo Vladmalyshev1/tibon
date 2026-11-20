@@ -31,7 +31,12 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
         </nav>
         <div className="menu-sets">
           {sets.map((set, index) => (
-            <Accordion key={set.id} title={`${set.title} · ${formatPrice({ amount: set.amount, unit: "человек" })}`} defaultOpen={index === 0}>
+            <Accordion key={set.id} title={
+              <span className="menu-set-label">
+                <span>{set.title}</span>{" "}
+                <span className="menu-set-price">{formatPrice({ amount: set.amount, unit: "человек" })}</span>
+              </span>
+            } defaultOpen={index === 0}>
               {isKids ? <p>К горячему блюду выберите ещё два блюда из меню.</p> : null}
               <div className="menu-categories">
                 {set.categories.map(({ title, dishes }) => (
@@ -49,7 +54,7 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
         <MenuDownloadForm current={type} />
       </PageSection>
       {!isKids ? (
-        <PageSection title="Стейки, закуски и напитки" className="editorial-section">
+        <PageSection title="Стейки, закуски и напитки" className="editorial-section menu-extras">
           <div className="menu-sets">
             {menuExtras.map(({ id, title, note, dishes }) => (
               <Accordion key={id} title={title}>

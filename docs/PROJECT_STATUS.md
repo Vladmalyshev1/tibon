@@ -50,6 +50,10 @@ TypeScript, ESLint, 34 Vitest tests, the production build and SSR/Chromium passe
 
 The separate taste-skill gate returned 35 findings in its second round. These include its full-viewport section rules, starter markup and grid conventions, fixed copy and contact fields, and required visuals in text-led sections. The redesign retains content-driven section heights, the existing React layout and the approved text and contact details.
 
+**Creative redesign — «Кухня крупным планом».** The public frontend uses measured [TIBON brand colors](DESIGN_SYSTEM.md), the supplied white wordmark as `logo1.png`, a black founder-led homepage, a white event and menu index, and denser services and contacts layouts. The design uses the Anthropic frontend-design skill with photo-led layout and accessibility guidance from taste-skill and ui-ux-pro-max.
+
+TypeScript, ESLint, 34 Vitest tests, the production build and SSR/Chromium passed. Playwright MCP checked 17 views at 390, 768, 1280 and 1920 px, including both menu selections, the contact alias and the retired gallery URL. The 68 runs found no horizontal overflow, clipped headings, broken images or hydration errors. The Yandex map rendered at all four widths.
+
 ## Environment
 
 | Tool | Status |

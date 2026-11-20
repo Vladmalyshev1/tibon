@@ -21,7 +21,7 @@ const hostPhoto = { src: "/images/studio/podkin.jpg", alt: "Александр �
 
 export default function Services() {
   return (
-    <main id="main-content" className="service-page" tabIndex={-1}>
+    <main id="main-content" className="service-page extras-page" tabIndex={-1}>
       <ServiceHero page="extras" className="extras-hero" image={eventCompanyImage} />
       <PageSection title="Весело. Оригинально. Со вкусом." overline="Ивент-компания «Друзья»"
         description="Мы создаём не просто праздники — мы создаём эмоции, которые остаются навсегда."
@@ -45,11 +45,11 @@ export default function Services() {
           </div>
         </div>
       </PageSection>
-      <ImageTextSection title="Ведущий Александр Подкин" image={hostPhoto} className="extras-host">
+      <ImageTextSection title="Ведущий Александр Подкин" image={hostPhoto} imageSide="right" className="extras-host">
         <p className="type-lead">Мы сотрудничаем с проверенным ведущим.</p>
         <ButtonLink to={requestAction.to} variant="outline">Запросить ведущего</ButtonLink>
       </ImageTextSection>
-      <PageSection title="Что можно добавить к мастер-классу" tone="alternate">
+      <PageSection title="Что можно добавить к мастер-классу" className="extras-ledger" tone="alternate">
         <ul className="extras-list" role="list">
           {extraServices.map((service) => (
             <li id={service.id} key={service.id}>
