@@ -5,9 +5,9 @@ from sqlalchemy.engine import Connection
 from alembic import context
 from app.config import Settings
 from app.database import create_database_engine
-from app.models.lead import Lead
+from app.models import Base
 
-target_metadata = Lead.metadata
+target_metadata = Base.metadata
 
 
 def run_offline() -> None:

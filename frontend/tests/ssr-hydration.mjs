@@ -84,7 +84,8 @@ try {
       assert.ok(html.includes(`rel="canonical" href="https://tibon.example${path}"`));
       assert.doesNotMatch(html, /name="robots" content="noindex/);
       assert.doesNotMatch(html, /Структурная заготовка/);
-      assert.match(html, /href="\/zayavka\/"[^>]*>Оставить заявку/);
+      const cta = path === "/menu/" ? /href="\/menu\/#menu-download"[^>]*>Скачать меню/ : /href="\/zayavka\/"[^>]*>Оставить заявку/;
+      assert.match(html, cta, `${path} should render its page CTA`);
     } else if (informationPages[path]) {
       const [canonical, content] = informationPages[path];
       assert.match(html, content);
@@ -219,10 +220,14 @@ try {
 
     await page.goto(`${baseUrl}/menu/`, { waitUntil: "networkidle" });
     const menuTypes = page.getByRole("navigation", { name: "Тип меню" });
+    assert.equal(await page.getByRole("button", { name: "Скачать взрослое меню" }).isDisabled(), true);
+    assert.equal(await page.getByRole("button", { name: "Скачать детское меню" }).isDisabled(), true);
+    assert.equal(await page.locator('a[href*=".pdf"]').count(), 0);
     await menuTypes.getByRole("link", { name: "Детское" }).click();
     await page.getByRole("heading", { name: "Детское меню", level: 2 }).waitFor();
     assert.equal(new URL(page.url()).searchParams.get("type"), "kids");
     assert.equal(await menuTypes.getByRole("link", { name: "Детское" }).getAttribute("aria-current"), "page");
+    assert.equal(await page.getByRole("button", { name: "Скачать детское меню" }).isDisabled(), true);
     await page.goBack();
     await page.getByRole("heading", { name: "Взрослое меню", level: 2 }).waitFor();
 

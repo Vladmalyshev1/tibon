@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
@@ -47,17 +47,15 @@ def test_lead_contract_accepts_current_draft_shape():
         {"consent": "true"},
         {"consent": 1},
         {"status": "confirmed"},
+        {"guests": "12"},
+        {"guests": 0},
+        {"guests": 10001},
+        {"source": "unknown"},
     ],
 )
 def test_lead_contract_rejects_invalid_payload(invalid):
     with pytest.raises(ValidationError):
         LeadCreate.model_validate({**LEAD_DRAFT, **invalid})
-
-
-def test_event_date_cannot_be_in_the_past():
-    yesterday = datetime.now(STUDIO_TIMEZONE).date() - timedelta(days=1)
-    with pytest.raises(ValidationError, match="cannot be in the past"):
-        LeadCreate.model_validate({**LEAD_DRAFT, "date": yesterday.isoformat()})
 
 
 def test_model_keeps_personal_data_out_of_default_repr():

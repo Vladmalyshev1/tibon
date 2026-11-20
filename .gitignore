@@ -14,6 +14,7 @@ build/
 .env
 .env.*
 !.env.example
+/backend/private-menus/
 
 # tests / tooling
 .pytest_cache/

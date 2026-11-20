@@ -17,20 +17,26 @@ export const leadSchema = z.object({
     return (!value.startsWith("+") && digits.length === 10) || /^[78]\d{10}$/.test(digits);
   }, phoneError).transform(value => `+7${value.replace(/\D/g, "").slice(-10)}`),
   format: z.string().pipe(z.enum(eventFormats, { error: "Выберите формат мероприятия." })),
-  date: z.string().refine(value => value === "" || (
-    z.iso.date().safeParse(value).success && value >= studioDate.format(new Date())
-  ), "Укажите сегодняшнюю или будущую дату.").transform(value => value || undefined),
+  date: z.string().refine(value => value === "" || z.iso.date().safeParse(value).success,
+    "Укажите корректную дату.").transform(value => value || undefined),
+  guests: z.string().trim().optional().refine(value =>
+    !value || (/^[0-9]+$/.test(value) && Number(value) >= 1 && Number(value) <= 10_000),
+  "Укажите целое число гостей от 1 до 10 000.").transform(value => value ? Number(value) : undefined),
   comment: z.string().trim().max(1000, "Комментарий должен быть не длиннее 1000 символов.").transform(value => value || undefined),
   consent: z.boolean().refine(Boolean, "Поставьте отметку о согласии."),
 });
 
 export type LeadFields = z.input<typeof leadSchema>;
 export type LeadDraft = z.output<typeof leadSchema>;
+export const menuLeadSchema = leadSchema.pick({ name: true, phone: true, consent: true });
+
+export function isPastStudioDate(date: string | undefined): boolean {
+  return date !== undefined && date < studioDate.format(new Date());
+}
 
 export const resolveLead: Resolver<LeadFields, undefined, LeadDraft> = (values) => {
   const parsed = leadSchema.safeParse(values);
   if (parsed.success) return { values: parsed.data, errors: {} };
-
   const fields = z.flattenError(parsed.error).fieldErrors;
   const errors = Object.fromEntries(
     Object.entries(fields).map(([field, messages]) => [field, { type: "validation", message: messages[0] }]),

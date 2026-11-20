@@ -38,12 +38,18 @@ class LeadStatus(StrEnum):
     ARCHIVED = "archived"
 
 
+class LeadSource(StrEnum):
+    MENU_ADULTS = "menu_adults"
+    MENU_KIDS = "menu_kids"
+
+
 class Lead(Base):
     __tablename__ = "leads"
     __table_args__ = (
         CheckConstraint("char_length(btrim(name)) >= 2", name="ck_leads_name"),
         CheckConstraint("phone ~ '^[+]7[0-9]{10}$'", name="ck_leads_phone"),
         CheckConstraint("consent IS TRUE", name="ck_leads_consent"),
+        CheckConstraint("guests BETWEEN 1 AND 10000", name="ck_leads_guests"),
         UniqueConstraint("idempotency_key", name="uq_leads_idempotency_key"),
         Index("ix_leads_status_created_at", "status", "created_at"),
     )
@@ -65,6 +71,17 @@ class Lead(Base):
         ),
     )
     event_date: Mapped[date | None] = mapped_column(Date)
+    guests: Mapped[int | None]
+    source: Mapped[LeadSource | None] = mapped_column(
+        Enum(
+            LeadSource,
+            name="ck_leads_source",
+            native_enum=False,
+            create_constraint=True,
+            values_callable=lambda members: [member.value for member in members],
+            length=16,
+        ),
+    )
     comment: Mapped[str | None] = mapped_column(String(1000))
     consent: Mapped[bool]
     idempotency_key: Mapped[UUID | None] = mapped_column(Uuid)

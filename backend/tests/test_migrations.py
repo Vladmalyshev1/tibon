@@ -23,13 +23,14 @@ def test_migration_sql_can_be_generated_without_database(capsys):
     config = Config(str(ALEMBIC_INI))
     assert (
         ScriptDirectory.from_config(config).get_current_head()
-        == "0002_lead_idempotency"
+        == "0003_telegram_notifications"
     )
     command.upgrade(config, "head", sql=True)
     sql = capsys.readouterr().out
     assert "CREATE TABLE leads" in sql
     assert "CREATE TRIGGER leads_set_updated_at" in sql
     assert "UNIQUE (idempotency_key)" in sql
+    assert "CREATE TABLE telegram_notifications" in sql
 
 
 @pytest.mark.skipif(
@@ -82,11 +83,19 @@ async def check_schema(settings, schema):
             await connection.run_sync(migrate, command.check)
             row = (
                 await connection.execute(
-                    text("SELECT id, idempotency_key FROM leads WHERE id = :id"),
+                    text(
+                        "SELECT id, idempotency_key, guests, source FROM leads WHERE id = :id"
+                    ),
                     {"id": existing_id},
                 )
             ).one()
-            assert row == (existing_id, None)
+            assert row == (existing_id, None, None, None)
+            assert (
+                await connection.scalar(
+                    text("SELECT count(*) FROM telegram_notifications")
+                )
+                == 0
+            )
             await connection.rollback()
 
         async with AsyncSession(engine) as session, session.begin():

@@ -1,8 +1,8 @@
 import { adultGroup, kidsGroup } from "./business";
 
 export const menuDocuments = {
-  adults: { title: "Взрослое меню", url: "https://ti-bon.ru/wp-content/uploads/2025/11/Меню_взрослое.pdf", size: "3,3 МБ" },
-  kids: { title: "Детское меню", url: "https://ti-bon.ru/wp-content/uploads/2025/11/Меню_детское.pdf", size: "1 МБ" },
+  adults: { title: "Взрослое меню" },
+  kids: { title: "Детское меню" },
 };
 
 export type MenuType = keyof typeof menuDocuments;

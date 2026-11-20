@@ -1,6 +1,5 @@
 import re
 from datetime import date as CalendarDate
-from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -14,7 +13,7 @@ from pydantic import (
     field_validator,
 )
 
-from app.models.lead import LeadFormat
+from app.models.lead import LeadFormat, LeadSource
 
 STUDIO_TIMEZONE = ZoneInfo("Europe/Samara")
 
@@ -28,6 +27,8 @@ class LeadCreate(BaseModel):
     phone: Annotated[str, Field(pattern=r"^\+7[0-9]{10}$")]
     format: LeadFormat
     date: CalendarDate | None = None
+    guests: Annotated[int, Field(strict=True, ge=1, le=10000)] | None = None
+    source: LeadSource | None = None
     comment: (
         Annotated[str, StringConstraints(strip_whitespace=True, max_length=1000)] | None
     ) = None
@@ -48,13 +49,6 @@ class LeadCreate(BaseModel):
             or re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is None
         ):
             raise ValueError("Use YYYY-MM-DD for the event date")
-        return value
-
-    @field_validator("date")
-    @classmethod
-    def require_available_date(cls, value: CalendarDate | None) -> CalendarDate | None:
-        if value is not None and value < datetime.now(STUDIO_TIMEZONE).date():
-            raise ValueError("The event date cannot be in the past")
         return value
 
     @field_validator("comment")

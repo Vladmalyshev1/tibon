@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/menu";
-import { formatPrice, requestAction, servicePages } from "../data/business";
+import { formatPrice, servicePages } from "../data/business";
 import { adultMenu, kidsMenu, menuDocuments, menuExtras, type MenuType } from "../data/menu";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { Accordion } from "../components/ui/Accordion";
 import { ServiceHero } from "../components/pages/ServiceContent";
-import { PageCTA } from "../components/pages/PageCTA";
+import { MenuDownloadForm } from "../components/pages/MenuDownloadForm";
 import { PageSection } from "../components/pages/PageSection";
 
 export function loader({ request }: Route.LoaderArgs): { origin: string | null; type: MenuType } {
@@ -21,7 +21,8 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
   const document = menuDocuments[type];
   return (
     <main id="main-content" className="service-page" tabIndex={-1}>
-      <ServiceHero page="menu" className="menu-hero" />
+      <ServiceHero page="menu" className="menu-hero"
+        action={{ label: "Скачать меню", to: isKids ? "/menu/?type=kids#menu-download" : "/menu/#menu-download" }} />
       <PageSection id="menu-options" title={document.title} tone="alternate" className="menu-section">
         <nav className="menu-types" aria-label="Тип меню">
           <Link to="/menu/#menu-options" aria-current={!isKids ? "page" : undefined}>Взрослое</Link>
@@ -42,7 +43,9 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
             </Accordion>
           ))}
         </div>
-        <a className="button-outline button-md" href={document.url}>Открыть PDF · {document.size}</a>
+      </PageSection>
+      <PageSection id="menu-download" title="Скачать меню в PDF" width="form">
+        <MenuDownloadForm current={type} />
       </PageSection>
       {!isKids ? (
         <PageSection title="Стейки, закуски и напитки" className="editorial-section">
@@ -63,7 +66,6 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
           </div>
         </PageSection>
       ) : null}
-      <PageCTA title="Обсудить меню для вашей компании" description="Сообщите число гостей и предпочтения при обращении в студию." action={requestAction} layout="inline" />
     </main>
   );
 }

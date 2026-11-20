@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { LeadForm } from "../app/components/pages/LeadForm";
+import { MenuDownloadForm } from "../app/components/pages/MenuDownloadForm";
 import { leadSchema } from "../app/data/lead";
 import { loader as robots } from "../app/routes/robots";
 import { loader as sitemap } from "../app/routes/sitemap";
@@ -20,8 +21,8 @@ describe("request draft", () => {
   });
 
   it.each([
-    { phone: "+44 1234567890" }, { date: "2020-01-01" }, { date: "2099-02-30" },
-    { format: "unknown" }, { consent: false },
+    { phone: "+44 1234567890" }, { date: "2099-02-30" },
+    { format: "unknown" }, { consent: false }, { guests: "0" }, { guests: "1.5" },
   ])("rejects invalid or incomplete drafts (%o)", invalid => {
     expect(leadSchema.safeParse({ ...draft, ...invalid }).success).toBe(false);
   });
@@ -30,7 +31,10 @@ describe("request draft", () => {
 
 describe("lead submission", () => {
   const result = { id: "5d34edf2-4f64-4d16-9a82-0701bc872355" };
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
 
   async function fillForm(user: ReturnType<typeof userEvent.setup>) {
     await user.type(screen.getByRole("textbox", { name: /Имя/ }), "Анна");
@@ -69,6 +73,7 @@ describe("lead submission", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith("/api/v1/leads", expect.objectContaining({
       method: "POST",
+      credentials: "omit",
       headers: { "Content-Type": "application/json", "Idempotency-Key": expect.any(String) },
       body: JSON.stringify({ name: "Анна", phone: "+79123456789", format: "birthday", consent: true }),
     }));
@@ -123,6 +128,93 @@ describe("lead submission", () => {
     expect(await screen.findByRole("status")).toBeInTheDocument();
     expect(fetchMock.mock.calls[0][1].headers["Idempotency-Key"])
       .not.toEqual(fetchMock.mock.calls[1][1].headers["Idempotency-Key"]);
+  });
+
+  it("recovers the original key after editing a failed submission and reverting the edit", async () => {
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(new Error("Response lost"))
+      .mockResolvedValueOnce(Response.json({}, { status: 503 }))
+      .mockResolvedValueOnce(Response.json(result, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<MemoryRouter><LeadForm /></MemoryRouter>);
+    await fillForm(user);
+    const comment = screen.getByRole("textbox", { name: "Комментарий" });
+    const submit = screen.getByRole("button", { name: "Отправить заявку" });
+    await user.click(submit);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Не удалось связаться");
+    await user.type(comment, "Изменение");
+    await user.click(submit);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Не удалось отправить");
+    await user.clear(comment);
+    await user.click(submit);
+    expect(await screen.findByRole("status")).toHaveTextContent("Заявка отправлена");
+    const keys = fetchMock.mock.calls.map(([, options]) => options.headers["Idempotency-Key"]);
+    expect(keys[0]).toBe(keys[2]);
+    expect(keys[0]).not.toBe(keys[1]);
+  });
+
+  it("retries a previously submitted date after midnight in Samara", async () => {
+    vi.setSystemTime(new Date("2099-05-20T19:59:00Z"));
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(new Error("Response lost"))
+      .mockResolvedValueOnce(Response.json(result, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<MemoryRouter><LeadForm /></MemoryRouter>);
+    await fillForm(user);
+    fireEvent.change(screen.getByLabelText("Желаемая дата"), { target: { value: "2099-05-20" } });
+    const submit = screen.getByRole("button", { name: "Отправить заявку" });
+    await user.click(submit);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Не удалось связаться");
+    vi.setSystemTime(new Date("2099-05-20T20:01:00Z"));
+    await user.click(submit);
+    expect(await screen.findByRole("status")).toHaveTextContent("Заявка отправлена");
+    expect(fetchMock.mock.calls[0][1].headers["Idempotency-Key"])
+      .toBe(fetchMock.mock.calls[1][1].headers["Idempotency-Key"]);
+  });
+
+  it("rejects a new submission with a past date before calling the API", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<MemoryRouter><LeadForm /></MemoryRouter>);
+    await fillForm(user);
+    const date = screen.getByLabelText("Желаемая дата");
+    fireEvent.change(date, { target: { value: "2020-01-01" } });
+    await user.click(screen.getByRole("button", { name: "Отправить заявку" }));
+    expect(screen.getByText("Укажите сегодняшнюю или будущую дату.")).toBeVisible();
+    await waitFor(() => expect(date).toHaveFocus());
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("requires valid contact and consent, saves a typed menu request, and retries only the PDF", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(Response.json(result, { status: 201 }))
+      .mockResolvedValue(new Response(null, { status: 503 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<MemoryRouter><MenuDownloadForm current="adults" /></MemoryRouter>);
+    const kids = screen.getByRole("button", { name: "Скачать детское меню" });
+    const adults = screen.getByRole("button", { name: "Скачать взрослое меню" });
+    expect(adults).toBeDisabled();
+    expect(kids).toBeDisabled();
+    await user.type(screen.getByLabelText(/Имя/), "Анна");
+    await user.type(screen.getByLabelText(/Телефон/), "8 (912) 345-67-89");
+    expect(kids).toBeDisabled();
+    await user.click(screen.getByRole("checkbox"));
+    expect(adults).toBeEnabled();
+    await user.click(kids);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Запрос сохранён");
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+      source: "menu_kids", format: "kids", phone: "+79123456789", consent: true,
+    });
+    const key = fetchMock.mock.calls[0][1].headers["Idempotency-Key"];
+    await user.click(kids);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    expect(fetchMock).toHaveBeenLastCalledWith(`/api/v1/leads/${result.id}/menu`, expect.objectContaining({
+      headers: { "Idempotency-Key": key },
+    }));
   });
 });
 

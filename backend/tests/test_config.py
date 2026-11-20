@@ -50,3 +50,9 @@ def test_requires_non_empty_database_password(monkeypatch, password):
 def test_rejects_invalid_cors_origins(origin):
     with pytest.raises(ValidationError, match="cors_origins"):
         Settings(_env_file=None, postgres_password="fake-secret", cors_origins=[origin])
+
+
+@pytest.mark.parametrize("proxy", ["*", "192.0.2.0/24", "localhost"])
+def test_proxy_trust_requires_exact_ip_addresses(proxy):
+    with pytest.raises(ValidationError, match="trusted_proxy_ips"):
+        Settings(_env_file=None, postgres_password="example", trusted_proxy_ips=[proxy])

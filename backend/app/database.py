@@ -8,5 +8,5 @@ def create_database_engine(settings: Settings) -> AsyncEngine:
         settings.database_url,
         pool_pre_ping=True,
         hide_parameters=True,
-        connect_args={"timeout": 5},
+        connect_args={"timeout": 5, "ssl": settings.postgres_sslmode},
     )

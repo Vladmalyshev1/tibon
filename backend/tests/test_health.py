@@ -69,8 +69,14 @@ def test_cors_only_allows_configured_origins(client, origin, expected):
 
 def test_public_lead_route_only_allows_post(client):
     paths = client.get("/openapi.json").json()["paths"]
-    assert set(paths) == {"/api/v1/health", "/api/v1/health/db", "/api/v1/leads"}
+    assert set(paths) == {
+        "/api/v1/health",
+        "/api/v1/health/db",
+        "/api/v1/leads",
+        "/api/v1/leads/{lead_id}/menu",
+    }
     assert set(paths["/api/v1/leads"]) == {"post"}
+    assert set(paths["/api/v1/leads/{lead_id}/menu"]) == {"get"}
     assert client.get("/api/v1/leads").status_code == 405
     assert (
         client.get("/api/v1/leads/00000000-0000-0000-0000-000000000000").status_code

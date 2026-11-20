@@ -1,22 +1,21 @@
 import asyncio
 import os
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
+from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
+import httpx
 import pytest
-from alembic.config import Config
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.schema import CreateSchema, DropSchema
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from alembic import command
 from app.config import Settings
-from app.database import create_database_engine
 from app.main import create_app
+from app.models import TelegramNotification
 from app.models.lead import Lead, LeadStatus
+from app.schemas.lead import STUDIO_TIMEZONE
 from app.services import leads as lead_service
 from app.services import rate_limit
 
@@ -119,6 +118,10 @@ def test_database_failure_does_not_echo_or_log_query_details(
     async def fail(*_args):
         raise OperationalError("private SQL", DRAFT, OSError("private DB error"))
 
+    async def configure(*_args):
+        pass
+
+    monkeypatch.setattr(lead_service, "bound_lead_transaction", configure)
     monkeypatch.setattr(lead_service, "insert_lead", fail)
     response = client.post(PATH, json=DRAFT)
     assert response.status_code == 503
@@ -126,63 +129,23 @@ def test_database_failure_does_not_echo_or_log_query_details(
     assert "private" not in caplog.text and DRAFT["phone"] not in caplog.text
 
 
-@pytest.fixture
-def postgres_schema(monkeypatch):
-    if os.environ.get("TIBON_TEST_POSTGRES") != "1":
-        pytest.skip("requires PostgreSQL")
-    settings = Settings()
-    schema = f"test_m62_{uuid4().hex}"
-
-    async def prepare():
-        engine = create_database_engine(settings)
-        try:
-            async with engine.begin() as connection:
-                await connection.execute(CreateSchema(schema))
-        finally:
-            await engine.dispose()
-
-    def scoped_engine(_settings):
-        return create_async_engine(
-            settings.database_url,
-            hide_parameters=True,
-            connect_args={"server_settings": {"search_path": schema}},
-        )
-
-    async def migrate():
-        engine = scoped_engine(settings)
-        config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
-
-        def upgrade(connection):
-            config.attributes["connection"] = connection
-            command.upgrade(config, "head")
-
-        try:
-            async with engine.connect() as connection:
-                await connection.run_sync(upgrade)
-        finally:
-            await engine.dispose()
-
-    async def clean():
-        engine = create_database_engine(settings)
-        try:
-            async with engine.begin() as connection:
-                await connection.execute(DropSchema(schema, cascade=True))
-        finally:
-            await engine.dispose()
-
-    asyncio.run(prepare())
-    try:
-        asyncio.run(migrate())
-        monkeypatch.setattr("app.main.create_database_engine", scoped_engine)
-        yield settings, scoped_engine
-    finally:
-        asyncio.run(clean())
+def test_past_date_without_key_is_rejected_before_database_access(client):
+    previous_day = datetime.now(STUDIO_TIMEZONE).date() - timedelta(days=1)
+    response = client.post(PATH, json=DRAFT | {"date": previous_day.isoformat()})
+    assert response.status_code == 422
+    assert response.json() == {"errors": {"date": "invalid"}}
 
 
 def test_concurrent_retries_persist_a_single_lead(postgres_schema):
     settings, scoped_engine = postgres_schema
     headers = {"Idempotency-Key": str(uuid4())}
-    body = DRAFT | {"date": "2099-01-01", "comment": "Synthetic note"}
+    body = DRAFT | {
+        "name": "O'Neil",
+        "date": "2099-01-01",
+        "guests": 15,
+        "source": "menu_kids",
+        "comment": "Synthetic 'note'; literal text",
+    }
 
     with TestClient(create_app(settings)) as client, ThreadPoolExecutor(2) as executor:
         responses = list(
@@ -204,8 +167,18 @@ def test_concurrent_retries_persist_a_single_lead(postgres_schema):
         try:
             async with AsyncSession(engine) as session:
                 lead = (await session.scalars(select(Lead))).one()
+                notification = (
+                    await session.scalars(select(TelegramNotification))
+                ).one()
+                assert notification.lead_id == lead_id
+                assert notification.status == "pending" and notification.attempts == 0
+                assert lead.guests == 15 and lead.source == "menu_kids"
                 assert lead.id == lead_id and lead.status is LeadStatus.NEW
-                assert lead.phone == DRAFT["phone"] and lead.consent
+                assert (
+                    lead.phone == DRAFT["phone"]
+                    and lead.consent
+                    and lead.name == body["name"]
+                )
                 assert (
                     lead.event_date.isoformat() == body["date"]
                     and lead.comment == body["comment"]
@@ -214,6 +187,127 @@ def test_concurrent_retries_persist_a_single_lead(postgres_schema):
             await engine.dispose()
 
     asyncio.run(verify())
+
+
+def test_committed_key_replays_after_event_date_passes(postgres_schema, monkeypatch):
+    settings, _ = postgres_schema
+    current_time = datetime(2099, 6, 1, 23, 59, tzinfo=STUDIO_TIMEZONE)
+
+    class Clock:
+        @staticmethod
+        def now(tz):
+            return current_time.astimezone(tz)
+
+    monkeypatch.setattr(lead_service, "datetime", Clock)
+    headers = {"Idempotency-Key": str(uuid4())}
+    body = DRAFT | {"date": "2099-06-01"}
+    with TestClient(create_app(settings)) as client:
+        original = client.post(PATH, json=body, headers=headers)
+        assert original.status_code == 201
+        current_time += timedelta(minutes=2)
+        replay = client.post(PATH, json=body, headers=headers)
+        assert replay.status_code == 200 and replay.json() == original.json()
+        assert (
+            client.post(
+                PATH, json=body | {"name": "Edited"}, headers=headers
+            ).status_code
+            == 409
+        )
+        new = client.post(PATH, json=body, headers={"Idempotency-Key": str(uuid4())})
+        assert new.status_code == 422 and new.json() == {"errors": {"date": "invalid"}}
+
+
+def test_failed_commit_rolls_back_and_same_key_can_be_retried(postgres_schema):
+    settings, scoped_engine = postgres_schema
+    key = uuid4()
+    headers = {"Idempotency-Key": str(key)}
+
+    async def run():
+        engine = scoped_engine(settings)
+        app = create_app(settings)
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(
+                    text("CREATE TABLE permitted_keys (key uuid PRIMARY KEY)")
+                )
+                await connection.execute(
+                    text(
+                        "ALTER TABLE leads ADD FOREIGN KEY (idempotency_key) "
+                        "REFERENCES permitted_keys(key) DEFERRABLE INITIALLY DEFERRED"
+                    )
+                )
+            async with (
+                app.router.lifespan_context(app),
+                httpx.AsyncClient(
+                    transport=httpx.ASGITransport(app=app), base_url="http://test"
+                ) as client,
+            ):
+                failed = await client.post(PATH, json=DRAFT, headers=headers)
+                assert failed.status_code == 503 and failed.json() == {
+                    "detail": "Service unavailable"
+                }
+                async with engine.begin() as connection:
+                    assert (
+                        await connection.scalar(text("SELECT count(*) FROM leads")) == 0
+                    )
+                    assert (
+                        await connection.scalar(
+                            text("SELECT count(*) FROM telegram_notifications")
+                        )
+                        == 0
+                    )
+                    await connection.execute(
+                        text("INSERT INTO permitted_keys VALUES (:key)"), {"key": key}
+                    )
+                created = await client.post(PATH, json=DRAFT, headers=headers)
+                assert created.status_code == 201
+                async with engine.connect() as connection:
+                    assert (
+                        await connection.scalar(text("SELECT count(*) FROM leads")) == 1
+                    )
+        finally:
+            await engine.dispose()
+
+    asyncio.run(run())
+
+
+def test_database_lock_timeout_recovers_without_creating_a_duplicate(postgres_schema):
+    settings, scoped_engine = postgres_schema
+    headers = {"Idempotency-Key": str(uuid4())}
+
+    async def run():
+        engine = scoped_engine(settings)
+        app = create_app(settings)
+        try:
+            async with (
+                app.router.lifespan_context(app),
+                httpx.AsyncClient(
+                    transport=httpx.ASGITransport(app=app), base_url="http://test"
+                ) as client,
+            ):
+                async with engine.begin() as connection:
+                    await connection.execute(text("LOCK TABLE leads IN SHARE MODE"))
+                    failed = await asyncio.wait_for(
+                        client.post(PATH, json=DRAFT, headers=headers), 5
+                    )
+                    assert failed.status_code == 503 and failed.json() == {
+                        "detail": "Service unavailable"
+                    }
+                    assert (
+                        await connection.scalar(text("SELECT count(*) FROM leads")) == 0
+                    )
+                created = await client.post(PATH, json=DRAFT, headers=headers)
+                replay = await client.post(PATH, json=DRAFT, headers=headers)
+                assert created.status_code == 201
+                assert replay.status_code == 200 and replay.json() == created.json()
+                async with engine.connect() as connection:
+                    assert (
+                        await connection.scalar(text("SELECT count(*) FROM leads")) == 1
+                    )
+        finally:
+            await engine.dispose()
+
+    asyncio.run(run())
 
 
 @pytest.mark.skipif(

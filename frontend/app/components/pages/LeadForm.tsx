@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
-import { requestFormats, resolveLead, type LeadDraft, type LeadFields } from "../../data/lead";
+import { isPastStudioDate, requestFormats, resolveLead, type LeadDraft, type LeadFields } from "../../data/lead";
 import { submitLead } from "../../lib/leadApi";
 import { Button } from "../ui/Button";
 
@@ -14,10 +14,12 @@ const invalidFields = {
   phone: "Проверьте номер телефона.",
   format: "Выберите формат мероприятия.",
   date: "Укажите сегодняшнюю или будущую дату.",
+  guests: "Укажите целое число гостей от 1 до 10 000.",
   comment: "Проверьте текст комментария. Максимум 1000 символов.",
   consent: "Поставьте отметку о согласии.",
 } satisfies Record<keyof LeadFields, string>;
 const fieldNames = Object.keys(invalidFields) as (keyof LeadFields)[];
+const maxRememberedAttempts = 8;
 
 function LeadField({ name, label, error, children }: {
   name: keyof LeadFields;
@@ -38,49 +40,66 @@ export function LeadForm() {
   const enabled = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
+  const [focusRequest, setFocusRequest] = useState<{ field: keyof LeadFields } | null>(null);
   const inFlight = useRef(false);
-  const attempt = useRef<{ body: string; key: string } | null>(null);
-  const invalidField = useRef<keyof LeadFields | null>(null);
+  const attempts = useRef(new Map<string, string>());
   const success = useRef<HTMLParagraphElement>(null);
-  const { handleSubmit, register, setError, setFocus, formState: { errors, isSubmitting } } = useForm<LeadFields, undefined, LeadDraft>({
+  const { handleSubmit, register, reset, setError, setFocus, formState: { errors, isSubmitting } } = useForm<LeadFields, undefined, LeadDraft>({
     resolver: resolveLead,
-    defaultValues: { name: "", phone: "", format: "", date: "", comment: "", consent: false },
+    defaultValues: {
+      name: "",
+      phone: "",
+      format: "",
+      date: "",
+      guests: "",
+      comment: "",
+      consent: false,
+    },
   });
 
   useEffect(() => {
     if (sent) success.current?.focus();
-    if (!isSubmitting && invalidField.current) {
-      setFocus(invalidField.current);
-      invalidField.current = null;
-    }
-  }, [isSubmitting, sent, setFocus]);
+    if (!isSubmitting && focusRequest) setFocus(focusRequest.field);
+  }, [focusRequest, isSubmitting, sent, setFocus]);
 
   async function send(draft: LeadDraft) {
     const body = JSON.stringify(draft);
-    const current = attempt.current?.body === body ? attempt.current : { body, key: crypto.randomUUID() };
-    attempt.current = current;
-    const result = await submitLead(body, current.key);
+    const previous = attempts.current.get(body);
+    if (!previous && isPastStudioDate(draft.date)) {
+      setError("date", { type: "validation", message: invalidFields.date });
+      setFocusRequest({ field: "date" });
+      return;
+    }
+    const key = previous ?? crypto.randomUUID();
+    if (previous) attempts.current.delete(body);
+    attempts.current.set(body, key);
+    if (attempts.current.size > maxRememberedAttempts) {
+      const oldest = attempts.current.keys().next();
+      if (!oldest.done) attempts.current.delete(oldest.value);
+    }
+    const result = await submitLead(body, key);
     if (result.kind === "success") {
-      attempt.current = null;
+      attempts.current.clear();
+      reset();
       setSent(true);
       return;
     }
     if (result.kind === "validation") {
+      attempts.current.delete(body);
       const fields = fieldNames.filter(field => Object.hasOwn(result.errors, field));
       for (const field of fields) {
         setError(field, { type: "server", message: invalidFields[field] });
       }
-      invalidField.current = fields[0] ?? null;
+      if (fields[0]) setFocusRequest({ field: fields[0] });
       if (fields.length && !Object.hasOwn(result.errors, "body")) return;
     }
     setSubmitError({
       network: "Не удалось связаться с сервером. Проверьте подключение и попробуйте снова.",
       limited: "Слишком много попыток. Подождите немного и попробуйте снова.",
-      conflict: "Не удалось повторить отправку. Попробуйте снова.",
+      conflict: "Не удалось повторить отправку. Измените данные заявки или позвоните в студию.",
       validation: "Не удалось проверить заявку. Проверьте данные и попробуйте снова.",
       unavailable: "Не удалось отправить заявку. Попробуйте снова или позвоните в студию.",
     }[result.kind]);
-    if (result.kind === "conflict") attempt.current = null;
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -88,6 +107,7 @@ export function LeadForm() {
     if (!enabled || inFlight.current || sent) return;
     inFlight.current = true;
     setSubmitError(undefined);
+    setFocusRequest(null);
     try {
       await handleSubmit(send)(event);
     } catch {
@@ -138,6 +158,9 @@ export function LeadForm() {
             <input {...fieldProps("date")} type="date" />
           </LeadField>
         </div>
+        <LeadField name="guests" label="Количество гостей" error={errors.guests?.message}>
+          <input {...fieldProps("guests")} type="number" inputMode="numeric" min={1} max={10_000} step={1} />
+        </LeadField>
         <LeadField name="comment" label="Комментарий" error={errors.comment?.message}>
           <textarea {...fieldProps("comment")} rows={4} maxLength={1000} />
         </LeadField>

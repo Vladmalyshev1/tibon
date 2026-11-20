@@ -10,14 +10,14 @@ import { PageHero } from "./PageHero";
 import { PageSection } from "./PageSection";
 
 type PageKey = keyof typeof servicePages;
-type ServiceHeroProps = Omit<ComponentProps<typeof PageHero>, "title" | "description" | "action" | "breadcrumbs">;
+type ServiceHeroProps = Omit<ComponentProps<typeof PageHero>, "title" | "description" | "breadcrumbs">;
 
-export function ServiceHero({ page, ...props }: ServiceHeroProps & { page: PageKey }) {
+export function ServiceHero({ page, action = requestAction, ...props }: ServiceHeroProps & { page: PageKey }) {
   const { title, description, crumb } = servicePages[page];
   const home = { label: "Главная", to: "/" };
   const breadcrumbs = ["corporate", "birthday", "romantic"].includes(page)
     ? [home, adultsBreadcrumb, { label: crumb }] : [home, { label: crumb }];
-  return <PageHero title={title} description={description} action={requestAction} breadcrumbs={breadcrumbs} {...props} />;
+  return <PageHero title={title} description={description} action={action} breadcrumbs={breadcrumbs} {...props} />;
 }
 
 export function EventFacts({ items }: { items: readonly (readonly [string, string])[] }) {

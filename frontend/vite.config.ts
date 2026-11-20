@@ -1,5 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import { reactRouter } from "@react-router/dev/vite";
+import { TLSSocket } from "node:tls";
 import { fileURLToPath } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 
@@ -15,6 +16,7 @@ export default defineConfig(({ mode }) => {
           configure(proxy) {
             proxy.on("proxyReq", (outgoing, incoming) => {
               outgoing.setHeader("X-Forwarded-For", incoming.socket.remoteAddress ?? "");
+              outgoing.setHeader("X-Forwarded-Proto", incoming.socket instanceof TLSSocket ? "https" : "http");
             });
           },
         },
