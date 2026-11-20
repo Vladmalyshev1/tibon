@@ -12,6 +12,7 @@ const navigationItems: NavigationItem[] = [
   { label: "Аренда", to: "/arenda/" },
   { label: "Меню", to: "/menu/" },
   { label: "Услуги", to: "/dop-uslugi/" },
+  { label: "Галерея", to: "/galereya/" },
   { label: "Контакты", to: "/contact/" },
 ];
 

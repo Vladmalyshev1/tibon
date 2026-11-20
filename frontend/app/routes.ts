@@ -17,5 +17,7 @@ export default [
   route("pravila", "./routes/rules.tsx"),
   route("zayavka", "./routes/request.tsx"),
   route("politika-konfidencialnosti", "./routes/privacy.tsx"),
+  route("robots.txt", "./routes/robots.ts"),
+  route("sitemap.xml", "./routes/sitemap.ts"),
   route("*", "./routes/not-found.tsx"),
 ] satisfies RouteConfig;

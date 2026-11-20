@@ -1,7 +1,16 @@
+const studioBuilding = "Удмуртская Республика, Завьяловский район, село Первомайский, ул. Архитектора Сергея Макарова, 2/4";
+const mapSearch = encodeURIComponent(studioBuilding);
+
 export const studioContact = {
   phone: { label: "57-69-90", href: "tel:+73412576990" },
-  address: "Удмуртская Республика, Завьяловский район, село Первомайский, ул. Архитектора Сергея Макарова, 2/4, офис 3",
+  address: `${studioBuilding}, офис 3`,
   hours: "Ежедневно 10:00–23:00, по записи",
+  mapUrl: `https://yandex.ru/maps/?text=${mapSearch}`,
+  mapEmbedUrl: `https://yandex.ru/map-widget/v1/?mode=search&text=${mapSearch}`,
+  socials: [
+    { label: "ВКонтакте", href: "https://vk.ru/ti_bon_studio" },
+    { label: "Telegram", href: "https://t.me/Tibon25" },
+  ],
 };
 
 export type Price = {
@@ -100,4 +109,16 @@ export const studioRules = {
   guestCount: "Изменить число гостей можно не позднее чем за два дня до мероприятия.",
   food: "Свою еду, напитки, фрукты и торты приносить нельзя.",
   parents: "За детей на мероприятии отвечают родители.",
+  participation: "Гости старше пяти лет участвуют в мастер-классе и оплачивают полную стоимость.",
+  belongings: "Студия не несёт ответственности за личные вещи гостей.",
+  smoking: "На территории студии нельзя курить.",
+  breakage: "Если посуда разбилась, оплачивается стоимость предмета.",
+  cancellation: "При отмене за 10 дней предусмотрен полный возврат. При отмене за 5 дней студия предлагает перенести дату.",
+  rescheduling: "Если отменить мероприятие после переноса, возврат не предусмотрен.",
+};
+
+export const informationPages = {
+  contact: { path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы кулинарной студии TIBON. Карта проезда в село Первомайский." },
+  gallery: { path: "/galereya/", title: "Галерея", description: "Кулинарная фотоподборка TIBON о приготовлении блюд, сервировке и кухонном пространстве." },
+  rules: { path: "/pravila/", title: "Правила студии", description: "Условия бронирования, переноса и посещения кулинарной студии TIBON." },
 };

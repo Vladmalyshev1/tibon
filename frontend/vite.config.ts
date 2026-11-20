@@ -1,7 +1,24 @@
 import tailwindcss from "@tailwindcss/vite";
 import { reactRouter } from "@react-router/dev/vite";
-import { defineConfig } from "vite";
+import { fileURLToPath } from "node:url";
+import { defineConfig, loadEnv } from "vite";
 
-export default defineConfig({
-  plugins: [tailwindcss(), reactRouter()],
+export default defineConfig(({ mode }) => {
+  const root = fileURLToPath(new URL("..", import.meta.url));
+  const { INTERNAL_API_URL } = loadEnv(mode, root, "INTERNAL_API_URL");
+  return {
+    plugins: [tailwindcss(), reactRouter()],
+    server: {
+      proxy: {
+        "/api/": {
+          target: process.env.INTERNAL_API_URL || INTERNAL_API_URL || "http://127.0.0.1:8000",
+          configure(proxy) {
+            proxy.on("proxyReq", (outgoing, incoming) => {
+              outgoing.setHeader("X-Forwarded-For", incoming.socket.remoteAddress ?? "");
+            });
+          },
+        },
+      },
+    },
+  };
 });

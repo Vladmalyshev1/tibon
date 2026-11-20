@@ -3,6 +3,7 @@
 @import "tailwindcss";
 @import "./pages.css";
 @import "./services.css";
+@import "./information.css";
 
 @theme static {
   --color-white: #FFFFFF;

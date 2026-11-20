@@ -18,22 +18,35 @@ M5.1 verification includes 14 Vitest tests, TypeScript, ESLint, a production SSR
 
 **M5.2 — Services and events pages: complete.** Eight public routes render sourced Russian-language content and page-specific metadata. Menus are available in HTML and as linked PDFs. TypeScript, ESLint, 14 Vitest tests and production SSR passed. Playwright MCP verified all eight pages at 360, 390, 768, 1024, 1440 and 1920 px. See [business data sources](BUSINESS_DATA_SOURCES.md).
 
+**M5.3 — Frontend completion: complete.** Contacts, gallery, studio rules and the request form are implemented. The request form validates a draft locally through React Hook Form and Zod. Visitors can call the studio with or without JavaScript. `LeadDraft` carries the validated data for the future FastAPI integration.
+
+TypeScript, ESLint, 23 Vitest tests, production build and SSR passed. Playwright MCP audited all registered public pages, both menu views and the 404 at 360, 390, 768, 1024, 1440 and 1920 px. It verified the map, gallery filters and keyboard focus, form validation and zero network submissions. At 390 px the nine lazy-loaded WebP previews total 300 KB. The corresponding full-size files total 1.62 MB.
+
+**M6.1 — Backend Foundation: complete.** FastAPI, async PostgreSQL, the lead model and its Alembic migration, two health routes, and explicit CORS origins are in place. See [local startup](ARCHITECTURE.md#local-startup-powershell).
+
+Ruff, the backend wheel build and 37 Pytest checks passed, including the migration round trip, database constraints and a health probe against PostgreSQL 18. The Alembic CLI applied the head revision and reported no schema drift. Frontend ESLint, TypeScript, 23 Vitest checks, the production build and the SSR/Chromium smoke test passed.
+
+**M6.2 — Lead Submission API + Frontend Integration: complete.** The request form submits to FastAPI and confirms only a committed lead. PostgreSQL enforces one row per submission key. The form blocks duplicate clicks, preserves the draft on error, and reuses the key for unchanged retries. See the [lead API contract](API.md#m62--lead-submission).
+
+Ruff, the backend wheel build, 48 Pytest checks, frontend ESLint, TypeScript, 29 Vitest checks, the production build and the SSR/Chromium smoke test passed. Alembic upgraded a local PostgreSQL 18.3 instance to `0002_lead_idempotency` and detected no schema drift. Playwright verified form layout at 360, 390, 768 and 1440 px and retried a draft after a real API outage. The retry returned `201`, the page displayed and focused the success message, and a direct PostgreSQL query confirmed exactly one committed row.
+
 ## Environment
 
 | Tool | Status |
 | --- | --- |
 | Git | 2.52.0.windows.1 |
 | Node.js / npm | v24.11.1 / 11.6.2 |
-| Python | 3.14.0 via `py` launcher; `python` alias broken (Microsoft Store stub), `pip` not on PATH |
+| Python | 3.12 used for backend verification via `py -3.12`; 3.14 also installed |
+| PostgreSQL | 18, verified in an isolated native cluster |
 | Docker | not installed |
 | OpenCode | v2.2.7 |
 | Playwright Chromium | installed for M3 browser smoke test |
 
 ## Repository state
 
-- Branch `master`. M4.1 is on the remote. M5.1 and M5.2 changes are in the working copy.
+- The `master` branch contains the project milestones through M6.2.
 - Existing project content includes `AGENTS.md`, `opencode.jsonc`, `.opencode/`, `docs/`, `infra/`, and the root Playwright dev dependency.
-- `frontend/` now contains the independent React application and lockfile; `backend/` is not created in M3.
+- `frontend/` contains the independent React application and lockfile. `backend/` contains FastAPI, Alembic and Pytest. `infra/compose.yaml` provisions the local PostgreSQL service.
 
 ## Design documents (M1)
 
@@ -73,10 +86,11 @@ M5.1 verification includes 14 Vitest tests, TypeScript, ESLint, a production SSR
 
 ## Open items
 
-- Docker is unavailable: Docker Compose / Nginx deployment cannot be verified until it is installed. The later deployment must include the Node SSR service.
-- Python `python`/`pip` on PATH are broken; use `py -m pip` when backend work begins.
-- Placeholder pages remain `noindex`; replace with approved content and page-specific SEO metadata before launch.
-- Confirm the public domain and set `PUBLIC_SITE_ORIGIN` for canonical and absolute Open Graph URLs. Online request submission is pending backend integration. The request route displays the studio phone.
+- Docker is unavailable on the verification host. The local Compose PostgreSQL service still needs a container startup check. The later deployment must include the Node SSR service.
+- The studio profile and privacy policy remain `noindex` until approved content is available. The request route also uses `noindex`.
+- Set `PUBLIC_SITE_ORIGIN` only after confirming the publication domain. Without it, `robots.txt` blocks crawling and `sitemap.xml` returns 404. With it, the sitemap contains 12 canonical content pages. The contact alias, request route and unfinished pages are excluded.
+- Public release of lead submission still needs the approved privacy policy. The request page offers the studio phone as a fallback.
+- Lead throttling runs per API process and resets on restart. Idempotency remains enforced in PostgreSQL across processes.
 
 ## Milestones
 
@@ -90,4 +104,7 @@ M5.1 verification includes 14 Vitest tests, TypeScript, ESLint, a production SSR
 | M4.1 | Dark Culinary Redesign and responsive verification | done |
 | M5.1 | Internal page foundations | done |
 | M5.2 | Services, event pages and menu | done |
-| M5.3 | Remaining internal pages | awaiting explicit approval |
+| M5.3 | Contacts, gallery, rules, local request form and frontend audit | done |
+| M6.1 | Backend foundation, database migrations, health and lead contract | done |
+| M6.2 | Lead submission and frontend integration | done |
+| M6.3 | Subsequent backend work | awaiting explicit approval |

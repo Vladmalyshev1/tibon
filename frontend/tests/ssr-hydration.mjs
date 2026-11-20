@@ -67,6 +67,12 @@ try {
     "/zayavka/",
     "/politika-konfidencialnosti/",
   ];
+  const informationPages = {
+    "/galereya/": ["/galereya/", /Иллюстративная подборка/],
+    "/contact/": ["/contact/", /Карта проезда/],
+    "/kontakty/": ["/contact/", /Карта проезда/],
+    "/pravila/": ["/pravila/", /При отмене за 10 дней/],
+  };
   for (const path of publicPaths) {
     const response = await fetch(`${baseUrl}${path}`);
     const html = await response.text();
@@ -79,6 +85,16 @@ try {
       assert.doesNotMatch(html, /name="robots" content="noindex/);
       assert.doesNotMatch(html, /Структурная заготовка/);
       assert.match(html, /href="\/zayavka\/"[^>]*>Оставить заявку/);
+    } else if (informationPages[path]) {
+      const [canonical, content] = informationPages[path];
+      assert.match(html, content);
+      assert.ok(html.includes(`rel="canonical" href="https://tibon.example${canonical}"`));
+      assert.doesNotMatch(html, /name="robots" content="noindex/);
+    } else if (path === "/zayavka/") {
+      assert.match(html, /name="robots" content="noindex, follow"/);
+      assert.match(html, /<fieldset[^>]*disabled/);
+      assert.match(html, /Отправить заявку/);
+      assert.match(html, /<fieldset class="lead-fields" disabled=""/);
     } else {
       assert.match(html, /name="robots" content="noindex, nofollow"/, `${path} is scaffold content`);
       assert.doesNotMatch(html, /rel="canonical"/, `${path} should not invent a canonical URL`);
@@ -94,6 +110,14 @@ try {
       assert.match(html, /<a href="\/dlya-vzroslyh\/"[^>]*>Для взрослых<\/a>/, `${path} should link to its parent`);
     }
   }
+  const robotsResponse = await fetch(`${baseUrl}/robots.txt`);
+  assert.equal(robotsResponse.status, 200);
+  assert.match(await robotsResponse.text(), /Sitemap: https:\/\/tibon\.example\/sitemap\.xml/);
+  const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
+  assert.equal(sitemapResponse.status, 200);
+  const sitemapXml = await sitemapResponse.text();
+  assert.match(sitemapXml, /<loc>https:\/\/tibon\.example\/galereya\/<\/loc>/);
+  assert.doesNotMatch(sitemapXml, /\/(kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
   const kidsMenuResponse = await fetch(`${baseUrl}/menu/?type=kids`);
   const kidsMenuHtml = await kidsMenuResponse.text();
   assert.equal(kidsMenuResponse.status, 200);
@@ -158,7 +182,7 @@ try {
     await lightbox.waitFor({ state: "hidden" });
     assert.equal(await thumbnail.evaluate((element) => document.activeElement === element), true);
     await page.locator(".final-cta").getByRole("link", { name: "Оставить заявку" }).click();
-    await page.getByText(/Онлайн-заявки пока недоступны/).waitFor();
+    await page.getByRole("button", { name: "Отправить заявку" }).waitFor();
     await page.getByRole("link", { name: "Вернуться на главную" }).click();
     await page.getByRole("heading", { level: 1, name: "Готовить вместе — это событие" }).waitFor();
     await page.setViewportSize({ width: 390, height: 844 });

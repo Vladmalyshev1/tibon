@@ -7,6 +7,7 @@ const footerLinks = [
   { label: "Аренда студии", to: "/arenda/" },
   { label: "Меню", to: "/menu/" },
   { label: "Дополнительные услуги", to: "/dop-uslugi/" },
+  { label: "Галерея", to: "/galereya/" },
   { label: "Контакты", to: "/contact/" },
 ];
 

@@ -1,5 +1,35 @@
-﻿import { PagePlaceholder } from "../components/ui/PagePlaceholder";
-import { placeholderMeta } from "../lib/pageMeta";
+import { informationPages, studioContact } from "../data/business";
+import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
+import { PageHero } from "../components/pages/PageHero";
+import { PageSection } from "../components/pages/PageSection";
 
-export function meta() { return placeholderMeta("Контакты"); }
-export default function Contact() { return <PagePlaceholder title="Контакты" />; }
+export const loader = loadPublicPage;
+export const meta = serviceMeta(informationPages.contact);
+
+export default function Contact() {
+  return (
+    <main id="main-content" className="information-page" tabIndex={-1}>
+      <PageHero className="information-hero contact-hero" title="Контакты" breadcrumbs={[{ label: "Главная", to: "/" }, { label: "Контакты" }]} />
+      <PageSection title="Как добраться" className="contact-section">
+        <div className="contact-layout">
+          <address className="contact-details">
+            <a className="contact-phone" href={studioContact.phone.href}>{studioContact.phone.label}</a>
+            <p>{studioContact.address}</p>
+            <p>{studioContact.hours}</p>
+            <ul className="official-links" role="list">
+              {studioContact.socials.map(({ label, href }) => <li key={href}><a href={href}>{label} <span aria-hidden="true">↗</span></a></li>)}
+            </ul>
+            <a className="button-outline button-md" href={studioContact.mapUrl}>Открыть в Яндекс Картах</a>
+          </address>
+          <iframe
+            className="studio-map"
+            title="Карта проезда к кулинарной студии TIBON"
+            src={studioContact.mapEmbedUrl}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      </PageSection>
+    </main>
+  );
+}
