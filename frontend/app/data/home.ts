@@ -106,3 +106,22 @@ export const galleryImages = [
   homeImages.pasta,
   homeImages.studio,
 ];
+export const studioHeading = "Кулинарная студия";
+export const founderName = "Рената Исмагилова";
+export const homeHeading = `${studioHeading} ${founderName}`;
+export const founderImage = {
+  src: "/images/studio/renat.jpg",
+  srcSet: "/images/studio/renat-small.jpg 540w, /images/studio/renat.jpg 960w",
+  sizes: "(min-width: 84rem) 39rem, (min-width: 48rem) 50vw, 100vw",
+  alt: "Ренат Исмагилов, основатель кулинарной студии TIBON",
+  width: 960,
+  height: 1708,
+};
+export const eventCompanyImage = {
+  src: "/images/studio/druzya.webp",
+  srcSet: "/images/studio/druzya-small.webp 540w, /images/studio/druzya.webp 1086w",
+  sizes: "(min-width: 80rem) 30rem, (min-width: 48rem) 40vw, calc(100vw - 2rem)",
+  alt: "Участники мероприятия ивент-компании «Друзья» в студии TIBON",
+  width: 1086,
+  height: 1448,
+};

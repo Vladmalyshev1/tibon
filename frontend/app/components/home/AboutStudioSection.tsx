@@ -10,7 +10,7 @@ export function AboutStudioSection() {
           <p className="type-overline">О пространстве</p>
           <h2 id="about-title" className="type-h2">Кухня как место встречи</h2>
           <p className="type-lead">В TIBON приготовление становится поводом быть рядом: выбирать продукты, пробовать, обсуждать и создавать вечер вместе.</p>
-          <ButtonLink to="#directions" variant="secondary">Смотреть направления</ButtonLink>
+          <ButtonLink to="#directions" variant="outline">Смотреть направления</ButtonLink>
         </Reveal>
         <Reveal className="about-media" delay={0.08}>
           <figure className="about-photo">

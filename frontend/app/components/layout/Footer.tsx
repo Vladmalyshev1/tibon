@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { Container } from "../ui/Container";
+import { BrandMark } from "../ui/BrandMark";
 
 const footerLinks = [
   { label: "Для взрослых", to: "/dlya-vzroslyh/" },
@@ -7,7 +8,6 @@ const footerLinks = [
   { label: "Аренда студии", to: "/arenda/" },
   { label: "Меню", to: "/menu/" },
   { label: "Дополнительные услуги", to: "/dop-uslugi/" },
-  { label: "Галерея", to: "/galereya/" },
   { label: "Контакты", to: "/contact/" },
 ];
 
@@ -26,8 +26,7 @@ export function Footer({ contact, socials = [] }: FooterProps) {
     <footer className="site-footer">
       <Container className="footer-inner">
         <div className="footer-brand">
-          <Link className="wordmark wordmark-inverse" to="/" aria-label="TIBON — главная">TIBON</Link>
-          <p>Кулинарная студия</p>
+          <Link className="brand-mark" to="/" aria-label="TIBON — главная"><BrandMark /></Link>
         </div>
         <nav className="footer-main-navigation" aria-label="Навигация в подвале">
           <ul className="footer-links">
@@ -56,7 +55,10 @@ export function Footer({ contact, socials = [] }: FooterProps) {
             <Link to="/pravila/">Правила студии</Link>
             <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
           </nav>
-          <p className="footer-copyright">© TIBON</p>
+          <div className="footer-business">
+            <p>© TIBON · ИП Исмагилов Р.С.</p>
+            <p>ОГРНИП: 325180000086978</p>
+          </div>
         </div>
       </Container>
     </footer>

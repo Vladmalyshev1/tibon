@@ -233,8 +233,8 @@ describe("publication endpoints", () => {
     const response = sitemap();
     expect(response.headers.get("content-type")).toBe("application/xml; charset=utf-8");
     const xml = await response.text();
-    expect(xml.match(/<loc>/g)).toHaveLength(12);
+    expect(xml.match(/<loc>/g)).toHaveLength(11);
     expect(xml).toContain("<loc>https://tibon.example/contact/</loc>");
-    expect(xml).not.toMatch(/\/(kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
+    expect(xml).not.toMatch(/\/(galereya|kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
   });
 });

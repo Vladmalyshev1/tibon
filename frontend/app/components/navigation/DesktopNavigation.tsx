@@ -1,9 +1,15 @@
-import { NavLink } from "react-router";
+import type { ReactNode } from "react";
+import { Link, useMatch } from "react-router";
 import type { BreadcrumbItem } from "./Breadcrumbs";
 
 export type NavigationItem = BreadcrumbItem & { to: string };
 
 type DesktopNavigationProps = { items: NavigationItem[] };
+
+export function NavigationLink({ to, children, onClick }: { to: string; children: ReactNode; onClick?: () => void }) {
+  const active = useMatch({ path: to, end: to === "/" });
+  return <Link to={to} aria-current={active ? "page" : undefined} onClick={onClick}>{children}</Link>;
+}
 
 export function DesktopNavigation({ items }: DesktopNavigationProps) {
   return (
@@ -11,9 +17,7 @@ export function DesktopNavigation({ items }: DesktopNavigationProps) {
       <ul>
         {items.map((item) => (
           <li key={item.to}>
-            <NavLink to={item.to} end={item.to === "/"}>
-              {item.label}
-            </NavLink>
+            <NavigationLink to={item.to}>{item.label}</NavigationLink>
           </li>
         ))}
       </ul>

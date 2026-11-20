@@ -10,7 +10,6 @@ export default [
   route("arenda", "./routes/rental.tsx"),
   route("menu", "./routes/menu.tsx"),
   route("dop-uslugi", "./routes/services.tsx"),
-  route("galereya", "./routes/gallery.tsx"),
   route("o-studii", "./routes/studio.tsx"),
   route("contact", "./routes/contact.tsx"),
   route("kontakty", "./routes/contact.tsx", { id: "contacts-alias" }),

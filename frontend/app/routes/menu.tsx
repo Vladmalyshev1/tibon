@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import type { Route } from "./+types/menu";
 import { formatPrice, servicePages } from "../data/business";
 import { adultMenu, kidsMenu, menuDocuments, menuExtras, type MenuType } from "../data/menu";
+import { homeImages } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { Accordion } from "../components/ui/Accordion";
 import { ServiceHero } from "../components/pages/ServiceContent";
@@ -21,7 +22,7 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
   const document = menuDocuments[type];
   return (
     <main id="main-content" className="service-page" tabIndex={-1}>
-      <ServiceHero page="menu" className="menu-hero"
+      <ServiceHero page="menu" className="menu-hero" image={homeImages.corporate}
         action={{ label: "Скачать меню", to: isKids ? "/menu/?type=kids#menu-download" : "/menu/#menu-download" }} />
       <PageSection id="menu-options" title={document.title} tone="alternate" className="menu-section">
         <nav className="menu-types" aria-label="Тип меню">
@@ -44,7 +45,7 @@ export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
           ))}
         </div>
       </PageSection>
-      <PageSection id="menu-download" title="Скачать меню в PDF" width="form">
+      <PageSection id="menu-download" title="Скачать меню в PDF" className="menu-download-section">
         <MenuDownloadForm current={type} />
       </PageSection>
       {!isKids ? (
