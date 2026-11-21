@@ -57,6 +57,10 @@ Design requirements are defined in:
 - `docs/COMPONENT_SPECIFICATION.md`
 - `docs/PAGE_SPECIFICATION.md`
 
+M4.2 — Dark Cinematic Visual Alignment uses the approved **Dark Cinematic Gastronomy** direction. [Site concept](docs/references/site-concept.png) governs the homepage composition and visual rhythm. [Chef hero](docs/references/chef-hero-reference.png) governs the first screen and takes precedence over the hero pictured in the site concept. These are approved target compositions.
+
+The current approved brief and its reference compositions take precedence over older visual rules. The homepage uses predominantly black, graphite and charcoal surfaces, cinematic food photography, large serif headings, white text and red accents. The desktop hero places the chef on the left and the large heading on the right, with a food close-up and dramatic lighting. Keep the dark composition when adapting it for phones. Never revert automatically to a light Premium Editorial theme. A change in direction requires explicit user approval.
+
 Use licensed images and document their sources.
 
 Preserve:
@@ -102,9 +106,10 @@ Before declaring a milestone complete:
 3. Run production build.
 4. Verify SSR when public pages are affected.
 5. Check responsive behavior when UI is affected.
-6. Inspect Git diff.
-7. Update relevant documentation.
-8. Report actual results.
+6. For M4.2 implementation, capture desktop and mobile screenshots and compare the hero with the approved chef reference and the full homepage with the approved site concept. Record widths, screenshot paths and any deliberate mobile adaptations. The supplied compositions are desktop references.
+7. Inspect Git diff.
+8. Update relevant documentation.
+9. Report actual results.
 
 Never claim a test passed unless it was executed.
 
@@ -157,5 +162,8 @@ Completed:
 - M5.1–M5.3 — Internal pages and public forms.
 - M6.1–M6.3 — Backend, lead submission, and integration QA.
 - M7 — Telegram Notifications and Menu Lead Capture.
+
+Current:
+- M4.2 — Dark Cinematic Visual Alignment. **In progress.** The current assignment is documentation only. Begin UI implementation only on a subsequent explicit assignment. Preserve architecture, API, backend, forms, routes and functional contracts.
 
 Do not start future milestones without explicit user approval.

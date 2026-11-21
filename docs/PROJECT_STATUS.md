@@ -4,6 +4,10 @@ Last updated: 2026-11-21
 
 ## Current milestone
 
+**M4.2 — Dark Cinematic Visual Alignment: In progress.** The approved direction is **Dark Cinematic Gastronomy**. [Site concept](references/site-concept.png) governs the homepage, and [chef hero](references/chef-hero-reference.png) takes precedence for the first screen. The current assignment covers documentation alignment. UI implementation requires a subsequent explicit assignment and must preserve architecture, API, backend, forms, routes and functional contracts. Visual acceptance requires [desktop and mobile screenshot comparison](HOME_PAGE_IMPLEMENTATION.md#приёмка-m42).
+
+## Completed milestones and design history
+
 **M0 — Environment & configuration check: complete.**
 **M1 — Reference audit & page specification: complete.** No application code written in M1 by design.
 **M2 — Design system & SEO decision: complete.** Documents only; no application code, no scaffolding, no dependencies installed.
@@ -59,6 +63,14 @@ TypeScript, ESLint, 34 Vitest tests, the production build and SSR/Chromium passe
 TypeScript, ESLint, 34 Vitest tests, production build and SSR/Chromium passed. Playwright MCP checked 17 views at 320, 390, 768, 1024, 1440 and 1920 px. It exercised keyboard navigation, menu category and history changes, accordion controls, request validation, reduced motion and content without JavaScript. Screenshots are in `frontend/test-results/creative-redesign/`.
 
 The standalone taste-skill gate reported 34 findings in the production visual audit. Its fixed section heights, grid and markup conventions, copy heuristics and contact rules differ from this implementation. The full report is in `frontend/test-results/creative-redesign/taste-gate-final.log`. The homepage pairs the restored chef portrait with a dark slate photograph. The background has separately preloaded mobile (49 KB) and desktop (175 KB) WebP assets.
+
+**Historical baseline — Creative Redesign 2.0, Premium Editorial × Creative Food Studio.** Before M4.2, the homepage used a cream background, Playfair Display with a red italic line, a responsive image of food preparation, asymmetric workshop features and an event list. The studio section features the founder’s portrait, the gallery adds a studio event photo, and the closing section links to the request form and phone. The header, mobile menu and shared page heroes used the light palette. This entry records the baseline implementation. M4.2 follows the approved dark references and prohibits automatic reversion to the light direction.
+
+TypeScript, ESLint, 34 Vitest tests, the production build and the SSR/Chromium smoke test passed. Playwright checked 17 views at 320, 390, 768, 1024, 1440 and 1920 px with no horizontal overflow, clipped headings, broken images or hydration errors. Keyboard navigation, the lightbox, reduced motion and server-rendered content without JavaScript passed. Screenshots are in `frontend/test-results/redesign-2.0/`.
+
+The browser-to-FastAPI test saved one event lead and two menu requests in disposable PostgreSQL. Both downloaded PDFs matched the local source hashes. The Telegram worker processed all three notifications against a local HTTP mock. All 83 Pytest tests passed with PostgreSQL. The production Telegram chat was outside this test.
+
+The separate taste-skill audit finished with `GATE: OPEN 31`. Its remaining findings cover fixed viewport section heights, starter markup, grid alignment, heading and action conventions, and contact fields. The full result is in `frontend/test-results/redesign-2.0/taste-gate.log`.
 
 ## Environment
 
@@ -132,6 +144,7 @@ The standalone taste-skill gate reported 34 findings in the production visual au
 | M3 | Frontend scaffold, SSR, shared UI foundations, token implementation, tests | done |
 | M4 | Homepage design, content and browser verification | done |
 | M4.1 | Dark Culinary Redesign and responsive verification | done |
+| M4.2 | Dark Cinematic Visual Alignment | In progress |
 | M5.1 | Internal page foundations | done |
 | M5.2 | Services, event pages and menu | done |
 | M5.3 | Contacts, gallery, rules, local request form and frontend audit | done |
