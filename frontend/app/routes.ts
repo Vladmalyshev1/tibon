@@ -13,7 +13,6 @@ export default [
   route("o-studii", "./routes/studio.tsx"),
   route("contact", "./routes/contact.tsx"),
   route("kontakty", "./routes/contact.tsx", { id: "contacts-alias" }),
-  route("pravila", "./routes/rules.tsx"),
   route("zayavka", "./routes/request.tsx"),
   route("politika-konfidencialnosti", "./routes/privacy.tsx"),
   route("robots.txt", "./routes/robots.ts"),

@@ -29,17 +29,23 @@ export const leadSchema = z.object({
 export type LeadFields = z.input<typeof leadSchema>;
 export type LeadDraft = z.output<typeof leadSchema>;
 export const menuLeadSchema = leadSchema.pick({ name: true, phone: true, consent: true });
+export type CallbackFields = z.input<typeof menuLeadSchema>;
 
 export function isPastStudioDate(date: string | undefined): boolean {
   return date !== undefined && date < studioDate.format(new Date());
 }
 
-export const resolveLead: Resolver<LeadFields, undefined, LeadDraft> = (values) => {
-  const parsed = leadSchema.safeParse(values);
+function resolveFields<T extends LeadDraft | CallbackFields>(parsed: z.ZodSafeParseResult<T>) {
   if (parsed.success) return { values: parsed.data, errors: {} };
   const fields = z.flattenError(parsed.error).fieldErrors;
   const errors = Object.fromEntries(
     Object.entries(fields).map(([field, messages]) => [field, { type: "validation", message: messages[0] }]),
   );
   return { values: {}, errors };
-};
+}
+
+export const resolveLead: Resolver<LeadFields, undefined, LeadDraft> = values =>
+  resolveFields(leadSchema.safeParse(values));
+
+export const resolveCallback: Resolver<CallbackFields> = values =>
+  resolveFields(menuLeadSchema.safeParse(values));

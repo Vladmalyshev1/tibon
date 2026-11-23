@@ -1,5 +1,5 @@
 import { adultGroup, requestAction, servicePages } from "../data/business";
-import { homeImages } from "../data/home";
+import { preparationImage } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { AdultGroupFacts, BookingFAQ, RelatedFormats, ServiceHero } from "../components/pages/ServiceContent";
 import { PageCTA } from "../components/pages/PageCTA";
@@ -11,9 +11,9 @@ export const meta = serviceMeta(servicePages.corporate);
 
 export default function Corporate() {
   return (
-    <main id="main-content" className="service-page" tabIndex={-1}>
-      <ServiceHero page="corporate" image={homeImages.corporate} layout="stacked" className="corporate-hero" />
-      <PageSection title="Как проходит корпоратив" tone="alternate" className="editorial-section">
+    <main id="main-content" className="service-page cinematic-page" tabIndex={-1}>
+      <ServiceHero page="corporate" image={{ ...preparationImage, sizes: "100vw" }} layout="stacked" className="corporate-hero" />
+      <PageSection title="Как проходит корпоратив" tone="alternate" className="editorial-section corporate-program">
         <div className="editorial-copy">
           <AdultGroupFacts />
           <p>Команда готовит с шефом. Кулинарная часть занимает {adultGroup.cooking}, затем участники пробуют приготовленное.</p>

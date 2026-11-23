@@ -1,17 +1,14 @@
-import type { BreadcrumbItem } from "../navigation/Breadcrumbs";
+import type { ReactNode } from "react";
 import { PageHero } from "../pages/PageHero";
 
-export function PagePlaceholder({ title, parent }: { title: string; parent?: BreadcrumbItem }) {
-  const breadcrumbs: BreadcrumbItem[] = [{ label: "Главная", to: "/" }];
-  if (parent) breadcrumbs.push(parent);
-  breadcrumbs.push({ label: title });
-
+export function PagePlaceholder({ title, description, children }: { title: string; description: string; children: ReactNode }) {
   return (
-    <main id="main-content" tabIndex={-1}>
+    <main id="main-content" className="information-page cinematic-page publication-page" tabIndex={-1}>
       <PageHero
         title={title}
-        description="Структурная заготовка страницы. Контент будет добавлен на следующем этапе."
-        breadcrumbs={breadcrumbs}
+        description={description}
+        breadcrumbs={[{ label: "Главная", to: "/" }, { label: title }]}
+        details={children}
       />
     </main>
   );

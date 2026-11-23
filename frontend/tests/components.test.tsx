@@ -30,7 +30,7 @@ describe("application chrome", () => {
     expect(screen.getAllByRole("link", { name: "TIBON — главная" })).toHaveLength(2);
     expect(screen.getByRole("main")).toHaveTextContent("Page body");
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Правила студии" })).toHaveAttribute("href", "/pravila/");
+    expect(screen.queryByRole("link", { name: "Правила студии" })).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Социальные сети" })).not.toBeInTheDocument();
   });
 

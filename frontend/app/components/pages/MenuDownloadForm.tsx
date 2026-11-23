@@ -3,7 +3,10 @@ import { Link } from "react-router";
 import { menuLeadSchema } from "../../data/lead";
 import type { MenuType } from "../../data/menu";
 import { downloadMenuPdf, submitLead } from "../../lib/leadApi";
+import { useHydrated } from "../../lib/useHydrated";
 import { Button } from "../ui/Button";
+import { IconInputControl } from "./IconInputControl";
+import { LineIcon } from "../ui/LineIcon";
 
 const menus = {
   adults: "Скачать взрослое меню",
@@ -12,6 +15,8 @@ const menus = {
 
 export function MenuDownloadForm({ current }: { current: MenuType }) {
   const labelId = useId();
+  const alternate = current === "adults" ? "kids" : "adults";
+  const enabled = useHydrated();
   const [fields, setFields] = useState({ name: "", phone: "", consent: false });
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{ message: string; error: boolean }>();
@@ -21,7 +26,7 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!details.success || inFlight.current) return;
+    if (!enabled || !details.success || inFlight.current) return;
     const button = (event.nativeEvent as SubmitEvent).submitter;
     const type = button instanceof HTMLButtonElement && (button.value === "kids" || button.value === "adults")
       ? button.value : current;
@@ -72,37 +77,40 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
   }
 
   return (
-    <form className="lead-form" method="post" aria-busy={busy} aria-describedby={labelId} onSubmit={submit} noValidate>
-      <p id={labelId}>Укажите имя и российский номер телефона, затем выберите PDF.</p>
+    <form className="lead-form menu-download-form" method="post" aria-busy={busy} aria-describedby={labelId} onSubmit={submit} noValidate>
+      <p id={labelId} className="menu-download-description">Укажите имя и российский номер телефона, чтобы скачать PDF.</p>
       <noscript><p>Для скачивания меню включите JavaScript.</p></noscript>
-      <fieldset className="lead-fields" disabled={busy}>
-        <div className="lead-pair">
-          <label className="lead-field">
-            Имя *
+      <fieldset className="lead-fields" disabled={!enabled || busy}>
+        <label className="lead-field">
+          <span>Имя <span className="menu-required">*</span></span>
+          <IconInputControl icon="user">
             <input autoComplete="name" required maxLength={80} value={fields.name}
+              placeholder="Ваше имя"
               onChange={event => setFields({ ...fields, name: event.currentTarget.value })} />
-          </label>
-          <label className="lead-field">
-            Телефон *
+          </IconInputControl>
+        </label>
+        <label className="lead-field">
+          <span>Телефон <span className="menu-required">*</span></span>
+          <IconInputControl icon="phone">
             <input type="tel" autoComplete="tel" required maxLength={24} value={fields.phone}
+              placeholder="+7 (___) ___-__-__"
               onChange={event => setFields({ ...fields, phone: event.currentTarget.value })} />
-          </label>
-        </div>
-        <div>
+          </IconInputControl>
+        </label>
+        <div className="menu-consent">
           <label className="lead-consent">
-            <input type="checkbox" required checked={fields.consent}
+            <input type="checkbox" required checked={fields.consent} aria-describedby={`${labelId}-policy`}
               onChange={event => setFields({ ...fields, consent: event.currentTarget.checked })} />
             <span>Согласен на обработку персональных данных для ответа на запрос *</span>
           </label>
-          <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
+          <Link id={`${labelId}-policy`} to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
         </div>
-        <div className="lead-pair">
-          {([current, current === "adults" ? "kids" : "adults"] as const).map(type => (
-            <Button key={type} type="submit" value={type} variant="outline" disabled={busy || !details.success}>
-              {menus[type]}
-            </Button>
-          ))}
-        </div>
+        <Button type="submit" size="lg" value={current} className="menu-primary-download" disabled={!enabled || busy || !details.success}>
+          {menus[current]} <LineIcon name="download" />
+        </Button>
+        <Button type="submit" value={alternate} variant="text" className="menu-alternate-download" disabled={!enabled || busy || !details.success}>
+          {menus[alternate]}
+        </Button>
       </fieldset>
       {feedback ? <p role={feedback.error ? "alert" : "status"} className={feedback.error ? "lead-error" : undefined}>
         {feedback.message}

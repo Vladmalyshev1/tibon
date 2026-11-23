@@ -6,11 +6,13 @@ from uuid import uuid4
 
 import httpx
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 from sqlalchemy import func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings, TelegramSettings
+from app.main import create_app
 from app.models import Lead, TelegramNotification
 from app.models.lead import LeadFormat, LeadSource
 from app.notifications import delivery_status
@@ -241,6 +243,63 @@ def test_worker_claims_once_across_concurrent_consumers(postgres_schema):
                 "failed": 0,
             }
             assert PAYLOAD.phone not in str(status) and PAYLOAD.name not in str(status)
+        finally:
+            await engine.dispose()
+
+    asyncio.run(run())
+
+
+def test_callback_api_persists_once_and_worker_sends_only_contact(postgres_schema):
+    settings, scoped_engine = postgres_schema
+    body = {
+        "name": "Synthetic Callback",
+        "phone": "+70000000703",
+        "format": "callback",
+        "consent": True,
+    }
+    headers = {"Idempotency-Key": str(uuid4())}
+    with TestClient(create_app(settings)) as client:
+        details = {
+            "date": "2099-01-01", "guests": 10, "comment": "Synthetic", "source": "menu_kids"
+        }
+        invalid = client.post("/api/v1/leads", json=body | details, headers=headers)
+        assert invalid.status_code == 422
+        assert invalid.json() == {"errors": dict.fromkeys(details, "invalid")}
+        saved = client.post("/api/v1/leads", json=body, headers=headers)
+        assert saved.status_code == 201
+        replay = client.post("/api/v1/leads", json=body, headers=headers)
+        assert replay.status_code == 200 and replay.json() == saved.json()
+        assert client.get(f"/api/v1/leads/{saved.json()['id']}/menu", headers=headers).status_code == 404
+
+    async def run():
+        engine = scoped_engine(settings)
+        calls = []
+
+        def mock(request):
+            calls.append(json.loads(request.content))
+            return httpx.Response(200, json={"ok": True, "result": {"message_id": 12}})
+
+        try:
+            async with AsyncSession(engine) as session:
+                lead = (await session.scalars(select(Lead))).one()
+                assert str(lead.id) == saved.json()["id"]
+                assert lead.format == LeadFormat.CALLBACK and lead.consent
+                assert (lead.name, lead.phone) == (body["name"], body["phone"])
+                assert (lead.event_date, lead.guests, lead.comment, lead.source) == (None,) * 4
+                notification = (await session.scalars(select(TelegramNotification))).one()
+                assert notification.lead_id == lead.id and notification.status == "pending"
+
+            async with telegram_http_client(transport=httpx.MockTransport(mock)) as http:
+                telegram = TelegramClient(http, TOKEN)
+                assert await deliver_next(engine, telegram, CHAT_ID)
+                assert not await deliver_next(engine, telegram, CHAT_ID)
+            assert (await delivery_status(engine, lead.id))["status"] == "sent"
+            assert len(calls) == 1 and calls[0]["chat_id"] == CHAT_ID
+            assert calls[0]["text"] == (
+                "Новая заявка: обратный звонок\n"
+                "Имя: Synthetic Callback\n"
+                "Телефон: +70000000703"
+            )
         finally:
             await engine.dispose()
 

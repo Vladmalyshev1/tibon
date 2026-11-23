@@ -1,0 +1,56 @@
+:root {
+  --hero-title-size: clamp(2.125rem, 1.52rem + 2.9vw, 4.25rem);
+  --hero-title-line-height: 1.06;
+  --hero-heading-size: clamp(1.35rem, 1.16rem + 0.75vw, 2rem);
+  --hero-heading-line-height: 1.2;
+  --hero-lead-size: clamp(0.9375rem, 0.86rem + 0.32vw, 1.125rem);
+  --hero-lead-line-height: 1.55;
+  --hero-eyebrow-size: clamp(0.75rem, 0.69rem + 0.25vw, 0.95rem);
+  --hero-eyebrow-line-height: 1.3;
+  --hero-button-size: clamp(0.875rem, 0.81rem + 0.28vw, 1.1rem);
+  --hero-button-line-height: 1.25;
+  --hero-copy-gap: clamp(0.9rem, 1.65vw, 1.5rem);
+  --hero-padding-top: clamp(1.6rem, 4vw, 4rem);
+  --hero-gutter: clamp(1rem, 5vw, 4rem);
+  --hero-copy-width: 41ch;
+}
+
+.hero-container {
+  width: calc(100% - 2 * var(--hero-gutter));
+  max-width: var(--container);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.hero .type-display {
+  font-size: var(--hero-title-size);
+  line-height: var(--hero-title-line-height);
+}
+
+.hero h2 {
+  font-size: var(--hero-heading-size);
+  line-height: var(--hero-heading-line-height);
+}
+
+.hero .type-lead {
+  max-width: var(--hero-copy-width);
+  font-size: var(--hero-lead-size);
+  line-height: var(--hero-lead-line-height);
+}
+
+.hero :is(.cinematic-kicker, .type-overline) {
+  font-size: var(--hero-eyebrow-size);
+  line-height: var(--hero-eyebrow-line-height);
+}
+
+.hero :is(.button-primary, .button-outline) {
+  font-size: var(--hero-button-size);
+  line-height: var(--hero-button-line-height);
+}
+
+.menu-hero-copy {
+  display: grid;
+  gap: var(--hero-copy-gap);
+}
+
+.menu-hero-copy .type-lead { margin: 0; }

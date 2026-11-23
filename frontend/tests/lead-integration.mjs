@@ -108,6 +108,102 @@ try {
   assert.notEqual(menus.adults.sha256, menus.kids.sha256);
   assert.equal(posts, 5);
   console.log(JSON.stringify({ leadId: first.body.id, status: [422, 201, 200], menus }));
+
+  const mobile = await browser.newContext({
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+  });
+  const callbackPage = await mobile.newPage();
+  await callbackPage.goto(base.href);
+  const callback = callbackPage.locator(".callback-form");
+  const callbackName = callback.getByLabel("Имя *", { exact: true });
+  const phone = callback.getByLabel("Телефон *");
+  const consent = callback.getByRole("checkbox");
+  const callMe = callback.getByRole("button", { name: "Перезвоните мне" });
+  const callbackStatus = callbackPage.getByRole("status").filter({ hasText: "Заявка принята" });
+  const requests = [];
+  callbackPage.on("request", request => {
+    if (request.url() === endpoint && request.method() === "POST") requests.push(request);
+  });
+  await expect(callMe).toBeEnabled();
+  assert.deepEqual(await callback.locator("input, select, textarea").evaluateAll(
+    fields => fields.map(field => field.name),
+  ), ["name", "phone", "consent"]);
+  await expect(consent).not.toBeChecked();
+  await callbackName.fill("TIBON synthetic callback");
+  await phone.press("End");
+  await phone.pressSequentially("0123456789");
+  await expect(phone).toHaveValue("+7 (012) 345-67-89");
+  await phone.pressSequentially("0");
+  await expect(phone).toHaveValue("+7 (012) 345-67-89");
+  await phone.evaluate(input => {
+    const start = input.value.indexOf("-");
+    input.setSelectionRange(start, start);
+  });
+  await phone.press("Delete");
+  await expect(phone).toHaveValue("+7 (012) 345-78-9");
+  await phone.pressSequentially("6");
+  await expect(phone).toHaveValue("+7 (012) 345-67-89");
+  await phone.evaluate(input => {
+    const start = input.value.indexOf(")") + 2;
+    input.setSelectionRange(start, start);
+  });
+  await phone.press("Backspace");
+  await expect(phone).toHaveValue("+7 (013) 456-78-9");
+  await callMe.click();
+  await expect(phone).toBeFocused();
+  await expect(phone).toHaveAttribute("aria-invalid", "true");
+  await phone.evaluate(input => {
+    const start = input.value.indexOf("(") + 3;
+    input.setSelectionRange(start, start);
+  });
+  await phone.pressSequentially("2");
+  await expect(phone).toHaveValue("+7 (012) 345-67-89");
+
+  for (const [pasted, expected] of [
+    ["+7 (000) 000-07-02", "+7 (000) 000-07-02"],
+    ["8 000 000 07 03", "+7 (000) 000-07-03"],
+  ]) {
+    await phone.evaluate((input, text) => {
+      const { DataTransfer, ClipboardEvent } = input.ownerDocument.defaultView;
+      const clipboardData = new DataTransfer();
+      clipboardData.setData("text/plain", text);
+      input.dispatchEvent(new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true }));
+    }, pasted);
+    await expect(phone).toHaveValue(expected);
+  }
+  await callMe.click();
+  await expect(consent).toBeFocused();
+  assert.equal(requests.length, 0);
+  await consent.check();
+
+  await callbackPage.route(endpoint, route => route.fulfill({ status: 503 }), { times: 1 });
+  await callMe.click();
+  await expect(callback.getByRole("alert")).toContainText("Не удалось отправить заявку");
+  await expect(callbackName).toHaveValue("TIBON synthetic callback");
+  await expect(phone).toHaveValue("+7 (000) 000-07-03");
+  await expect(callbackStatus).toHaveCount(0);
+
+  const releaseCallback = Promise.withResolvers();
+  await callbackPage.route(endpoint, async route => {
+    await releaseCallback.promise;
+    await route.continue();
+  }, { times: 1 });
+  const callbackSaved = callbackPage.waitForResponse(response =>
+    response.url() === endpoint && response.status() === 201,
+  );
+  await callMe.click();
+  await expect(callback.getByRole("button", { name: "Отправляем…" })).toBeDisabled();
+  await callback.evaluate(form => form.requestSubmit());
+  await expect(callbackStatus).toHaveCount(0);
+  releaseCallback.resolve();
+  await callbackSaved;
+  await expect(callbackStatus).toBeFocused();
+  assert.equal(requests.length, 2);
+  assert.equal(requests[0].headers()["idempotency-key"], requests[1].headers()["idempotency-key"]);
+  assert.deepEqual(requests[1].postDataJSON(), {
+    name: "TIBON synthetic callback", phone: "+70000000703", consent: true, format: "callback",
+  });
+  console.log("Callback: mobile input, paste, deletion, consent, HTTP 503, duplicate protection and real API save pass.");
 } finally {
   await browser.close();
 }

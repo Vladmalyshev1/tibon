@@ -5,9 +5,8 @@ import { Breadcrumbs } from "../app/components/navigation/Breadcrumbs";
 import { PageGallery } from "../app/components/pages/PageGallery";
 import { PageHero } from "../app/components/pages/PageHero";
 import { ServiceCard } from "../app/components/pages/ServiceCard";
-import { galleryImages } from "../app/data/home";
 import { pageMeta, placeholderMeta } from "../app/lib/pageMeta";
-import { InternalPage } from "./fixtures/InternalPage";
+import { galleryImages, InternalPage } from "./fixtures/InternalPage";
 
 describe("internal page components", () => {
   it("composes one H1, named H2 sections and H3 items with page actions", () => {

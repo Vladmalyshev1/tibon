@@ -8,6 +8,25 @@ type LeadResult =
   | { kind: "network" | "unavailable" | "limited" | "conflict" }
   | { kind: "validation"; errors: Record<string, "required" | "invalid"> };
 
+export const leadSubmissionErrors = {
+  network: "Не удалось связаться с сервером. Проверьте подключение и попробуйте снова.",
+  limited: "Слишком много попыток. Подождите немного и попробуйте снова.",
+  conflict: "Не удалось повторить отправку. Измените данные заявки или позвоните в студию.",
+  validation: "Не удалось проверить заявку. Проверьте данные и попробуйте снова.",
+  unavailable: "Не удалось отправить заявку. Попробуйте снова или позвоните в студию.",
+};
+
+export function rememberSubmissionKey(attempts: Map<string, string>, body: string) {
+  const key = attempts.get(body) ?? crypto.randomUUID();
+  attempts.delete(body);
+  attempts.set(body, key);
+  if (attempts.size > 8) {
+    const oldest = attempts.keys().next();
+    if (!oldest.done) attempts.delete(oldest.value);
+  }
+  return key;
+}
+
 export async function submitLead(body: string, key: string): Promise<LeadResult> {
   let response: Response;
   try {

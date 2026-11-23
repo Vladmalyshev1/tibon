@@ -1,13 +1,9 @@
-import { Link } from "react-router";
 import type { Route } from "./+types/menu";
-import { formatPrice, servicePages } from "../data/business";
-import { adultMenu, kidsMenu, menuDocuments, menuExtras, type MenuType } from "../data/menu";
-import { homeImages } from "../data/home";
+import { servicePages } from "../data/business";
+import type { MenuType } from "../data/menu";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
-import { Accordion } from "../components/ui/Accordion";
-import { ServiceHero } from "../components/pages/ServiceContent";
+import { LineIcon } from "../components/ui/LineIcon";
 import { MenuDownloadForm } from "../components/pages/MenuDownloadForm";
-import { PageSection } from "../components/pages/PageSection";
 
 export function loader({ request }: Route.LoaderArgs): { origin: string | null; type: MenuType } {
   const type = new URL(request.url).searchParams.get("type") === "kids" ? "kids" : "adults";
@@ -17,61 +13,25 @@ export function loader({ request }: Route.LoaderArgs): { origin: string | null; 
 export const meta = serviceMeta(servicePages.menu);
 
 export default function Menu({ loaderData: { type } }: Route.ComponentProps) {
-  const isKids = type === "kids";
-  const sets = isKids ? [kidsMenu] : adultMenu;
-  const document = menuDocuments[type];
   return (
-    <main id="main-content" className="service-page" tabIndex={-1}>
-      <ServiceHero page="menu" className="menu-hero" image={homeImages.corporate}
-        action={{ label: "Скачать меню", to: isKids ? "/menu/?type=kids#menu-download" : "/menu/#menu-download" }} />
-      <PageSection id="menu-options" title={document.title} tone="alternate" className="menu-section">
-        <nav className="menu-types" aria-label="Тип меню">
-          <Link to="/menu/#menu-options" aria-current={!isKids ? "page" : undefined}>Взрослое</Link>
-          <Link to="/menu/?type=kids#menu-options" aria-current={isKids ? "page" : undefined}>Детское</Link>
-        </nav>
-        <div className="menu-sets" key={type}>
-          {sets.map((set, index) => (
-            <Accordion key={set.id} title={
-              <span className="menu-set-label">
-                <span>{set.title}</span>{" "}
-                <span className="menu-set-price">{formatPrice({ amount: set.amount, unit: "человек" })}</span>
-              </span>
-            } defaultOpen={index === 0}>
-              {isKids ? <p>К горячему блюду выберите ещё два блюда из меню.</p> : null}
-              <div className="menu-categories">
-                {set.categories.map(({ title, dishes }) => (
-                  <section key={title}>
-                    <h3 className="type-h3">{title}</h3>
-                    <ul>{dishes.map(dish => <li key={dish}>{dish}</li>)}</ul>
-                  </section>
-                ))}
-              </div>
-            </Accordion>
-          ))}
-        </div>
-      </PageSection>
-      <PageSection id="menu-download" title="Скачать меню в PDF" className="menu-download-section">
-        <MenuDownloadForm current={type} />
-      </PageSection>
-      {!isKids ? (
-        <PageSection title="Стейки, закуски и напитки" className="editorial-section menu-extras">
-          <div className="menu-sets">
-            {menuExtras.map(({ id, title, note, dishes }) => (
-              <Accordion key={id} title={title}>
-                {note ? <p>{note}</p> : null}
-                <dl className="menu-price-list">
-                  {dishes.map(([dish, amount, quantity, from]) => (
-                    <div key={dish}>
-                      <dt>{dish}{quantity ? <small>{quantity}</small> : null}</dt>
-                      <dd>{formatPrice({ amount, from })}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Accordion>
-            ))}
+    <main id="main-content" className="service-page cinematic-menu" tabIndex={-1}>
+      <section className="hero menu-hero" aria-labelledby="menu-title">
+        <div className="hero-container menu-hero-inner">
+          <div className="menu-hero-copy">
+            <p className="cinematic-kicker">Меню студии</p>
+            <h1 id="menu-title" className="type-display">Ознакомьтесь<br />с нашим меню</h1>
+            <p className="type-lead">Авторские блюда и программы для разных поводов. Скачайте актуальное меню в PDF.</p>
           </div>
-        </PageSection>
-      ) : null}
+          <div className="menu-hero-cover" aria-hidden="true" />
+          <section id="menu-download" className="menu-download-panel" aria-labelledby="menu-download-title" tabIndex={-1}>
+            <div className="menu-download-heading">
+              <LineIcon name="download" />
+              <h2 id="menu-download-title">Скачать меню</h2>
+            </div>
+            <MenuDownloadForm current={type} />
+          </section>
+        </div>
+      </section>
     </main>
   );
 }

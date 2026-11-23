@@ -1,24 +1,26 @@
-import type { ReactNode } from "react";
-import { Link, useMatch } from "react-router";
-import type { BreadcrumbItem } from "./Breadcrumbs";
+import type { MouseEventHandler, ReactNode } from "react";
+import { Link, matchPath, useLocation } from "react-router";
 
-export type NavigationItem = BreadcrumbItem & { to: string };
+export type NavigationItem = { label: string; to: string; section?: boolean; alias?: string };
 
-type DesktopNavigationProps = { items: NavigationItem[] };
-
-export function NavigationLink({ to, children, onClick }: { to: string; children: ReactNode; onClick?: () => void }) {
-  const active = useMatch({ path: to, end: to === "/" });
-  return <Link to={to} aria-current={active ? "page" : undefined} onClick={onClick}>{children}</Link>;
+export function NavigationLink({ item, children, onClick }: {
+  item: NavigationItem;
+  children: ReactNode;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+}) {
+  const { pathname } = useLocation();
+  const currentPage = matchPath(item.to, pathname) || (item.alias && matchPath(item.alias, pathname));
+  const currentSection = item.section && matchPath({ path: item.to, end: false }, pathname);
+  const current = currentPage ? "page" : currentSection ? "location" : undefined;
+  return <Link to={item.to} aria-current={current} onClick={onClick}>{children}</Link>;
 }
 
-export function DesktopNavigation({ items }: DesktopNavigationProps) {
+export function DesktopNavigation({ items }: { items: readonly NavigationItem[] }) {
   return (
     <nav className="desktop-navigation" aria-label="Основная навигация">
-      <ul>
-        {items.map((item) => (
-          <li key={item.to}>
-            <NavigationLink to={item.to}>{item.label}</NavigationLink>
-          </li>
+      <ul className="desktop-navigation-list">
+        {items.map(item => (
+          <li key={item.to}><NavigationLink item={item}>{item.label}</NavigationLink></li>
         ))}
       </ul>
     </nav>

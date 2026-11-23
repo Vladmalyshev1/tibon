@@ -1,31 +1,43 @@
 import { formatPrice, rentalRates, rentalUses, requestAction, servicePages, studioContact } from "../data/business";
 import { homeImages } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
-import { ServiceHero } from "../components/pages/ServiceContent";
+import { ReferenceHero } from "../components/pages/ReferenceHero";
 import { FeatureGrid } from "../components/pages/FeatureGrid";
 import { PageCTA } from "../components/pages/PageCTA";
 import { PageSection } from "../components/pages/PageSection";
+import { ButtonLink } from "../components/ui/Button";
+import { LineIcon } from "../components/ui/LineIcon";
 
 export const loader = loadPublicPage;
 export const meta = serviceMeta(servicePages.rental);
 
 export default function Rental() {
   return (
-    <main id="main-content" className="service-page" tabIndex={-1}>
-      <ServiceHero page="rental" image={homeImages.studio} imageCaption="Иллюстрация кухонного пространства" className="rental-hero" />
-      <PageSection title="Почасовая аренда" tone="alternate" className="editorial-section">
-        <div className="editorial-copy">
-          <dl className="editorial-ledger">
-            {rentalRates.map(({ id, label, price }) => <div key={id}><dt>{label}</dt><dd>{formatPrice(price)}</dd></div>)}
+    <main id="main-content" className="service-page cinematic-page" tabIndex={-1}>
+      <ReferenceHero page="rental" lines={["Аренда", "кулинарной", "студии"]}
+        image={{ ...homeImages.studio, alt: "Иллюстрация кухонного пространства" }}
+        caption="Иллюстрация кухонного пространства" />
+      <section className="reference-rates" aria-labelledby="rental-rates-title">
+        <div className="reference-wrap reference-rates-layout">
+          <h2 id="rental-rates-title" className="type-h2 reference-rule">Почасовая аренда</h2>
+          <dl className="reference-rate-cards">
+            {rentalRates.map(({ id, label, price }) => (
+              <div key={id}>
+                <dt><LineIcon name={id === "weekday" ? "calendar" : "calendar-star"} />{label}</dt>
+                <dd><strong>{formatPrice({ amount: price.amount })}</strong>{" "}<span>в час</span></dd>
+              </div>
+            ))}
           </dl>
-          <p>Окончательный тариф зависит от выбранного времени. Уточните его при согласовании даты.</p>
         </div>
-      </PageSection>
-      <PageSection title="Для чего можно снять студию">
+      </section>
+      <PageSection title="Для чего можно снять студию" className="rental-uses">
         <FeatureGrid items={rentalUses} />
       </PageSection>
       <PageSection title="Как нас найти" className="editorial-section">
-        <address className="editorial-copy"><p>{studioContact.address}</p><p>{studioContact.hours}</p></address>
+        <address className="editorial-copy">
+          <p>{studioContact.address}</p><p>{studioContact.hours}</p>
+          <ButtonLink to="/contact/" variant="outline">Карта проезда</ButtonLink>
+        </address>
       </PageSection>
       <PageCTA title="Проверить дату и время" action={requestAction} layout="inline" />
     </main>

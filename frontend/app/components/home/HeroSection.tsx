@@ -1,24 +1,43 @@
-import { Link } from "react-router";
 import { ButtonLink } from "../ui/Button";
+import { LineIcon } from "../ui/LineIcon";
 import { PhotoImage } from "../ui/PhotoTile";
-import { founderImage, founderName, studioHeading } from "../../data/home";
+import { founderImage } from "../../data/home";
+
+const studioBenefits = [
+  { icon: "chef", lines: ["Профессиональный", "шеф"] },
+  { icon: "cutlery", lines: ["Авторские", "рецепты"] },
+  { icon: "group", lines: ["Форматы", "для разных событий"] },
+  { icon: "pin", lines: ["Студия рядом", "с Ижевском"] },
+] as const;
 
 export function HeroSection() {
   return (
-    <section className="home-hero" aria-labelledby="home-title" data-enter>
-      <div className="container-default home-hero-grid">
-        <figure className="home-hero-portrait">
-          <PhotoImage photo={{ ...founderImage, sizes: "(min-width: 82rem) 26rem, (min-width: 64rem) 33vw, (min-width: 30rem) 18rem, 62vw" }} priority />
-        </figure>
-        <div className="home-hero-copy">
-          <h1 id="home-title" className="type-display">{studioHeading} <span>{founderName}</span></h1>
-          <p className="type-lead">Место для вкуса, разговора и совместного приготовления. Выберите формат, который подойдёт вашему поводу.</p>
-          <div className="hero-actions">
-            <ButtonLink to="/zayavka/" size="lg">Оставить заявку</ButtonLink>
-            <Link className="button-text" to="#directions">Смотреть направления <span aria-hidden="true">↓</span></Link>
+    <>
+      <section className="hero home-hero" aria-labelledby="home-title">
+        <div className="home-hero-portrait">
+          <PhotoImage photo={{ ...founderImage, sizes: "(min-width: 56rem) 58vw, (min-width: 40rem) 62vw, 83vw" }} priority />
+        </div>
+        <div className="home-hero-food" aria-hidden="true" />
+        <div className="hero-container home-hero-inner">
+          <div className="home-hero-copy">
+            <p className="cinematic-kicker">Кулинарная студия ТИ-БОН</p>
+            <h1 id="home-title" className="type-display">
+              <span>Ти-Бон — это не просто</span>{" "}
+              <span>кулинарная студия,</span>{" "}
+              <em><span>а настоящее</span>{" "}<span>гастрономическое</span>{" "}<span>путешествие,</span></em>
+            </h1>
+            <p className="type-lead">где в одном блюде собрана целая палитра вкусов и эмоций.</p>
+            <div className="hero-actions">
+              <ButtonLink to="#directions" size="lg">Выбрать программу <LineIcon name="arrow" /></ButtonLink>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <ul className="home-benefits" aria-label="Преимущества студии">
+        {studioBenefits.map(({ icon, lines }) => (
+          <li key={icon}><LineIcon name={icon} /><span>{lines[0]}<br />{lines[1]}</span></li>
+        ))}
+      </ul>
+    </>
   );
 }

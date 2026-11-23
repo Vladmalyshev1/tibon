@@ -3,7 +3,7 @@ import type { To } from "react-router";
 import { Section } from "../layout/Section";
 import { Breadcrumbs, type BreadcrumbItem } from "../navigation/Breadcrumbs";
 import { ButtonLink } from "../ui/Button";
-import { Container } from "../ui/Container";
+import { LineIcon } from "../ui/LineIcon";
 import { PhotoImage, type Photo } from "../ui/PhotoTile";
 import { SectionHeading } from "../ui/SectionHeading";
 
@@ -28,8 +28,8 @@ export function PageHero({
   const headingId = useId();
 
   return (
-    <Section className={`page-hero ${className}`.trim()} aria-labelledby={headingId}>
-      <Container>
+    <Section className={`hero page-hero ${className}`.trim()} aria-labelledby={headingId}>
+      <div className="hero-container">
         {breadcrumbs ? <Breadcrumbs items={breadcrumbs} /> : null}
         <div className={`page-hero-layout page-hero-${image ? layout : "text"}`}>
           <SectionHeading id={headingId} title={title} level={1} overline={overline} />
@@ -37,7 +37,7 @@ export function PageHero({
             <div className="page-hero-copy">
               {description ? <p className="type-lead">{description}</p> : null}
               {details}
-              {action ? <ButtonLink to={action.to} size="lg">{action.label}</ButtonLink> : null}
+              {action ? <ButtonLink to={action.to} size="lg">{action.label} <LineIcon name="arrow" /></ButtonLink> : null}
             </div>
           ) : null}
           {image ? (
@@ -47,7 +47,7 @@ export function PageHero({
             </figure>
           ) : null}
         </div>
-      </Container>
+      </div>
     </Section>
   );
 }

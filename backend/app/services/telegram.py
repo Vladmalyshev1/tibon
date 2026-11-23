@@ -25,11 +25,17 @@ SOURCE_LABELS = {
 
 
 def notification_text(lead: Lead) -> str:
+    contact = [
+        f"Имя: {' '.join(lead.name.split())}",
+        f"Телефон: {lead.phone}",
+    ]
+    if lead.format == LeadFormat.CALLBACK:
+        return "\n".join(["Новая заявка: обратный звонок", *contact])
+
     lines = [
         "Новая заявка TIBON",
         f"UUID: {lead.id}",
-        f"Имя: {' '.join(lead.name.split())}",
-        f"Телефон: {lead.phone}",
+        *contact,
         f"Формат: {FORMAT_LABELS[lead.format]}",
     ]
     if lead.source:

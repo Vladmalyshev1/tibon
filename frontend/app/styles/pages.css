@@ -1,7 +1,6 @@
 .section.page-hero {
   padding-block: var(--space-2) clamp(var(--space-7), 6vw, var(--space-9));
   border-bottom: var(--border-w) solid var(--color-border);
-  background: var(--color-surface-inverse);
 }
 
 .page-hero-layout, .image-text-layout {

@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { adultGroup, formatPrice, requestAction, servicePages, studioRules } from "../../data/business";
+import { adultGroup, formatPrice, requestAction, romanticDinner, servicePages, studioRules } from "../../data/business";
 import { homeImages } from "../../data/home";
 import type { MenuType } from "../../data/menu";
 import { adultsBreadcrumb } from "../navigation/Breadcrumbs";
@@ -65,21 +65,28 @@ export function MenuTeaser({ type = "adults" }: { type?: MenuType }) {
       title={kids ? "Горячее и два блюда на выбор" : "Что приготовим"}
       image={kids ? homeImages.birthday : homeImages.pasta}
       imageSide={kids ? "left" : "right"}
+      className={kids ? "kids-menu-preview" : undefined}
     >
       <p>{kids ? "В детском меню есть горячие блюда, салаты, десерты и напитки." : "Посмотрите варианты салатов, горячего и десертов в четырёх взрослых меню."}</p>
-      <ButtonLink to={kids ? "/menu/?type=kids#menu-options" : "/menu/#menu-options"} variant="outline">
+      <ButtonLink to={kids ? "/menu/?type=kids#menu-download" : "/menu/#menu-download"} variant="outline">
         {kids ? "Детское меню" : "Смотреть меню"}
       </ButtonLink>
     </ImageTextSection>
   );
 }
 
-export function BookingFAQ({ kids = false }: { kids?: boolean }) {
+export const romanticDinnerQuestions = [
+  { id: "dinner-guests", question: "На сколько гостей рассчитан романтический ужин?", answer: <p>{romanticDinner.guests}.</p> },
+  { id: "dinner-menu", question: "Что будем готовить на романтическом ужине?", answer: <p>Формат включает три блюда. Конкретное меню ужина уточните при обращении в студию.</p> },
+];
+
+export function BookingFAQ({ kids = false, includeRomanticDinner = false }: { kids?: boolean; includeRomanticDinner?: boolean }) {
   const items = [
     { id: "booking", question: "Как подтвердить бронирование?", answer: <p>{studioRules.booking}</p> },
     { id: "count", question: "До какого срока можно изменить число гостей?", answer: <p>{studioRules.guestCount}</p> },
     { id: "food", question: kids ? "Можно ли принести свой торт?" : "Можно ли принести еду и напитки?", answer: <p>{studioRules.food}</p> },
   ];
   if (kids) items.push({ id: "parents", question: "Кто отвечает за детей?", answer: <p>{studioRules.parents}</p> });
+  if (includeRomanticDinner) items.push(...romanticDinnerQuestions);
   return <FAQSection title={kids ? "Вопросы родителей" : "Перед бронированием"} items={items} />;
 }

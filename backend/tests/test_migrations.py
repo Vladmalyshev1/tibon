@@ -23,7 +23,7 @@ def test_migration_sql_can_be_generated_without_database(capsys):
     config = Config(str(ALEMBIC_INI))
     assert (
         ScriptDirectory.from_config(config).get_current_head()
-        == "0003_telegram_notifications"
+        == "0004_callback_leads"
     )
     command.upgrade(config, "head", sql=True)
     sql = capsys.readouterr().out
@@ -31,6 +31,7 @@ def test_migration_sql_can_be_generated_without_database(capsys):
     assert "CREATE TRIGGER leads_set_updated_at" in sql
     assert "UNIQUE (idempotency_key)" in sql
     assert "CREATE TABLE telegram_notifications" in sql
+    assert "ADD CONSTRAINT ck_leads_callback_details" in sql
 
 
 @pytest.mark.skipif(

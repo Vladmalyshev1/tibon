@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { studioOperator } from "../../data/business";
 import { Container } from "../ui/Container";
 import { BrandMark } from "../ui/BrandMark";
 
@@ -52,12 +53,11 @@ export function Footer({ contact, socials = [] }: FooterProps) {
         ) : null}
         <div className="footer-meta">
           <nav className="footer-legal" aria-label="Правовая информация">
-            <Link to="/pravila/">Правила студии</Link>
             <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
           </nav>
           <div className="footer-business">
-            <p>© TIBON · ИП Исмагилов Р.С.</p>
-            <p>ОГРНИП: 325180000086978</p>
+            <p>© TIBON · {studioOperator.name}</p>
+            <p>ОГРНИП: {studioOperator.registrationNumber}</p>
           </div>
         </div>
       </Container>

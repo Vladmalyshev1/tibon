@@ -6,7 +6,9 @@ import { PageGallery } from "../../app/components/pages/PageGallery";
 import { PageHero } from "../../app/components/pages/PageHero";
 import { PageSection } from "../../app/components/pages/PageSection";
 import { ServiceCard } from "../../app/components/pages/ServiceCard";
-import { galleryImages, homeImages } from "../../app/data/home";
+import { homeImages } from "../../app/data/home";
+
+export const galleryImages = [homeImages.pasta, homeImages.studio];
 
 export function InternalPage({ alternate = false }: { alternate?: boolean }) {
   return (

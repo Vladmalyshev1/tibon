@@ -1,12 +1,15 @@
 const studioBuilding = "Удмуртская Республика, Завьяловский район, село Первомайский, ул. Архитектора Сергея Макарова, 2/4";
 const mapSearch = encodeURIComponent(studioBuilding);
+const studioMapPoint = "53.310386,56.872993";
+
+export const studioOperator = { name: "ИП Исмагилов Р.С.", registrationNumber: "325180000086978" };
 
 export const studioContact = {
   phone: { label: "57-69-90", href: "tel:+73412576990" },
   address: `${studioBuilding}, офис 3`,
   hours: "Ежедневно 10:00–23:00, по записи",
   mapUrl: `https://yandex.ru/maps/?text=${mapSearch}`,
-  mapEmbedUrl: `https://yandex.ru/map-widget/v1/?mode=search&text=${mapSearch}`,
+  mapEmbedUrl: `https://yandex.ru/map-widget/v1/?ll=53.27,56.865&z=11&pt=${studioMapPoint}&l=map`,
   socials: [
     { label: "ВКонтакте", href: "https://vk.ru/ti_bon_studio" },
     { label: "Telegram", href: "https://t.me/Tibon25" },
@@ -119,5 +122,4 @@ export const studioRules = {
 
 export const informationPages = {
   contact: { path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы кулинарной студии TIBON. Карта проезда в село Первомайский." },
-  rules: { path: "/pravila/", title: "Правила студии", description: "Условия бронирования, переноса и посещения кулинарной студии TIBON." },
 };

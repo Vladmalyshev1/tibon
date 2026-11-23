@@ -5,6 +5,7 @@ import { PhotoImage, type Photo } from "../ui/PhotoTile";
 import { SectionHeading } from "../ui/SectionHeading";
 
 type ImageTextSectionProps = {
+  id?: string;
   title: string;
   overline?: string;
   image: Photo;
@@ -16,12 +17,12 @@ type ImageTextSectionProps = {
 };
 
 export function ImageTextSection({
-  title, overline, image, caption, imageSide = "left", reveal, className, children,
+  id, title, overline, image, caption, imageSide = "left", reveal, className, children,
 }: ImageTextSectionProps) {
   const headingId = useId();
 
   return (
-    <Section className={className ? `page-section ${className}` : "page-section"} aria-labelledby={headingId}>
+    <Section id={id} className={className ? `page-section ${className}` : "page-section"} aria-labelledby={headingId}>
       <Container className={`image-text-layout image-text-${imageSide}`}>
         <div className="image-text-copy" data-editorial-reveal={reveal}>
           <SectionHeading id={headingId} title={title} overline={overline} />

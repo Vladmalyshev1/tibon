@@ -10,6 +10,7 @@ from pydantic import (
     Field,
     StrictBool,
     StringConstraints,
+    ValidationInfo,
     field_validator,
 )
 
@@ -55,6 +56,13 @@ class LeadCreate(BaseModel):
     @classmethod
     def normalize_comment(cls, value: str | None) -> str | None:
         return value or None
+
+    @field_validator("date", "guests", "source", "comment")
+    @classmethod
+    def reject_callback_details(cls, value: object, info: ValidationInfo) -> object:
+        if value is not None and info.data.get("format") == LeadFormat.CALLBACK:
+            raise ValueError("Callback requests do not accept event or menu details")
+        return value
 
     @field_validator("consent")
     @classmethod

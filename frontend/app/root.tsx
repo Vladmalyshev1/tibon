@@ -42,8 +42,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   return (
     <AppLayout>
-      <MainContainer>
+      <MainContainer className="cinematic-page error-state" tabIndex={-1}>
         <Section className="error-page" aria-labelledby="error-title">
+          {isNotFound ? <p className="cinematic-kicker">Ошибка 404</p> : null}
           <h1 id="error-title" className="type-display">{title}</h1>
           <p className="type-lead">
             {isNotFound ? "Проверьте адрес или вернитесь на главную страницу." : "Попробуйте обновить страницу позже."}

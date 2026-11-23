@@ -1,28 +1,44 @@
 import { Link } from "react-router";
-import { directions } from "../../data/home";
-import { SectionHeading } from "../ui/SectionHeading";
+import { directions, occasions } from "../../data/home";
+import { LineIcon } from "../ui/LineIcon";
+import { PhotoImage } from "../ui/PhotoTile";
 
 export function DirectionsSection() {
   return (
-    <section id="directions" className="home-section" aria-labelledby="directions-title">
+    <section id="directions" className="home-directions" aria-labelledby="directions-title" tabIndex={-1}>
       <div className="container-default">
-        <div><SectionHeading id="directions-title" title="Выберите своё направление" overline="Форматы" lead="От спокойного вечера до события, которое хочется разделить с близкими." /></div>
-        <div className="directions-grid">
-          {directions.map((direction) => (
-            <div key={direction.title} className={`direction-card direction-card-${direction.layout ?? "portrait"}`}>
-              <Link to={direction.to} className="image-card-link">
-                <div className="image-card-media">
-                  <img src={direction.image.src} width={direction.image.width} height={direction.image.height} alt={direction.image.alt} loading="lazy" decoding="async" />
+        <div className="home-section-heading">
+          <p className="cinematic-kicker">Программы</p>
+          <h2 id="directions-title" className="type-h2">Выберите свой<br />формат</h2>
+        </div>
+        <ul className="directions-grid">
+          {directions.map(({ title, description, to, image, illustration }) => (
+            <li key={to}>
+              <Link to={to} className="direction-link">
+                <div className="direction-media">
+                  <PhotoImage photo={image} />
+                  {illustration ? <span className="direction-image-label">Иллюстрация</span> : null}
                 </div>
-                <div className="image-card-content">
-                  <h3 className="type-h3">{direction.title}</h3>
-                  <p>{direction.description}</p>
-                  <span className="image-card-arrow">Подробнее <span aria-hidden="true">↗</span></span>
+                <div className="direction-copy">
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                  <LineIcon name="arrow" />
                 </div>
               </Link>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
+        <ul className="occasions-list">
+          {occasions.map(({ title, description, to }) => (
+            <li key={to}>
+              <Link to={to}>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <LineIcon name="arrow" />
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

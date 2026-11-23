@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { Link } from "react-router";
 import { mobileMenuMotion } from "../../lib/animations";
 import { BrandMark } from "../ui/BrandMark";
 import { studioContact } from "../../data/business";
 import type { NavigationItem } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
-type MobileMenuProps = { items: NavigationItem[]; onClose: () => void };
+type MobileMenuProps = { items: readonly NavigationItem[]; onClose: () => void };
 
 export function MobileMenu({ items, onClose }: MobileMenuProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -17,14 +18,20 @@ export function MobileMenu({ items, onClose }: MobileMenuProps) {
     if (!dialog) return;
     const previousOverflow = document.body.style.overflow;
     const trigger = document.getElementById("mobile-menu-trigger");
+    const headerBrand = document.querySelector<HTMLAnchorElement>(".site-header .brand-mark");
+    const isDesktop = () => trigger && getComputedStyle(trigger).display === "none";
+    const closeOnDesktop = () => { if (isDesktop()) onClose(); };
+    window.addEventListener("resize", closeOnDesktop);
     document.body.style.overflow = "hidden";
     dialog.showModal();
+    dialog.querySelector("button")?.focus();
     return () => {
+      window.removeEventListener("resize", closeOnDesktop);
       document.body.style.overflow = previousOverflow;
       if (dialog.open) dialog.close();
-      trigger?.focus();
+      (isDesktop() ? headerBrand : trigger)?.focus({ preventScroll: true });
     };
-  }, []);
+  }, [onClose]);
 
   return (
     <dialog
@@ -43,7 +50,7 @@ export function MobileMenu({ items, onClose }: MobileMenuProps) {
         transition={reducedMotion ? { duration: 0 } : undefined}
       >
         <div className="mobile-menu-top">
-          <span className="brand-mark"><BrandMark /></span>
+          <Link className="brand-mark" to="/" aria-label="TIBON — главная" onClick={onClose}><BrandMark /></Link>
           <button className="icon-button" type="button" aria-label="Закрыть меню" onClick={onClose}>×</button>
         </div>
         <MobileNavigation items={items} onNavigate={onClose} />

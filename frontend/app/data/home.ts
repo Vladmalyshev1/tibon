@@ -1,19 +1,13 @@
-export type HomeImage = {
-  src: string;
-  width: number;
-  height: number;
-  alt: string;
-};
+import type { Photo } from "../components/ui/PhotoTile";
+import { servicePages } from "./business";
 
-export type HomeLinkCard = {
+type HomeLink = {
   title: string;
   description: string;
   to: string;
-  image: HomeImage;
-  layout?: "portrait" | "landscape";
 };
 
-const image = (file: string, width: number, height: number, alt: string): HomeImage => ({
+const image = (file: string, width: number, height: number, alt: string): Photo => ({
   src: `/images/home/${file}`,
   width,
   height,
@@ -22,93 +16,78 @@ const image = (file: string, width: number, height: number, alt: string): HomeIm
 
 export const homeImages = {
   hero: image("preparation.webp", 960, 1440, "Руки нарезают овощи на разделочной доске"),
-  ingredients: image("ingredients.webp", 960, 640, "Свежие овощи и зелень в лотках"),
   birthday: image("birthday.webp", 960, 640, "Блюдо с овощами и миска томатов на столе"),
   corporate: image("shared-table.webp", 960, 640, "Несколько блюд на общем столе"),
   dinner: image("dinner.webp", 960, 1361, "Тарелка с зеленью и яйцом на тёмном столе"),
   studio: image("kitchen.webp", 960, 575, "Светлая кухня с продуктами и посудой"),
   table: image("prep-board.webp", 960, 960, "Овощи и яйца на деревянной доске"),
   pasta: image("pasta.webp", 960, 641, "Паста с томатами и зеленью"),
-  baking: image("dough.webp", 960, 1442, "Руки формуют тесто"),
 };
 
-export const directions: HomeLinkCard[] = [
+export const preparationImage: Photo = {
+  ...homeImages.hero,
+  srcSet: "/images/gallery/preparation.webp 480w, /images/home/preparation-small.webp 640w, /images/home/preparation.webp 960w",
+  sizes: "(min-width: 48rem) 62vw, 100vw",
+};
+
+const directionSizes = "(min-width: 85rem) 26rem, (min-width: 48rem) 32vw, calc(100vw - 2rem)";
+
+export const directions: (HomeLink & { image: Photo; illustration?: boolean })[] = [
   {
     title: "Для взрослых",
-    description: "Совместное приготовление, разговоры за столом и новые вкусовые впечатления.",
-    to: "/dlya-vzroslyh/",
-    image: homeImages.ingredients,
-    layout: "portrait",
+    description: "Кулинарные мастер-классы и гастрономические ужины.",
+    to: servicePages.adults.path,
+    image: {
+      src: "/images/studio/hero-steak.webp",
+      width: 1024,
+      height: 846,
+      alt: "Стейк со специями на тёмном сланце",
+      focalPoint: "center 23%",
+      srcSet: "/images/studio/hero-steak-small.webp 660w, /images/studio/hero-steak.webp 1024w",
+      sizes: directionSizes,
+    },
   },
   {
     title: "Для детей",
-    description: "Форматы, в которых знакомство с продуктами становится частью игры и творчества.",
-    to: "/dlya-detey/",
-    image: homeImages.baking,
-    layout: "landscape",
+    description: "Дети готовят выбранные блюда и пробуют то, что получилось.",
+    to: servicePages.kids.path,
+    illustration: true,
+    image: {
+      src: "/images/studio/kids-pizza-1100.webp",
+      srcSet: "/images/studio/kids-pizza-640.webp 640w, /images/studio/kids-pizza-1100.webp 1100w",
+      sizes: directionSizes,
+      width: 1100,
+      height: 614,
+      alt: "Иллюстрация детского мастер-класса по приготовлению пиццы",
+    },
+  },
+  {
+    title: "Корпоративы",
+    description: "Мастер-класс и ужин за одним столом для всей команды.",
+    to: servicePages.corporate.path,
+    image: { ...homeImages.corporate, sizes: directionSizes, srcSet: "/images/gallery/shared-table.webp 480w, /images/home/shared-table.webp 960w" },
   },
 ];
 
-export const eventFormats: HomeLinkCard[] = [
+export const occasions: HomeLink[] = [
   {
-    title: "День рождения",
-    description: "Повод собрать близких вокруг общего кулинарного опыта.",
-    to: "/dlya-vzroslyh/den-rozhdeniya/",
-    image: homeImages.birthday,
-  },
-  {
-    title: "Корпоративные мероприятия",
-    description: "Время вне привычного сценария, которое можно провести вместе.",
-    to: "/dlya-vzroslyh/korporativ/",
-    image: homeImages.corporate,
+    title: "Дни рождения",
+    description: "Праздник для близких с мастер-классом и ужином.",
+    to: servicePages.birthday.path,
   },
   {
     title: "Романтический ужин",
-    description: "Вечер, где внимание остаётся на вкусе, диалоге и деталях.",
-    to: "/dlya-vzroslyh/romanticheskiy-uzhin/",
-    image: homeImages.dinner,
+    description: "Ужин с кулинарным мастер-классом для двоих.",
+    to: servicePages.romantic.path,
+  },
+  {
+    title: "Аренда студии",
+    description: "Кухня для съёмок, своего мастер-класса или встречи.",
+    to: servicePages.rental.path,
   },
 ];
 
-export const experiences = [
-  { number: "01", title: "Готовить вместе", text: "Делить процесс, открывать сочетания и собирать блюдо шаг за шагом." },
-  { number: "02", title: "Пробовать новое", text: "Знакомиться с приёмами и продуктами через практику, а не теорию." },
-  { number: "03", title: "Собирать событие", text: "Выбирать формат, который поддерживает повод и настроение встречи." },
-  { number: "04", title: "Запоминать вкус", text: "Оставлять место для разговора, деталей сервировки и общего впечатления." },
-];
-
-export const popularOffers: HomeLinkCard[] = [
-  {
-    title: "Кулинарные впечатления",
-    description: "Направление для тех, кто хочет готовить и пробовать вместе.",
-    to: "/dlya-vzroslyh/",
-    image: homeImages.pasta,
-  },
-  {
-    title: "Праздничные форматы",
-    description: "Идеи для событий, в центре которых — совместный процесс и стол.",
-    to: "/dlya-vzroslyh/den-rozhdeniya/",
-    image: homeImages.corporate,
-  },
-  {
-    title: "Кулинария для детей",
-    description: "Знакомство с приготовлением через понятные действия и любопытство.",
-    to: "/dlya-detey/",
-    image: homeImages.baking,
-  },
-];
-
-export const galleryImages = [
-  homeImages.table,
-  homeImages.corporate,
-  homeImages.baking,
-  homeImages.dinner,
-  homeImages.pasta,
-  homeImages.studio,
-];
-export const studioHeading = "Кулинарная студия";
-export const founderName = "Рената Исмагилова";
-export const homeHeading = `${studioHeading} ${founderName}`;
+export const homeHeading = "Кулинарная студия Рената Исмагилова";
 export const founderImage = {
   src: "/images/studio/renat.jpg",
   srcSet: "/images/studio/renat-small.jpg 540w, /images/studio/renat.jpg 960w",
@@ -119,7 +98,7 @@ export const founderImage = {
 };
 export const eventCompanyImage = {
   src: "/images/studio/druzya.webp",
-  srcSet: "/images/studio/druzya-small.webp 480w, /images/studio/druzya.webp 1086w",
+  srcSet: "/images/studio/druzya-small.webp 540w, /images/studio/druzya.webp 1086w",
   sizes: "(min-width: 82rem) 45rem, (min-width: 48rem) 55vw, calc(100vw - 2rem)",
   alt: "Участники мероприятия ивент-компании «Друзья» в студии TIBON",
   width: 1086,

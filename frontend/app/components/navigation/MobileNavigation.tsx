@@ -1,6 +1,6 @@
 import { NavigationLink, type NavigationItem } from "./DesktopNavigation";
 
-type MobileNavigationProps = { items: NavigationItem[]; onNavigate: () => void };
+type MobileNavigationProps = { items: readonly NavigationItem[]; onNavigate: () => void };
 
 export function MobileNavigation({ items, onNavigate }: MobileNavigationProps) {
   return (
@@ -8,7 +8,7 @@ export function MobileNavigation({ items, onNavigate }: MobileNavigationProps) {
       <ul className="mobile-menu-links">
         {items.map((item) => (
           <li key={item.to}>
-            <NavigationLink to={item.to} onClick={onNavigate}>
+            <NavigationLink item={item} onClick={onNavigate}>
               {item.label} <span aria-hidden="true">↗</span>
             </NavigationLink>
           </li>

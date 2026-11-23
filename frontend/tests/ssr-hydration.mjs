@@ -43,9 +43,13 @@ try {
   assert.match(homeHtml, /TIBON — главная/);
   assert.match(homeHtml, /Навигация в подвале/);
   assert.match(homeHtml, /type="module"/);
-  assert.match(homeHtml, /<h1[^>]*>Кулинарная студия(?:<!-- -->)? <span>Рената Исмагилова<\/span><\/h1>/);
+  assert.match(homeHtml, /<h1[^>]*id="home-title"[^>]*>.*кулинарная студия,.*<em>.*гастрономическое.*путешествие.*<\/em><\/h1>/);
   assert.match(homeHtml, /rel="canonical" href="https:\/\/tibon\.example\/"/);
   assert.match(homeHtml, /property="og:image" content="https:\/\/tibon\.example\/images\/studio\/renat\.jpg"/);
+  assert.match(homeHtml, /class="lead-form callback-form"/);
+  assert.match(homeHtml, /<input[^>]*id="callback-phone"[^>]*value="\+7"/);
+  assert.match(homeHtml, /Перезвоните мне/);
+  assert.doesNotMatch(homeHtml, /name="format"|id="gallery|href="[^"]*#gallery/);
 
   const servicePages = {
     "/dlya-vzroslyh/": /от 3\s300\s₽ за человека/,
@@ -53,8 +57,8 @@ try {
     "/dlya-vzroslyh/den-rozhdeniya/": /от 3\s300\s₽ за человека/,
     "/dlya-vzroslyh/romanticheskiy-uzhin/": /от 18\s000\s₽/,
     "/dlya-detey/": /от 2\s200\s₽ за ребёнка/,
-    "/arenda/": /6\s000\s₽ в час/,
-    "/menu/": /4\s900\s₽ за человека/,
+    "/arenda/": /<dd><strong>3\s000\s₽<\/strong> <span>в час<\/span><\/dd>.*<dd><strong>6\s000\s₽<\/strong> <span>в час<\/span><\/dd>/,
+    "/menu/": /Скачать взрослое меню/,
     "/dop-uslugi/": /от 10\s000\s₽ в час/,
   };
   const publicPaths = [
@@ -62,14 +66,12 @@ try {
     "/o-studii/",
     "/contact/",
     "/kontakty/",
-    "/pravila/",
     "/zayavka/",
     "/politika-konfidencialnosti/",
   ];
   const informationPages = {
     "/contact/": ["/contact/", /Карта проезда/],
     "/kontakty/": ["/contact/", /Карта проезда/],
-    "/pravila/": ["/pravila/", /При отмене за 10 дней/],
   };
   for (const path of publicPaths) {
     const response = await fetch(`${baseUrl}${path}`);
@@ -78,12 +80,17 @@ try {
     assert.match(html, /<title>.+ — TIBON<\/title>/, `${path} should return route metadata`);
     assert.match(html, /name="description" content="[^"]+"/, `${path} should have a description`);
     if (servicePages[path]) {
-      assert.match(html, servicePages[path], `${path} should render a sourced price in SSR`);
+      assert.match(html, servicePages[path], `${path} should render its content in SSR`);
       assert.ok(html.includes(`rel="canonical" href="https://tibon.example${path}"`));
       assert.doesNotMatch(html, /name="robots" content="noindex/);
       assert.doesNotMatch(html, /Структурная заготовка/);
-      const cta = path === "/menu/" ? /href="\/menu\/#menu-download"[^>]*>Скачать меню/ : /href="\/zayavka\/"[^>]*>Оставить заявку/;
-      assert.match(html, cta, `${path} should render its page CTA`);
+      if (path === "/menu/") {
+        assert.match(html, /id="menu-download"/);
+        assert.match(html, /<fieldset class="lead-fields" disabled=""/);
+        assert.match(html, /<button[^>]*type="submit"[^>]*>Скачать взрослое меню/);
+      } else {
+        assert.match(html, /href="\/zayavka\/"[^>]*>Оставить заявку/, `${path} should render its page CTA`);
+      }
     } else if (informationPages[path]) {
       const [canonical, content] = informationPages[path];
       assert.match(html, content);
@@ -94,16 +101,22 @@ try {
       assert.match(html, /<fieldset[^>]*disabled/);
       assert.match(html, /Отправить заявку/);
       assert.match(html, /<fieldset class="lead-fields" disabled=""/);
-    } else {
-      assert.match(html, /name="robots" content="noindex, nofollow"/, `${path} is scaffold content`);
-      assert.doesNotMatch(html, /rel="canonical"/, `${path} should not invent a canonical URL`);
+    } else if (path === "/politika-konfidencialnosti/") {
+      assert.match(html, /name="robots" content="noindex, nofollow"/);
+      assert.match(html, /Проект для согласования/);
+      assert.match(html, /11\. Изменение политики/);
+    } else if (path === "/o-studii/") {
+      assert.match(html, /name="robots" content="noindex, nofollow"/);
+      assert.doesNotMatch(html, /rel="canonical"/);
     }
     assert.match(html, /href="tel:\+73412576990">57-69-90<\/a>/);
     assert.match(html, /TIBON — главная/, `${path} should SSR the header`);
     assert.match(html, /Навигация в подвале/, `${path} should SSR the footer`);
-    assert.match(html, /ОГРНИП: 325180000086978/);
+    assert.match(html, /ОГРНИП: (?:<!-- -->)?325180000086978/);
     assert.doesNotMatch(html, /href="\/galereya/);
-    if (path !== "/zayavka/") {
+    if (["/dlya-vzroslyh/", "/zayavka/", "/politika-konfidencialnosti/", "/menu/"].includes(path)) {
+      assert.doesNotMatch(html, /aria-label="Навигационная цепочка"/);
+    } else {
       assert.match(html, /aria-label="Навигационная цепочка"/, `${path} should SSR breadcrumbs`);
       assert.match(html, /<span aria-current="page">/, `${path} should mark the last crumb`);
     }
@@ -117,16 +130,15 @@ try {
   const sitemapResponse = await fetch(`${baseUrl}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200);
   const sitemapXml = await sitemapResponse.text();
-  assert.doesNotMatch(sitemapXml, /\/(galereya|kontakty|zayavka|o-studii|politika-konfidencialnosti)\//);
+  assert.doesNotMatch(sitemapXml, /\/(galereya|kontakty|zayavka|o-studii|politika-konfidencialnosti|pravila)\//);
   const kidsMenuResponse = await fetch(`${baseUrl}/menu/?type=kids`);
   const kidsMenuHtml = await kidsMenuResponse.text();
   assert.equal(kidsMenuResponse.status, 200);
-  assert.match(kidsMenuHtml, /<h2[^>]*>Детское меню<\/h2>/);
-  assert.match(kidsMenuHtml, /2\s200\s₽ за человека/);
-  assert.doesNotMatch(kidsMenuHtml, /Меню № 4/);
+  assert.match(kidsMenuHtml, /<button[^>]*class="[^"]*menu-primary-download[^"]*"[^>]*>Скачать детское меню/);
+  assert.doesNotMatch(kidsMenuHtml, /menu-options|Стейки, закуски и напитки/);
   assert.match(kidsMenuHtml, /rel="canonical" href="https:\/\/tibon\.example\/menu\/"/);
 
-  for (const path of ["/unknown-m3-route/", "/galereya/", "/galereya/?category=cooking"]) {
+  for (const path of ["/unknown-m3-route/", "/pravila/", "/galereya/", "/galereya/?category=cooking"]) {
     const missingResponse = await fetch(new URL(path, baseUrl));
     assert.equal(missingResponse.status, 404, path);
     assert.match(await missingResponse.text(), /Страница не найдена/);
@@ -136,14 +148,21 @@ try {
   const browser = await chromium.launch({ headless: true });
   try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const hasNoHorizontalOverflow = () => page.evaluate(() =>
+      [document.documentElement, document.body].every(element => element.scrollWidth <= element.clientWidth));
     const pageErrors = [];
     page.on("pageerror", (error) => pageErrors.push(error.message));
     await page.goto(baseUrl, { waitUntil: "networkidle" });
-    await page.getByRole("heading", { name: "Кулинарная студия Рената Исмагилова" }).waitFor();
-    assert.equal(await page.locator("main > section").count(), 9);
+    const homeTitle = page.getByRole("heading", { name: /^Ти-Бон.*гастрономическое путешествие,$/, level: 1 });
+    await homeTitle.waitFor();
     assert.equal(await page.locator("h1").count(), 1);
-    await page.locator(".hero-actions").getByRole("link", { name: "Смотреть направления" }).click();
+    await page.locator(".hero-actions").getByRole("link", { name: "Выбрать программу" }).click();
     await page.waitForURL("**/#directions");
+    const directions = page.getByRole("region", { name: "Выберите свой формат" });
+    for (const name of ["Для взрослых", "Для детей", "Дни рождения", "Корпоративы", "Аренда студии", "Романтический ужин"]) {
+      assert.equal(await directions.getByRole("link", { name: new RegExp(name) }).count(), 1);
+    }
+    assert.equal(await page.getByRole("link", { name: "Организовать праздник" }).getAttribute("href"), "/zayavka/");
     page.on("console", (message) => {
       if (message.type() === "error") pageErrors.push(message.text());
     });
@@ -159,35 +178,23 @@ try {
         assert.equal((await fetch(new URL(href, baseUrl))).status, 200, href);
       }
     }
-    for (const width of [360, 390, 480, 768, 1024, 1280, 1440, 1920]) {
+    for (const width of [320, 390, 480, 768, 1024, 1280, 1440, 1920]) {
       await page.setViewportSize({ width, height: 900 });
       for (const picture of await page.locator("main img").all()) {
         await picture.scrollIntoViewIfNeeded();
         await picture.evaluate((element) => element.decode());
         assert(await picture.getAttribute("alt"));
       }
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth === document.documentElement.clientWidth), true, `Overflow at ${width}px`);
+      assert.equal(await hasNoHorizontalOverflow(), true, `Overflow at ${width}px`);
     }
-    const thumbnail = page.getByRole("button", { name: /^Открыть фото:/ }).first();
-    await thumbnail.scrollIntoViewIfNeeded();
-    await thumbnail.focus();
-    await page.keyboard.press("Enter");
-    const lightbox = page.getByRole("dialog", { name: "Фотография" });
-    await lightbox.waitFor();
-    assert.match(await lightbox.locator("figcaption").innerText(), /^1 из 6/);
-    await page.keyboard.press("ArrowRight");
-    await lightbox.getByText(/^2 из 6/).waitFor();
-    await lightbox.getByRole("button", { name: "Предыдущее" }).click();
-    await lightbox.getByText(/^1 из 6/).waitFor();
-    await page.keyboard.press("Escape");
-    await lightbox.waitFor({ state: "hidden" });
-    assert.equal(await thumbnail.evaluate((element) => document.activeElement === element), true);
-    await page.locator(".final-cta").getByRole("link", { name: "Оставить заявку" }).click();
+    assert.equal(await page.locator("#gallery, #gallery-photos, a[href*='#gallery']").count(), 0);
+    assert.equal(await page.getByRole("button", { name: /^Открыть фото:/ }).count(), 0);
+    await page.locator(".final-cta").getByRole("link", { name: "Забронировать" }).click();
     await page.getByRole("button", { name: "Отправить заявку" }).waitFor();
     await page.getByRole("link", { name: "Вернуться на главную" }).click();
-    await page.getByRole("heading", { level: 1, name: "Кулинарная студия Рената Исмагилова" }).waitFor();
+    await homeTitle.waitFor();
     await page.setViewportSize({ width: 390, height: 844 });
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth === document.documentElement.clientWidth), true);
+    assert.equal(await hasNoHorizontalOverflow(), true);
 
     const fontsLoaded = await page.evaluate(async () => {
       const [display, body] = await Promise.all([
@@ -202,17 +209,37 @@ try {
     await page.getByRole("button", { name: "Открыть меню" }).click();
     const menu = page.getByRole("dialog", { name: "Мобильная навигация" });
     await menu.waitFor({ state: "visible" });
-    assert.equal(await menu.getByRole("link", { name: "Оставить заявку" }).count(), 0);
+    const navigationLabels = ["Для взрослых", "Для детей", "Аренда студии", "Меню", "Доп. услуги", "Контакты"];
+    const labels = nav => nav.getByRole("link").evaluateAll(links => links.map(link => link.firstChild.textContent.trim()));
+    assert.deepEqual(await labels(menu.getByRole("navigation")), navigationLabels);
+    await page.keyboard.press("Escape");
+    await menu.waitFor({ state: "hidden" });
+    assert.equal(await page.locator("#mobile-menu-trigger").evaluate(button => button === document.activeElement), true);
+    await page.getByRole("button", { name: "Открыть меню" }).click();
     await menu.getByRole("link", { name: "Для взрослых" }).click();
     await page.getByRole("heading", { level: 1, name: "Кулинарные мастер-классы для взрослых" }).waitFor();
+    await menu.waitFor({ state: "hidden" });
     assert.equal(new URL(page.url()).pathname, "/dlya-vzroslyh/");
 
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.locator('.desktop-navigation a[aria-current="page"]').waitFor();
-    assert.equal(await page.locator('.desktop-navigation a[aria-current="page"]').getAttribute("href"), "/dlya-vzroslyh/");
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth === document.documentElement.clientWidth), true);
+    const desktopNav = page.getByRole("navigation", { name: "Основная навигация", exact: true });
+    assert.deepEqual(await labels(desktopNav), navigationLabels);
+    assert.equal(await desktopNav.locator("details").count(), 0);
+    const adultLink = desktopNav.getByRole("link", { name: "Для взрослых" });
+    assert.equal(await adultLink.getAttribute("aria-current"), "page");
+    await adultLink.focus();
+    await page.keyboard.press("Tab");
+    assert.equal(await desktopNav.getByRole("link", { name: "Для детей" }).evaluate(link => link === document.activeElement), true);
+    const adultFormats = page.getByRole("navigation", { name: "Форматы для взрослых" });
+    for (const id of ["birthday", "corporate", "romantic"]) {
+      await adultFormats.locator(`a[href="#${id}"]`).click();
+      await page.waitForURL(`**/#${id}`);
+      assert.equal(await page.locator(`section#${id} a[href="/zayavka/"]`).count(), 1);
+    }
+    assert.equal(await hasNoHorizontalOverflow(), true);
 
     await page.goto(`${baseUrl}/dlya-vzroslyh/den-rozhdeniya/`, { waitUntil: "networkidle" });
+    assert.equal(await adultLink.getAttribute("aria-current"), "location");
     const breadcrumbs = page.getByRole("navigation", { name: "Навигационная цепочка" });
     assert.equal(await breadcrumbs.locator('[aria-current="page"]').innerText(), "День рождения");
     await breadcrumbs.getByRole("link", { name: "Для взрослых" }).click();
@@ -225,20 +252,17 @@ try {
     }
 
     await page.goto(`${baseUrl}/menu/`, { waitUntil: "networkidle" });
-    const menuTypes = page.getByRole("navigation", { name: "Тип меню" });
     assert.equal(await page.getByRole("button", { name: "Скачать взрослое меню" }).isDisabled(), true);
     assert.equal(await page.getByRole("button", { name: "Скачать детское меню" }).isDisabled(), true);
-    assert.equal(await page.locator('a[href*=".pdf"]').count(), 0);
-    await menuTypes.getByRole("link", { name: "Детское" }).click();
-    await page.getByRole("heading", { name: "Детское меню", level: 2 }).waitFor();
-    assert.equal(new URL(page.url()).searchParams.get("type"), "kids");
-    assert.equal(await menuTypes.getByRole("link", { name: "Детское" }).getAttribute("aria-current"), "page");
-    assert.equal(await page.getByRole("button", { name: "Скачать детское меню" }).isDisabled(), true);
-    await page.goBack();
-    await page.getByRole("heading", { name: "Взрослое меню", level: 2 }).waitFor();
+    assert.equal(await page.locator('a[href*=".pdf"], #menu-options, .menu-extras').count(), 0);
+    await page.goto(`${baseUrl}/menu/?type=kids#menu-download`);
+    assert.match(await page.locator(".menu-primary-download").innerText(), /Скачать детское меню/);
+    await page.getByRole("link", { name: "Политика обработки персональных данных" }).first().click();
+    await page.getByRole("heading", { level: 1, name: "Политика обработки персональных данных" }).waitFor();
+    assert.equal(await page.locator(".privacy-document h2").count(), 11);
 
     assert.deepEqual(pageErrors, []);
-    console.log("Chromium: 8 widths, images, links, request CTA, keyboard gallery, fonts, mobile navigation, breadcrumbs and console pass.");
+    console.log("Chromium: 8 widths, images, links, request CTA, gallery removal, fonts, mobile navigation, breadcrumbs and console pass.");
   } finally {
     await browser.close();
   }

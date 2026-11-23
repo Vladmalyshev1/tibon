@@ -1,21 +1,15 @@
-import { ButtonLink } from "../ui/Button";
-import { homeImages } from "../../data/home";
+import { preparationImage } from "../../data/home";
+import { PhotoImage } from "../ui/PhotoTile";
 
 export function AboutStudioSection() {
   return (
-    <section className="home-section about-section" aria-labelledby="about-title">
-      <div className="container-default about-grid">
-        <div className="about-copy">
-          <p className="type-overline">О пространстве</p>
-          <h2 id="about-title" className="type-h2" data-editorial-reveal>Кухня как место встречи</h2>
-          <p className="type-lead">В TIBON приготовление становится поводом быть рядом: выбирать продукты, пробовать, обсуждать и создавать вечер вместе.</p>
-          <ButtonLink to="#directions" variant="outline">Смотреть направления</ButtonLink>
-        </div>
-        <div className="about-media">
-          <figure className="about-photo" data-editorial-reveal>
-            <img src={homeImages.studio.src} width={homeImages.studio.width} height={homeImages.studio.height} alt={homeImages.studio.alt} loading="lazy" decoding="async" />
-            <figcaption className="home-photo-note">Иллюстрация кухонного пространства</figcaption>
-          </figure>
+    <section id="about-studio" className="home-scene home-about" aria-labelledby="about-title" tabIndex={-1}>
+      <div className="home-scene-media"><PhotoImage photo={preparationImage} /></div>
+      <div className="container-default home-scene-inner">
+        <div className="home-scene-copy">
+          <p className="cinematic-kicker">О студии</p>
+          <h2 id="about-title" className="type-h2">Больше, чем<br />просто готовка</h2>
+          <p className="home-summary">В студии Рената Исмагилова гости готовят вместе с шефом. Он показывает приёмы, помогает с блюдами, а за ужином можно попробовать всё, что приготовили.</p>
         </div>
       </div>
     </section>

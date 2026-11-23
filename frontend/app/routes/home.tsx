@@ -1,21 +1,14 @@
-import { useRef } from "react";
 import { AboutStudioSection } from "../components/home/AboutStudioSection";
-import { AdditionalServicesSection } from "../components/home/AdditionalServicesSection";
 import { DirectionsSection } from "../components/home/DirectionsSection";
-import { EventsSection } from "../components/home/EventsSection";
 import { ExperienceSection } from "../components/home/ExperienceSection";
 import { FinalCtaSection } from "../components/home/FinalCtaSection";
-import { GallerySection } from "../components/home/GallerySection";
 import { HeroSection } from "../components/home/HeroSection";
+import { CallbackForm } from "../components/pages/CallbackForm";
+import { studioContact } from "../data/business";
 import { founderImage, homeHeading } from "../data/home";
-import { PopularOffersSection } from "../components/home/PopularOffersSection";
-import { useEditorialReveal } from "../lib/useEditorialReveal";
 import type { Route } from "./+types/home";
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preload", as: "image", href: "/images/studio/home-hero-slate-mobile.webp", media: "(width < 64rem)" },
-  { rel: "preload", as: "image", href: "/images/studio/home-hero-slate.webp", media: "(width >= 64rem)" },
-];
+const [opensAt, closesAt] = studioContact.hours.match(/\d{2}:\d{2}/g) ?? [];
 
 export function loader() {
   const configuredUrl = process.env.PUBLIC_SITE_ORIGIN;
@@ -35,6 +28,9 @@ export function meta({ data }: Route.MetaArgs) {
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
     { property: "og:locale", content: "ru_RU" },
+    { name: "page-type", content: "place" },
+    { name: "site-kind", content: "other" },
+    { name: "page-kind", content: "place" },
     ...(canonical ? [
       { tagName: "link" as const, rel: "canonical", href: canonical },
       { property: "og:url", content: canonical },
@@ -45,19 +41,20 @@ export function meta({ data }: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const main = useRef<HTMLElement>(null);
-  useEditorialReveal(main);
-
   return (
-    <main id="main-content" className="editorial-home" tabIndex={-1} ref={main}>
+    <main id="main-content" className="cinematic-home" tabIndex={-1}>
       <HeroSection />
+      <section className="home-callback" aria-labelledby="home-callback-title">
+        <div className="reference-wrap">
+          <p className="cinematic-kicker">Обратная связь</p>
+          <h2 id="home-callback-title" className="type-h2">Заказать обратный звонок</h2>
+          <p className="home-callback-hours">Позвоним в рабочее время с <strong>{opensAt}</strong> до <strong>{closesAt}</strong></p>
+          <CallbackForm />
+        </div>
+      </section>
       <AboutStudioSection />
       <DirectionsSection />
-      <EventsSection />
       <ExperienceSection />
-      <GallerySection />
-      <AdditionalServicesSection />
-      <PopularOffersSection />
       <FinalCtaSection />
     </main>
   );

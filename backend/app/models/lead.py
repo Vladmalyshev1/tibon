@@ -28,6 +28,7 @@ class LeadFormat(StrEnum):
     ROMANTIC = "romantic"
     RENTAL = "rental"
     EXTRAS = "extras"
+    CALLBACK = "callback"
 
 
 class LeadStatus(StrEnum):
@@ -50,6 +51,11 @@ class Lead(Base):
         CheckConstraint("phone ~ '^[+]7[0-9]{10}$'", name="ck_leads_phone"),
         CheckConstraint("consent IS TRUE", name="ck_leads_consent"),
         CheckConstraint("guests BETWEEN 1 AND 10000", name="ck_leads_guests"),
+        CheckConstraint(
+            "format <> 'callback' OR (event_date IS NULL AND guests IS NULL "
+            "AND source IS NULL AND comment IS NULL)",
+            name="ck_leads_callback_details",
+        ),
         UniqueConstraint("idempotency_key", name="uq_leads_idempotency_key"),
         Index("ix_leads_status_created_at", "status", "created_at"),
     )
