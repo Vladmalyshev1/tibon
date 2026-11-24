@@ -22,6 +22,7 @@ from app.services.leads import (
     SubmissionUnavailable,
     submit_lead,
 )
+from app.services.rate_limit import LeadRateLimit
 
 MAX_BODY_BYTES = 8192
 BODY_TIMEOUT_SECONDS = 5
@@ -29,9 +30,9 @@ NO_STORE = {"Cache-Control": "no-store"}
 MENU_FILES = {LeadSource.MENU_ADULTS: "adults.pdf", LeadSource.MENU_KIDS: "kids.pdf"}
 
 
-def enforce_lead_rate_limit(request: Request) -> None:
+def enforce_lead_rate_limit(request: Request, limiter: LeadRateLimit) -> None:
     client = request.client.host if request.client else None
-    retry_after = request.app.state.lead_rate_limit.retry_after(client)
+    retry_after = limiter.retry_after(client)
     if retry_after is not None:
         raise HTTPException(
             429, "Too many requests", {**NO_STORE, "Retry-After": str(retry_after)}
@@ -43,7 +44,9 @@ class LeadSubmissionRoute(APIRoute):
         handle = super().get_route_handler()
 
         async def guarded(request: Request) -> Response:
-            enforce_lead_rate_limit(request)
+            enforce_lead_rate_limit(
+                request, request.app.state.lead_submission_rate_limit
+            )
             if (
                 request.headers.get("content-type", "").split(";", 1)[0].strip().lower()
                 != "application/json"
@@ -178,7 +181,7 @@ async def download_menu(
     request: Request,
     idempotency_key: Annotated[UUID | None, Header()] = None,
 ) -> FileResponse:
-    enforce_lead_rate_limit(request)
+    enforce_lead_rate_limit(request, request.app.state.menu_download_rate_limit)
     if idempotency_key is None:
         raise HTTPException(404, "Menu request not found", NO_STORE)
     try:

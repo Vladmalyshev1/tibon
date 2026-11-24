@@ -38,7 +38,7 @@ describe("lead submission", () => {
 
   async function fillForm(user: ReturnType<typeof userEvent.setup>) {
     await user.type(screen.getByRole("textbox", { name: /Имя/ }), "Анна");
-    await user.type(screen.getByRole("textbox", { name: /Телефон/ }), "+7 912 345-67-89");
+    await user.type(screen.getByRole("textbox", { name: /Телефон/ }), "9123456789");
     await user.selectOptions(screen.getByRole("combobox", { name: /Формат/ }), "birthday");
     await user.click(screen.getByRole("checkbox", { name: /Согласен/ }));
   }
@@ -53,6 +53,7 @@ describe("lead submission", () => {
     await user.click(submit);
     await waitFor(() => expect(name).toHaveFocus());
     expect(screen.getByRole("alert")).toHaveTextContent("Проверьте отмеченные поля");
+    expect(screen.getByRole("textbox", { name: /Телефон/ })).toHaveAttribute("aria-invalid", "true");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -75,7 +76,10 @@ describe("lead submission", () => {
       method: "POST",
       credentials: "omit",
       headers: { "Content-Type": "application/json", "Idempotency-Key": expect.any(String) },
-      body: JSON.stringify({ name: "Анна", phone: "+79123456789", format: "birthday", consent: true }),
+      body: JSON.stringify({
+        name: "Анна", phone: "+79123456789", format: "birthday", consent: true,
+        consent_version: "lead-consent-v1",
+      }),
     }));
     resolve(Response.json(result, { status: 201 }));
     const success = await screen.findByRole("status");
@@ -100,7 +104,7 @@ describe("lead submission", () => {
     const submit = screen.getByRole("button", { name: "Отправить заявку" });
     await user.click(submit);
     expect(await screen.findByRole("alert")).toHaveTextContent(message);
-    expect(screen.getByRole("textbox", { name: /Телефон/ })).toHaveValue("+7 912 345-67-89");
+    expect(screen.getByRole("textbox", { name: /Телефон/ })).toHaveValue("+7 (912) 345-67-89");
     expect(screen.getByRole("checkbox", { name: /Согласен/ })).toBeChecked();
     await user.click(submit);
     expect(await screen.findByRole("status")).toHaveTextContent("Заявка отправлена");
@@ -122,8 +126,8 @@ describe("lead submission", () => {
     expect(await screen.findByText("Проверьте номер телефона.")).toBeInTheDocument();
     expect(phone).toHaveFocus();
     expect(screen.queryByText("private detail")).not.toBeInTheDocument();
-    await user.clear(phone);
-    await user.type(phone, "+7 000 000-00-00");
+    await user.paste("+7 000 000-00-00");
+    expect(phone).toHaveValue("+7 (000) 000-00-00");
     await user.click(submit);
     expect(await screen.findByRole("status")).toBeInTheDocument();
     expect(fetchMock.mock.calls[0][1].headers["Idempotency-Key"])
@@ -200,14 +204,19 @@ describe("lead submission", () => {
     expect(adults).toBeDisabled();
     expect(kids).toBeDisabled();
     await user.type(screen.getByLabelText(/Имя/), "Анна");
-    await user.type(screen.getByLabelText(/Телефон/), "8 (912) 345-67-89");
-    expect(kids).toBeDisabled();
+    const phone = screen.getByLabelText(/Телефон/);
+    await user.type(phone, "912345678");
     await user.click(screen.getByRole("checkbox"));
+    expect(kids).toBeDisabled();
+    await user.click(phone);
+    await user.paste("8 (912) 345-67-89");
+    expect(phone).toHaveValue("+7 (912) 345-67-89");
     expect(adults).toBeEnabled();
     await user.click(kids);
     expect(await screen.findByRole("alert")).toHaveTextContent("Запрос сохранён");
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
       source: "menu_kids", format: "kids", phone: "+79123456789", consent: true,
+      consent_version: "lead-consent-v1",
     });
     const key = fetchMock.mock.calls[0][1].headers["Idempotency-Key"];
     await user.click(kids);
@@ -215,6 +224,33 @@ describe("lead submission", () => {
     expect(fetchMock).toHaveBeenLastCalledWith(`/api/v1/leads/${result.id}/menu`, expect.objectContaining({
       headers: { "Idempotency-Key": key },
     }));
+  });
+
+  it("shows menu validation from the API on the corresponding controls and clears it on edit", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(Response.json({
+      errors: { phone: "invalid", consent: "required" }, detail: "private detail",
+    }, { status: 422 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<MemoryRouter><MenuDownloadForm current="kids" /></MemoryRouter>);
+    const phone = screen.getByLabelText(/Телефон/);
+    const consent = screen.getByRole("checkbox");
+    await user.type(screen.getByLabelText(/Имя/), "Анна");
+    await user.click(phone);
+    await user.paste("8 (912) 345-67-89");
+    await user.click(consent);
+    await user.click(screen.getByRole("button", { name: "Скачать детское меню" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Не удалось проверить данные");
+    expect(phone).toHaveAccessibleDescription(/Сервер не принял номер/);
+    expect(consent).toHaveAccessibleDescription(/Сервер не принял согласие/);
+    expect(screen.queryByText("private detail")).not.toBeInTheDocument();
+    await user.click(phone);
+    await user.paste("8 (912) 345-67-80");
+    expect(phone).not.toHaveAttribute("aria-invalid");
+    await user.click(consent);
+    expect(consent).toHaveAccessibleDescription(/Чтобы скачать меню, отметьте согласие/);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 

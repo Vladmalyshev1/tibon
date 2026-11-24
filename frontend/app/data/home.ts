@@ -27,34 +27,38 @@ export const homeImages = {
 export const preparationImage: Photo = {
   ...homeImages.hero,
   srcSet: "/images/gallery/preparation.webp 480w, /images/home/preparation-small.webp 640w, /images/home/preparation.webp 960w",
+  avifSrcSet: "/images/home/preparation-480.avif 480w, /images/home/preparation-768.avif 768w, /images/home/preparation-960.avif 960w",
   sizes: "(min-width: 48rem) 62vw, 100vw",
 };
 
 const directionSizes = "(min-width: 85rem) 26rem, (min-width: 48rem) 32vw, calc(100vw - 2rem)";
 
-export const directions: (HomeLink & { image: Photo; illustration?: boolean })[] = [
+const groupCookingImage: Photo = {
+  src: "/images/home/adults-format-960.webp",
+  width: 960,
+  height: 540,
+  alt: "Иллюстрация мастер-класса: взрослые готовят пиццу вместе",
+  focalPoint: "90% center",
+  srcSet: "/images/home/adults-format-640.webp 640w, /images/home/adults-format-960.webp 960w",
+  avifSrcSet: "/images/home/adults-format-480.avif 480w, /images/home/adults-format-768.avif 768w, /images/home/adults-format-960.avif 960w",
+  sizes: directionSizes,
+};
+
+export const directions: (HomeLink & { image: Photo })[] = [
   {
     title: "Для взрослых",
     description: "Кулинарные мастер-классы и гастрономические ужины.",
     to: servicePages.adults.path,
-    image: {
-      src: "/images/studio/hero-steak.webp",
-      width: 1024,
-      height: 846,
-      alt: "Стейк со специями на тёмном сланце",
-      focalPoint: "center 23%",
-      srcSet: "/images/studio/hero-steak-small.webp 660w, /images/studio/hero-steak.webp 1024w",
-      sizes: directionSizes,
-    },
+    image: groupCookingImage,
   },
   {
     title: "Для детей",
     description: "Дети готовят выбранные блюда и пробуют то, что получилось.",
     to: servicePages.kids.path,
-    illustration: true,
     image: {
       src: "/images/studio/kids-pizza-1100.webp",
       srcSet: "/images/studio/kids-pizza-640.webp 640w, /images/studio/kids-pizza-1100.webp 1100w",
+      avifSrcSet: "/images/studio/kids-pizza-480.avif 480w, /images/studio/kids-pizza-768.avif 768w, /images/studio/kids-pizza-1100.avif 1100w",
       sizes: directionSizes,
       width: 1100,
       height: 614,
@@ -65,7 +69,13 @@ export const directions: (HomeLink & { image: Photo; illustration?: boolean })[]
     title: "Корпоративы",
     description: "Мастер-класс и ужин за одним столом для всей команды.",
     to: servicePages.corporate.path,
-    image: { ...homeImages.corporate, sizes: directionSizes, srcSet: "/images/gallery/shared-table.webp 480w, /images/home/shared-table.webp 960w" },
+    image: {
+      ...image("corporate-format-960.webp", 960, 1200, "Иллюстрация мастер-класса: участники вместе оформляют блюда"),
+      focalPoint: "center 24%",
+      srcSet: "/images/home/corporate-format-640.webp 640w, /images/home/corporate-format-960.webp 960w",
+      avifSrcSet: "/images/home/corporate-format-480.avif 480w, /images/home/corporate-format-768.avif 768w, /images/home/corporate-format-960.avif 960w",
+      sizes: directionSizes,
+    },
   },
 ];
 

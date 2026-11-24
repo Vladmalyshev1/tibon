@@ -1,14 +1,16 @@
+import logging
 from dataclasses import dataclass
 from datetime import timedelta
 from uuid import UUID, uuid4
 
-from sqlalchemy import func, insert, select, text, update
+from sqlalchemy import event, func, insert, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Lead, TelegramNotification
 
 MAX_ATTEMPTS = 5
 LEASE_DURATION = timedelta(seconds=60)
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -34,11 +36,17 @@ async def claim_notification(session: AsyncSession) -> NotificationClaim | None:
         .limit(32)
         .with_for_update(skip_locked=True)
     )
-    await session.execute(
+    expired_jobs = await session.execute(
         update(queue)
         .where(queue.lead_id.in_(expired))
         .values(status="failed", last_error="lease_expired", lease_id=None)
     )
+    if expired_jobs.rowcount > 0:
+
+        @event.listens_for(session.sync_session, "after_commit", once=True)
+        def log_expired_jobs(_session) -> None:
+            logger.warning("Notification permanently failed")
+
     result = await session.execute(
         select(queue, Lead)
         .join(Lead, Lead.id == queue.lead_id)
@@ -69,7 +77,7 @@ async def finish_notification(
     *,
     error: str | None = None,
     retry_after: timedelta | None = None,
-) -> None:
+) -> str | None:
     queue = TelegramNotification
     values = {"status": "sent", "sent_at": func.now(), "last_error": None}
     if error is not None:
@@ -80,7 +88,7 @@ async def finish_notification(
         }
         if can_retry:
             values["available_at"] = func.now() + retry_after
-    await session.execute(
+    return await session.scalar(
         update(queue)
         .where(
             queue.lead_id == claim.lead.id,
@@ -88,6 +96,7 @@ async def finish_notification(
             queue.lease_id == claim.lease_id,
         )
         .values(**values, lease_id=None)
+        .returning(queue.status)
     )
 
 

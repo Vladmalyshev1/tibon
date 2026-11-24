@@ -20,7 +20,7 @@ export function DesktopNavigation({ items }: { items: readonly NavigationItem[] 
     <nav className="desktop-navigation" aria-label="Основная навигация">
       <ul className="desktop-navigation-list">
         {items.map(item => (
-          <li key={item.to}><NavigationLink item={item}>{item.label}</NavigationLink></li>
+          <li key={item.to}><NavigationLink item={item}><span>{item.label}</span></NavigationLink></li>
         ))}
       </ul>
     </nav>

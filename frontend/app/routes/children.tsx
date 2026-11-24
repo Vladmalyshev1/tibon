@@ -1,4 +1,4 @@
-import { formatPrice, kidsGroup, requestAction, servicePages } from "../data/business";
+import { formatPrice, kidsGroup, requestActionFor, servicePages } from "../data/business";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { BookingFAQ, EventFacts, MenuTeaser } from "../components/pages/ServiceContent";
 import { ReferenceHero } from "../components/pages/ReferenceHero";
@@ -35,7 +35,7 @@ export default function Children() {
       </PageSection>
       <MenuTeaser type="kids" />
       <BookingFAQ kids />
-      <PageCTA title="Подобрать дату для праздника" action={requestAction} />
+      <PageCTA title="Подобрать дату для праздника" action={requestActionFor("kids")} />
     </main>
   );
 }

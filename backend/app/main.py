@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
+from app.api.health import database_router
 from app.api.health import router as health_router
 from app.api.leads import router as leads_router
 from app.api.leads import validation_error
@@ -23,13 +24,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine = create_database_engine(settings)
         app.state.database_engine = engine
         app.state.menu_pdf_dir = settings.menu_pdf_dir
-        app.state.lead_rate_limit = LeadRateLimit()
+        app.state.lead_submission_rate_limit = LeadRateLimit()
+        app.state.menu_download_rate_limit = LeadRateLimit()
         try:
             yield
         finally:
             await engine.dispose()
 
-    app = FastAPI(title="TIBON API", version="1.0", lifespan=lifespan)
+    app = FastAPI(
+        title="TIBON API",
+        version="1.0",
+        lifespan=lifespan,
+        openapi_url="/openapi.json" if settings.api_docs_enabled else None,
+        docs_url="/docs" if settings.api_docs_enabled else None,
+        redoc_url="/redoc" if settings.api_docs_enabled else None,
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -43,6 +52,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             trusted_hosts=[str(address) for address in settings.trusted_proxy_ips],
         )
     app.include_router(health_router, prefix="/api/v1")
+    if settings.database_health_enabled:
+        app.include_router(database_router, prefix="/api/v1")
     app.include_router(leads_router, prefix="/api/v1")
     app.add_exception_handler(RequestValidationError, validation_error)
     return app

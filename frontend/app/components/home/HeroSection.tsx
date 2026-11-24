@@ -3,11 +3,21 @@ import { LineIcon } from "../ui/LineIcon";
 import { PhotoImage } from "../ui/PhotoTile";
 import { founderImage } from "../../data/home";
 
+const heroPortrait = {
+  ...founderImage,
+  src: "/images/home/hero-renat.webp",
+  srcSet: "/images/home/hero-renat-small.webp 540w, /images/home/hero-renat.webp 940w",
+  avifSrcSet: "/images/home/hero-renat-540.avif 540w, /images/home/hero-renat-720.avif 720w, /images/home/hero-renat-940.avif 940w",
+  sizes: "(min-width: 40rem) min(56vw, 61rem), min(81vw, 30rem)",
+  width: 940,
+  height: 1672,
+};
+
 const studioBenefits = [
   { icon: "chef", lines: ["Профессиональный", "шеф"] },
   { icon: "cutlery", lines: ["Авторские", "рецепты"] },
   { icon: "group", lines: ["Форматы", "для разных событий"] },
-  { icon: "pin", lines: ["Студия рядом", "с Ижевском"] },
+  { icon: "pin", lines: ["Студия", "в Ижевске"] },
 ] as const;
 
 export function HeroSection() {
@@ -15,12 +25,11 @@ export function HeroSection() {
     <>
       <section className="hero home-hero" aria-labelledby="home-title">
         <div className="home-hero-portrait">
-          <PhotoImage photo={{ ...founderImage, sizes: "(min-width: 56rem) 58vw, (min-width: 40rem) 62vw, 83vw" }} priority />
+          <PhotoImage photo={heroPortrait} priority />
         </div>
-        <div className="home-hero-food" aria-hidden="true" />
         <div className="hero-container home-hero-inner">
           <div className="home-hero-copy">
-            <p className="cinematic-kicker">Кулинарная студия ТИ-БОН</p>
+            <p className="cinematic-kicker">Кулинарная студия Рената Исмагилова</p>
             <h1 id="home-title" className="type-display">
               <span>Ти-Бон — это не просто</span>{" "}
               <span>кулинарная студия,</span>{" "}

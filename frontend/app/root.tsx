@@ -5,6 +5,7 @@ import type { Route } from "./+types/root";
 import { AppLayout } from "./layouts/AppLayout";
 import { MainContainer } from "./components/layout/MainContainer";
 import { Section } from "./components/layout/Section";
+import { cookieConsentFirstPaintScript } from "./lib/cookieConsent";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,10 @@ export function Layout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <style id="cookie-consent-first-paint" />
+        <script dangerouslySetInnerHTML={{ __html: cookieConsentFirstPaintScript }} />
         <Meta />
         <Links />
       </head>

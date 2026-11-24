@@ -1,4 +1,8 @@
-const studioBuilding = "Удмуртская Республика, Завьяловский район, село Первомайский, ул. Архитектора Сергея Макарова, 2/4";
+const addressRegion = "Удмуртская Республика";
+const addressLocality = "село Первомайский";
+const studioStreet = "ул. Архитектора Сергея Макарова, 2/4";
+const studioOffice = "офис 3";
+const studioBuilding = `${addressRegion}, Завьяловский район, ${addressLocality}, ${studioStreet}`;
 const mapSearch = encodeURIComponent(studioBuilding);
 const studioMapPoint = "53.310386,56.872993";
 
@@ -6,7 +10,8 @@ export const studioOperator = { name: "ИП Исмагилов Р.С.", registra
 
 export const studioContact = {
   phone: { label: "57-69-90", href: "tel:+73412576990" },
-  address: `${studioBuilding}, офис 3`,
+  address: `${studioBuilding}, ${studioOffice}`,
+  postalAddress: { addressRegion, addressLocality, streetAddress: `${studioStreet}, ${studioOffice}`, addressCountry: "RU" },
   hours: "Ежедневно 10:00–23:00, по записи",
   mapUrl: `https://yandex.ru/maps/?text=${mapSearch}`,
   mapEmbedUrl: `https://yandex.ru/map-widget/v1/?ll=53.27,56.865&z=11&pt=${studioMapPoint}&l=map`,
@@ -31,39 +36,78 @@ export function formatPrice({ amount, unit, from }: Price) {
 }
 
 export const requestAction = { label: "Оставить заявку", to: "/zayavka/" };
+export const requestFormatIds = ["adults", "kids", "corporate", "birthday", "romantic", "rental", "extras"] as const;
+export type RequestFormat = typeof requestFormatIds[number];
+
+export function getRequestFormat(value: string | null) {
+  return requestFormatIds.find(format => format === value);
+}
+
+export function requestActionFor(format: RequestFormat) {
+  return { ...requestAction, to: `${requestAction.to}?format=${format}` };
+}
 
 export const servicePages = {
   adults: {
     path: "/dlya-vzroslyh/", crumb: "Для взрослых", title: "Кулинарные мастер-классы для взрослых",
     description: "Готовьте с шефом или выберите ужин, который он приготовит для вашей компании. Форматы для дня рождения, корпоратива и встречи с друзьями.",
+    seo: {
+      title: "Кулинарные мастер-классы для взрослых в Ижевске",
+      description: "Готовьте вместе с шефом или закажите ужин для компании. Выберите формат для взрослого дня рождения, корпоратива или встречи с друзьями.",
+    },
   },
   kids: {
     path: "/dlya-detey/", crumb: "Для детей", title: "Детские кулинарные мастер-классы",
     description: "Детский праздник, на котором гости готовят и пробуют выбранные блюда. Для компаний от восьми детей.",
+    seo: {
+      title: "Детские кулинарные мастер-классы в Ижевске",
+      description: "Детский праздник для группы от восьми участников. Дети готовят выбранные блюда и пробуют их вместе. Посмотрите программу и запросите детское меню.",
+    },
   },
   corporate: {
     path: "/dlya-vzroslyh/korporativ/", crumb: "Корпоратив", title: "Кулинарный корпоратив",
     description: "Соберите команду за одним столом. Вместе приготовьте блюда с шефом и попробуйте их за ужином.",
+    seo: {
+      title: "Кулинарный корпоратив в Ижевске",
+      description: "Команда готовит блюда с шефом и пробует их за общим столом. Посмотрите программу кулинарного корпоратива, меню и варианты дополнительных услуг.",
+    },
   },
   birthday: {
     path: "/dlya-vzroslyh/den-rozhdeniya/", crumb: "День рождения", title: "День рождения за общим столом",
     description: "Пригласите близких на кулинарный мастер-класс. Выберите меню для праздника и приготовьте его вместе с шефом.",
+    seo: {
+      title: "Кулинарный день рождения для взрослых",
+      description: "Отметьте день рождения в Ижевске с кулинарным мастер-классом и ужином. Выберите меню и приготовьте блюда вместе с шефом.",
+    },
   },
   romantic: {
     path: "/dlya-vzroslyh/romanticheskiy-uzhin/", crumb: "Романтический ужин", title: "Романтический ужин для двоих",
     description: "Гастрономический ужин из трёх блюд с мастер-классом. В формат входят три часа аренды студии и кулинарное шоу.",
+    seo: {
+      title: "Романтический ужин для двоих в Ижевске",
+      description: "Ужин из трёх блюд с кулинарным мастер-классом и шоу. В стоимость формата для двоих входят три часа аренды студии.",
+    },
   },
   rental: {
     path: "/arenda/", crumb: "Аренда студии", title: "Аренда кулинарной студии",
     description: "Кухня и пространство для вашей фотосессии, авторского мастер-класса или частного мероприятия.",
+    seo: {
+      title: "Аренда кулинарной студии в Ижевске",
+      description: "Почасовая аренда кухни для съёмок, мастер-класса или частного мероприятия. Посмотрите тарифы и маршрут до студии в селе Первомайском.",
+    },
   },
   menu: {
     path: "/menu/", crumb: "Меню", title: "Меню кулинарной студии",
-    description: "Взрослые и детские меню мастер-классов, стоимость наборов, стейки, закуски и напитки.",
+    description: "Запросите взрослое или детское меню кулинарных мастер-классов. Актуальный PDF можно скачать после заполнения формы.",
+    seo: { title: "Меню мастер-классов для взрослых и детей" },
   },
   extras: {
     path: "/dop-uslugi/", crumb: "Дополнительные услуги", title: "Дополнительные услуги для праздника",
     description: "Организация праздников с ивент-компанией «Друзья», ведущий Александр Подкин, игры, квизы и фотосъёмка в кулинарной студии TIBON.",
+    seo: {
+      title: "Ведущий, игры и фотосъёмка для праздника",
+      description: "Дополните кулинарный мастер-класс ведущим, квизом, детской анимацией или фотосъёмкой. Посмотрите варианты и цены на дополнительные услуги.",
+    },
   },
 };
 
@@ -121,5 +165,8 @@ export const studioRules = {
 };
 
 export const informationPages = {
-  contact: { path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы кулинарной студии TIBON. Карта проезда в село Первомайский." },
+  contact: {
+    path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы по записи. Карта проезда до кулинарной студии в селе Первомайском.",
+    seo: { title: "Контакты кулинарной студии в Ижевске" },
+  },
 };

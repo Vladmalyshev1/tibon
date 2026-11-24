@@ -1,10 +1,8 @@
 import type { Resolver } from "react-hook-form";
 import { z } from "zod";
-import { servicePages } from "./business";
+import { requestFormatIds, servicePages } from "./business";
 
-const eventFormats = ["adults", "kids", "corporate", "birthday", "romantic", "rental", "extras"] as const;
-
-export const requestFormats = eventFormats.map(id => ({ id, label: servicePages[id].crumb }));
+export const requestFormats = requestFormatIds.map(id => ({ id, label: servicePages[id].crumb }));
 
 const phoneError = "Введите российский номер из 10 цифр или с префиксом +7 или 8.";
 const studioDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Samara", dateStyle: "short" });
@@ -16,7 +14,7 @@ export const leadSchema = z.object({
     const digits = value.replace(/\D/g, "");
     return (!value.startsWith("+") && digits.length === 10) || /^[78]\d{10}$/.test(digits);
   }, phoneError).transform(value => `+7${value.replace(/\D/g, "").slice(-10)}`),
-  format: z.string().pipe(z.enum(eventFormats, { error: "Выберите формат мероприятия." })),
+  format: z.string().pipe(z.enum(requestFormatIds, { error: "Выберите формат мероприятия." })),
   date: z.string().refine(value => value === "" || z.iso.date().safeParse(value).success,
     "Укажите корректную дату.").transform(value => value || undefined),
   guests: z.string().trim().optional().refine(value =>

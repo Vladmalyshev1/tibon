@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { preload } from "react-dom";
 
 export type Photo = {
   src: string;
@@ -6,12 +7,23 @@ export type Photo = {
   width: number;
   height: number;
   srcSet?: string;
+  avifSrcSet?: string;
   sizes?: string;
   focalPoint?: CSSProperties["objectPosition"];
 };
 
 export function PhotoImage({ photo, priority = false }: { photo: Photo; priority?: boolean }) {
-  return (
+  if (priority && photo.avifSrcSet) {
+    preload(photo.src, {
+      as: "image",
+      type: "image/avif",
+      imageSrcSet: photo.avifSrcSet,
+      imageSizes: photo.sizes,
+      fetchPriority: "high",
+    });
+  }
+
+  const image = (
     <img
       src={photo.src}
       srcSet={photo.srcSet}
@@ -24,6 +36,14 @@ export function PhotoImage({ photo, priority = false }: { photo: Photo; priority
       fetchPriority={priority ? "high" : undefined}
       decoding={priority ? undefined : "async"}
     />
+  );
+
+  if (!photo.avifSrcSet) return image;
+  return (
+    <picture>
+      <source type="image/avif" srcSet={photo.avifSrcSet} sizes={photo.sizes} />
+      {image}
+    </picture>
   );
 }
 

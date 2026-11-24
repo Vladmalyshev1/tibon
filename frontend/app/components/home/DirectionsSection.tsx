@@ -12,12 +12,11 @@ export function DirectionsSection() {
           <h2 id="directions-title" className="type-h2">Выберите свой<br />формат</h2>
         </div>
         <ul className="directions-grid">
-          {directions.map(({ title, description, to, image, illustration }) => (
+          {directions.map(({ title, description, to, image }) => (
             <li key={to}>
               <Link to={to} className="direction-link">
                 <div className="direction-media">
                   <PhotoImage photo={image} />
-                  {illustration ? <span className="direction-image-label">Иллюстрация</span> : null}
                 </div>
                 <div className="direction-copy">
                   <h3>{title}</h3>

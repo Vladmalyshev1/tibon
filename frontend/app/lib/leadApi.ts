@@ -16,6 +16,10 @@ export const leadSubmissionErrors = {
   unavailable: "Не удалось отправить заявку. Попробуйте снова или позвоните в студию.",
 };
 
+export function serializeLead(draft: Record<string, unknown>) {
+  return JSON.stringify({ ...draft, consent_version: "lead-consent-v1" });
+}
+
 export function rememberSubmissionKey(attempts: Map<string, string>, body: string) {
   const key = attempts.get(body) ?? crypto.randomUUID();
   attempts.delete(body);

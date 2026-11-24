@@ -44,6 +44,7 @@ def client():
     [
         ({"phone": "private value"}, None, {"phone": "invalid"}),
         ({"consent": False}, None, {"consent": "invalid"}),
+        ({"consent_version": "unknown"}, None, {"consent_version": "invalid"}),
         ({}, "consent", {"consent": "required"}),
         ({"customer-supplied-field": "private value"}, None, {"body": "invalid"}),
     ],
@@ -136,6 +137,32 @@ def test_past_date_without_key_is_rejected_before_database_access(client):
     assert response.json() == {"errors": {"date": "invalid"}}
 
 
+@pytest.mark.parametrize(
+    ("format", "source"),
+    [
+        ("kids", "menu_adults"),
+        ("adults", "menu_kids"),
+        ("corporate", "menu_adults"),
+        ("callback", "menu_kids"),
+    ],
+)
+def test_rejects_mismatched_menu_format_before_saving(
+    client, monkeypatch, format, source
+):
+    async def unexpected_save(*_args):
+        pytest.fail("Invalid menu classification reached persistence")
+
+    monkeypatch.setattr("app.api.leads.submit_lead", unexpected_save)
+    response = client.post(
+        PATH,
+        json=DRAFT | {"format": format, "source": source},
+        headers={"Idempotency-Key": str(uuid4())},
+    )
+    assert response.status_code == 422
+    assert response.json() == {"errors": {"source": "invalid"}}
+    assert response.headers["cache-control"] == "no-store"
+
+
 def test_concurrent_retries_persist_a_single_lead(postgres_schema):
     settings, scoped_engine = postgres_schema
     headers = {"Idempotency-Key": str(uuid4())}
@@ -144,6 +171,7 @@ def test_concurrent_retries_persist_a_single_lead(postgres_schema):
         "date": "2099-01-01",
         "guests": 15,
         "source": "menu_kids",
+        "consent_version": "lead-consent-v1",
         "comment": "Synthetic 'note'; literal text",
     }
 
@@ -161,6 +189,9 @@ def test_concurrent_retries_persist_a_single_lead(postgres_schema):
             PATH, json=body | {"comment": "Different"}, headers=headers
         )
         assert conflict.status_code == 409
+        legacy_body = body.copy()
+        legacy_body.pop("consent_version")
+        assert client.post(PATH, json=legacy_body, headers=headers).status_code == 409
 
     async def verify():
         engine = scoped_engine(settings)
@@ -174,6 +205,9 @@ def test_concurrent_retries_persist_a_single_lead(postgres_schema):
                 assert notification.status == "pending" and notification.attempts == 0
                 assert lead.guests == 15 and lead.source == "menu_kids"
                 assert lead.id == lead_id and lead.status is LeadStatus.NEW
+                assert lead.consent_version == body["consent_version"]
+                assert lead.consented_at == lead.created_at
+                assert lead.consented_at.utcoffset() is not None
                 assert (
                     lead.phone == DRAFT["phone"]
                     and lead.consent

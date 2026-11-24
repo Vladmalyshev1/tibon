@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Link } from "react-router";
+import type { RequestFormat } from "../../data/business";
 import { isPastStudioDate, requestFormats, resolveLead, type LeadDraft, type LeadFields } from "../../data/lead";
-import { leadSubmissionErrors, rememberSubmissionKey, submitLead } from "../../lib/leadApi";
+import { leadSubmissionErrors, rememberSubmissionKey, serializeLead, submitLead } from "../../lib/leadApi";
 import { useHydrated } from "../../lib/useHydrated";
 import { Button } from "../ui/Button";
+import { CallbackPhoneInput } from "./CallbackPhoneInput";
 import { LeadField } from "./LeadField";
 
 const invalidFields = {
@@ -17,7 +19,7 @@ const invalidFields = {
   consent: "Поставьте отметку о согласии.",
 } satisfies Record<keyof LeadFields, string>;
 const fieldNames = Object.keys(invalidFields) as (keyof LeadFields)[];
-export function LeadForm() {
+export function LeadForm({ initialFormat }: { initialFormat?: RequestFormat }) {
   const enabled = useHydrated();
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -25,12 +27,12 @@ export function LeadForm() {
   const inFlight = useRef(false);
   const attempts = useRef(new Map<string, string>());
   const success = useRef<HTMLParagraphElement>(null);
-  const { handleSubmit, register, reset, setError, setFocus, formState: { errors, isSubmitting } } = useForm<LeadFields, undefined, LeadDraft>({
+  const { control, handleSubmit, register, reset, setError, setFocus, formState: { errors, isSubmitting } } = useForm<LeadFields, undefined, LeadDraft>({
     resolver: resolveLead,
     defaultValues: {
       name: "",
-      phone: "",
-      format: "",
+      phone: "+7",
+      format: initialFormat ?? "",
       date: "",
       guests: "",
       comment: "",
@@ -44,7 +46,7 @@ export function LeadForm() {
   }, [focusRequest, isSubmitting, sent, setFocus]);
 
   async function send(draft: LeadDraft) {
-    const body = JSON.stringify(draft);
+    const body = serializeLead(draft);
     const previous = attempts.current.get(body);
     if (!previous && isPastStudioDate(draft.date)) {
       setError("date", { type: "validation", message: invalidFields.date });
@@ -86,13 +88,16 @@ export function LeadForm() {
     }
   }
 
-  function fieldProps(name: keyof LeadFields) {
+  function fieldA11y(name: keyof LeadFields) {
     return {
       id: `lead-${name}`,
       "aria-invalid": errors[name] ? true : undefined,
       "aria-describedby": errors[name] ? `lead-${name}-error` : undefined,
-      ...register(name),
     };
+  }
+
+  function fieldProps(name: Exclude<keyof LeadFields, "phone">) {
+    return { ...fieldA11y(name), ...register(name) };
   }
 
   if (sent) {
@@ -113,12 +118,14 @@ export function LeadForm() {
             <input {...fieldProps("name")} autoComplete="name" maxLength={80} required />
           </LeadField>
           <LeadField id="lead-phone" label="Телефон *" error={errors.phone?.message} icon="phone">
-            <input {...fieldProps("phone")} type="tel" autoComplete="tel" maxLength={24} required />
+            <Controller name="phone" control={control} render={({ field: { onChange, ...field } }) => (
+              <CallbackPhoneInput {...fieldA11y("phone")} {...field} onValueChange={onChange} required />
+            )} />
           </LeadField>
         </div>
         <div className="lead-pair">
           <LeadField id="lead-format" label="Формат мероприятия *" error={errors.format?.message}>
-            <select {...fieldProps("format")} required>
+            <select {...fieldProps("format")} defaultValue={initialFormat ?? ""} required>
               <option value="">Выберите формат</option>
               {requestFormats.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
             </select>

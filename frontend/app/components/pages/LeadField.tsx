@@ -3,7 +3,7 @@ import { IconInputControl } from "./IconInputControl";
 
 export function LeadField({ id, label, error, icon, children }: {
   id: string;
-  label: string;
+  label: ReactNode;
   error?: string;
   icon?: "user" | "phone";
   children: ReactNode;

@@ -84,6 +84,28 @@ def test_public_lead_route_only_allows_post(client):
     )
 
 
+@pytest.mark.parametrize("database_health_enabled", [True, False])
+def test_api_docs_can_be_disabled_independently_of_database_health(
+    monkeypatch, database_health_enabled
+):
+    async def healthy_database(_engine):
+        return True
+
+    monkeypatch.setattr("app.api.health.database_is_available", healthy_database)
+    settings = Settings(
+        _env_file=None,
+        postgres_password="example",
+        api_docs_enabled=False,
+        database_health_enabled=database_health_enabled,
+    )
+    with TestClient(create_app(settings)) as client:
+        for path in ("/docs", "/docs/oauth2-redirect", "/redoc", "/openapi.json"):
+            assert client.get(path).status_code == 404
+        assert client.get("/api/v1/health").json() == {"status": "ok"}
+        expected = 200 if database_health_enabled else 404
+        assert client.get("/api/v1/health/db").status_code == expected
+
+
 @pytest.mark.skipif(
     os.environ.get("TIBON_TEST_POSTGRES") != "1", reason="requires PostgreSQL"
 )

@@ -1,4 +1,4 @@
-import { adultGroup, formatPrice, requestAction, servicePages } from "../data/business";
+import { adultGroup, formatPrice, requestActionFor, servicePages } from "../data/business";
 import { homeImages } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { BookingFAQ, EventFacts, RelatedFormats, ServiceHero } from "../components/pages/ServiceContent";
@@ -38,7 +38,7 @@ export default function Birthday() {
       </PageSection>
       <BookingFAQ />
       <RelatedFormats except="birthday" />
-      <PageCTA title="Обсудить день рождения" action={requestAction} />
+      <PageCTA title="Обсудить день рождения" action={requestActionFor("birthday")} />
     </main>
   );
 }

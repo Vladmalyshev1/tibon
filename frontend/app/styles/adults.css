@@ -16,6 +16,7 @@
 .adults-hero {
   position: relative;
   isolation: isolate;
+  min-height: clamp(34rem, 52vw, 49.5rem);
   overflow: clip;
   background: var(--adults-background);
 }
@@ -23,7 +24,7 @@
 .adults-hero-media {
   position: absolute;
   z-index: -1;
-  inset: 12% 0 0;
+  inset: 0;
 }
 
 .adults-hero-media img {
@@ -180,11 +181,13 @@
 }
 
 @media (width < 48rem) {
+  .adults-hero { min-height: 0; }
   .adults-hero .type-display span { display: block; }
-  .adults-hero-copy { padding-bottom: clamp(11rem, 52vw, 17rem); }
-  .adults-hero-media { inset-block-start: 28%; }
+  .adults-hero-copy { padding-bottom: 64vw; }
+  .adults-hero-media { inset-block-start: auto; }
+  .adults-hero-media img { display: block; height: auto; }
   .adults-hero-media::after {
-    background: linear-gradient(180deg, var(--adults-background), #090909ef 25%, #090909bc 46%, #09090925 68%, #09090940);
+    background: linear-gradient(180deg, var(--adults-background), transparent 35%);
   }
   .adults-formats .image-text-layout figure { order: -1; }
   .adults-formats .image-text-media { aspect-ratio: 16 / 10; }

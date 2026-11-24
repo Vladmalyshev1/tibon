@@ -1,4 +1,4 @@
-import { formatPrice, requestAction, romanticDinner, servicePages } from "../data/business";
+import { formatPrice, requestActionFor, romanticDinner, servicePages } from "../data/business";
 import { homeImages } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { EventFacts, RelatedFormats, romanticDinnerQuestions, ServiceHero } from "../components/pages/ServiceContent";
@@ -24,7 +24,7 @@ export default function RomanticDinner() {
       </PageSection>
       <FAQSection title="О формате" items={romanticDinnerQuestions} />
       <RelatedFormats except="romantic" />
-      <PageCTA title="Подобрать дату ужина" action={requestAction} layout="inline" />
+      <PageCTA title="Подобрать дату ужина" action={requestActionFor("romantic")} layout="inline" />
     </main>
   );
 }

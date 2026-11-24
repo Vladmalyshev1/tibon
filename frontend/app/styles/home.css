@@ -6,22 +6,21 @@
 }
 
 .home-hero {
+  --home-hero-background: url("/images/home/hero-kitchen-steak.webp");
+  --home-hero-background-mobile: url("/images/home/hero-kitchen-steak-mobile.webp");
   position: relative;
   isolation: isolate;
   overflow: clip;
   min-height: clamp(35rem, 58.5vw, 55rem);
   padding-block: clamp(2.75rem, 4.8vw, 5rem) 11rem;
-  background: var(--cinematic-black);
+  background: var(--cinematic-black) var(--home-hero-background) center bottom / cover no-repeat;
 }
 
-.home-hero::before {
-  position: absolute;
-  z-index: -3;
-  inset: 0 45% 0 0;
-  background: linear-gradient(180deg, #090909 0%, transparent 19%, #090909 98%),
-    linear-gradient(90deg, transparent 60%, #090909), url("/images/studio/hero-ambience.webp") 48% center / cover;
-  opacity: 0.8;
-  content: "";
+@supports (background-image: image-set(url("") type("image/avif"))) {
+  .home-hero {
+    --home-hero-background: image-set(url("/images/home/hero-kitchen-steak-1536.avif") type("image/avif"), url("/images/home/hero-kitchen-steak.webp") type("image/webp"));
+    --home-hero-background-mobile: image-set(url("/images/home/hero-kitchen-steak-768.avif") type("image/avif"), url("/images/home/hero-kitchen-steak-mobile.webp") type("image/webp"));
+  }
 }
 
 .home-hero-portrait {
@@ -29,21 +28,23 @@
   z-index: -2;
   inset: clamp(-10rem, -9.8vw, -4.2rem) auto 0 0;
   width: min(55vw, 53rem);
-  mix-blend-mode: lighten;
 }
 
 .home-hero-portrait img { width: 100%; max-width: none; }
 
-.home-hero-food {
+.home-hero::after {
   position: absolute;
   z-index: -1;
-  inset: 58% -2% 0 auto;
-  width: min(59vw, 64rem);
-  background: url("/images/studio/hero-steak.webp") right top / 100% auto no-repeat;
-  mask-image: radial-gradient(ellipse 78% 102% at 76% 86%, #000 47%, transparent 98%),
-    linear-gradient(180deg, transparent, #000 24%);
-  mask-composite: intersect;
-  filter: brightness(1.16) saturate(1.1);
+  inset: auto 0 0;
+  height: clamp(4.25rem, 12vw, 11rem);
+  background: linear-gradient(to bottom,
+    transparent,
+    rgb(13 13 13 / 0.12) 28%,
+    rgb(13 13 13 / 0.5) 58%,
+    rgb(13 13 13 / 0.9) 88%,
+    #0d0d0d);
+  pointer-events: none;
+  content: "";
 }
 
 .home-hero-inner { position: relative; }
@@ -207,17 +208,6 @@
 }
 .direction-link:is(:hover, :focus-visible) img { transform: scale(1.035); }
 .directions-grid > :nth-child(3) img { filter: brightness(0.75) saturate(0.89) sepia(0.14); }
-.direction-image-label {
-  position: absolute;
-  right: 0.55rem;
-  bottom: 0.45rem;
-  border-radius: 0.2rem;
-  padding: 0.2rem 0.4rem;
-  color: #fff;
-  background: #000c;
-  font-size: 0.75rem;
-}
-
 .direction-copy { display: grid; gap: 0.45rem; padding: clamp(1rem, 2vw, 1.7rem); }
 .direction-copy h3, .occasions-list h3 { margin: 0; font-size: var(--text-lead); line-height: 1.3; font-weight: 550; }
 .direction-copy p, .occasions-list p { margin: 0; color: #c0b9b5; font-size: var(--text-body-s); }
@@ -293,19 +283,30 @@
   .home-hero .type-display > span { display: inline; }
 }
 
+@media (width < 70rem) {
+  .home-hero {
+    background-image: linear-gradient(var(--cinematic-black), transparent 24%),
+      var(--home-hero-background);
+    background-size: 100% calc(100vw * 2 / 3), 100% auto;
+  }
+}
+
+@media (40rem <= width < 56rem) {
+  .home-hero-portrait {
+    inset-block-start: max(clamp(-10rem, -9.8vw, -4.2rem), calc(100% - 56vw * 1672 / 940));
+  }
+}
+
 @media (width < 40rem) {
-  .home-hero { min-height: 0; padding-block: 1.8rem clamp(15.5rem, 78vw, 23rem); }
+  .home-hero {
+    min-height: 0;
+    padding-block: 1.8rem clamp(15.5rem, 78vw, 23rem);
+    background-image: linear-gradient(var(--cinematic-black), transparent 24%),
+      var(--home-hero-background-mobile);
+  }
   .home-hero-copy { margin-left: 0; }
   .home-hero .type-display em, .home-hero .type-lead, .home-hero .hero-actions { margin-left: 0; }
-  .home-hero::before { inset: 38% 36% 0 0; }
   .home-hero-portrait { z-index: -1; inset: auto auto clamp(-15rem, -52vw, -9rem) -5vw; width: min(81vw, 27rem); }
-  .home-hero-food {
-    z-index: -2;
-    inset: auto -7% 0 auto;
-    width: min(75vw, 28rem);
-    height: clamp(8rem, 47vw, 17rem);
-    background-image: url("/images/studio/hero-steak-small.webp");
-  }
   .home-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1rem; }
   .home-benefits li:nth-child(3) { border-left: 0; }
 }

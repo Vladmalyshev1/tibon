@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.services.health import database_is_available
 
 router = APIRouter(prefix="/health", tags=["health"])
+database_router = APIRouter(prefix="/health", tags=["health"])
 
 
 class HealthResponse(BaseModel):
@@ -22,7 +23,7 @@ async def health(response: Response) -> HealthResponse:
     return HealthResponse(status="ok")
 
 
-@router.get("/db", responses={503: {"model": DatabaseHealthResponse}})
+@database_router.get("/db", responses={503: {"model": DatabaseHealthResponse}})
 async def database_health(
     request: Request, response: Response
 ) -> DatabaseHealthResponse:

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link } from "react-router";
 import { resolveCallback, type CallbackFields } from "../../data/lead";
-import { leadSubmissionErrors, rememberSubmissionKey, submitLead } from "../../lib/leadApi";
+import { leadSubmissionErrors, rememberSubmissionKey, serializeLead, submitLead } from "../../lib/leadApi";
 import { useHydrated } from "../../lib/useHydrated";
 import { Button } from "../ui/Button";
 import { LineIcon } from "../ui/LineIcon";
@@ -37,7 +37,7 @@ export function CallbackForm() {
   }, [sent, isSubmitting, focusRequest, setFocus]);
 
   async function send(draft: CallbackFields) {
-    const body = JSON.stringify({ ...draft, format: "callback" });
+    const body = serializeLead({ ...draft, format: "callback" });
     const result = await submitLead(body, rememberSubmissionKey(attempts.current, body));
     if (result.kind === "success") {
       attempts.current.clear();

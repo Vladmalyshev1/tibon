@@ -1,3 +1,14 @@
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 1
+
+[mcp_servers.tibon-semgrep]
+command = "powershell.exe"
+args = ["-NoProfile", "-NonInteractive", "-Command", "$env:SEMGREP_SETTINGS_FILE = Join-Path $env:LOCALAPPDATA 'TibonAudit/semgrep-settings.yml'; & (Join-Path $env:LOCALAPPDATA 'TibonAudit/scanner-venv/Scripts/semgrep.exe') mcp -t stdio"]
+enabled_tools = ["get_supported_languages", "semgrep_scan", "semgrep_scan_with_custom_rule", "semgrep_rule_schema"]
+startup_timeout_sec = 30
+
+[mcp_servers.tibon-semgrep.env]
+SEMGREP_SEND_METRICS = "off"
+SEMGREP_ENABLE_VERSION_CHECK = "0"
+SEMGREP_APP_TOKEN = ""

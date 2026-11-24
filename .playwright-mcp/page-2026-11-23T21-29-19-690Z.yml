@@ -1,0 +1,195 @@
+- generic [ref=e2]:
+  - link "К содержанию" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "TIBON — главная" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Логотип кулинарной студии TIBON" [ref=e7]
+      - navigation "Основная навигация" [ref=e8]:
+        - list [ref=e9]:
+          - listitem [ref=e10]:
+            - link "Для взрослых" [ref=e11] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/
+          - listitem [ref=e12]:
+            - link "Для детей" [ref=e13] [cursor=pointer]:
+              - /url: /dlya-detey/
+          - listitem [ref=e14]:
+            - link "Аренда студии" [ref=e15] [cursor=pointer]:
+              - /url: /arenda/
+          - listitem [ref=e16]:
+            - link "Меню" [ref=e17] [cursor=pointer]:
+              - /url: /menu/
+          - listitem [ref=e18]:
+            - link "Доп. услуги" [ref=e19] [cursor=pointer]:
+              - /url: /dop-uslugi/
+          - listitem [ref=e20]:
+            - link "Контакты" [ref=e21] [cursor=pointer]:
+              - /url: /contact/
+      - link "57-69-90" [ref=e22] [cursor=pointer]:
+        - /url: tel:+73412576990
+  - main [ref=e26]:
+    - region "Ти-Бон — это не просто кулинарная студия, а настоящее гастрономическое путешествие," [ref=e27]:
+      - img "Ренат Исмагилов, основатель кулинарной студии TIBON" [ref=e29]
+      - generic [ref=e32]:
+        - paragraph [ref=e33]: Кулинарная студия ТИ-БОН
+        - heading "Ти-Бон — это не просто кулинарная студия, а настоящее гастрономическое путешествие," [level=1] [ref=e34]:
+          - generic [ref=e35]: Ти-Бон — это не просто
+          - generic [ref=e36]: кулинарная студия,
+          - emphasis [ref=e37]:
+            - generic [ref=e38]: а настоящее
+            - generic [ref=e39]: гастрономическое
+            - generic [ref=e40]: путешествие,
+        - paragraph [ref=e41]: где в одном блюде собрана целая палитра вкусов и эмоций.
+        - link "Выбрать программу" [ref=e43] [cursor=pointer]:
+          - /url: /#directions
+    - list "Преимущества студии" [ref=e46]:
+      - listitem [ref=e47]:
+        - generic [ref=e50]: Профессиональныйшеф
+      - listitem [ref=e51]:
+        - generic [ref=e54]: Авторскиерецепты
+      - listitem [ref=e55]:
+        - generic [ref=e59]: Форматыдля разных событий
+      - listitem [ref=e60]:
+        - generic [ref=e64]: Студия рядомс Ижевском
+    - region "Заказать обратный звонок" [ref=e65]:
+      - generic [ref=e66]:
+        - paragraph [ref=e67]: Обратная связь
+        - heading "Заказать обратный звонок" [level=2] [ref=e68]
+        - paragraph [ref=e69]:
+          - text: Позвоним в рабочее время с
+          - strong [ref=e70]: 10:00
+          - text: до
+          - strong [ref=e71]: 23:00
+        - group [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: Имя *
+              - textbox "Имя *" [disabled] [ref=e78]:
+                - /placeholder: Ваше имя
+            - generic [ref=e79]:
+              - generic [ref=e80]: Телефон *
+              - textbox "Телефон *" [disabled] [ref=e82]: "+7"
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - checkbox "Согласен на обработку персональных данных для обратного звонка *" [disabled] [ref=e85]
+              - generic [ref=e86]: Согласен на обработку персональных данных для обратного звонка *
+            - link "Политика обработки персональных данных" [ref=e87] [cursor=pointer]:
+              - /url: /politika-konfidencialnosti/
+          - button "Перезвоните мне" [disabled] [ref=e88]
+    - region "Больше, чем просто готовка" [ref=e91]:
+      - img "Руки нарезают овощи на разделочной доске" [ref=e93]
+      - generic [ref=e95]:
+        - paragraph [ref=e96]: О студии
+        - heading "Больше, чем просто готовка" [level=2] [ref=e97]: Больше, чемпросто готовка
+        - paragraph [ref=e98]: В студии Рената Исмагилова гости готовят вместе с шефом. Он показывает приёмы, помогает с блюдами, а за ужином можно попробовать всё, что приготовили.
+    - region "Выберите свой формат" [ref=e99]:
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - paragraph [ref=e102]: Программы
+          - heading "Выберите свой формат" [level=2] [ref=e103]: Выберите свойформат
+        - list [ref=e104]:
+          - listitem [ref=e105]:
+            - link [ref=e106] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/
+              - img "Стейк со специями на тёмном сланце" [ref=e108]
+              - generic [ref=e109]:
+                - heading "Для взрослых" [level=3] [ref=e110]
+                - paragraph [ref=e111]: Кулинарные мастер-классы и гастрономические ужины.
+          - listitem [ref=e114]:
+            - link "Иллюстрация детского мастер-класса по приготовлению пиццы Иллюстрация Для детей Дети готовят выбранные блюда и пробуют то, что получилось." [ref=e115] [cursor=pointer]:
+              - /url: /dlya-detey/
+              - generic [ref=e116]:
+                - img "Иллюстрация детского мастер-класса по приготовлению пиццы" [ref=e117]
+                - generic [ref=e118]: Иллюстрация
+              - generic [ref=e119]:
+                - heading "Для детей" [level=3] [ref=e120]
+                - paragraph [ref=e121]: Дети готовят выбранные блюда и пробуют то, что получилось.
+          - listitem [ref=e124]:
+            - link [ref=e125] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/korporativ/
+              - img "Несколько блюд на общем столе" [ref=e127]
+              - generic [ref=e128]:
+                - heading "Корпоративы" [level=3] [ref=e129]
+                - paragraph [ref=e130]: Мастер-класс и ужин за одним столом для всей команды.
+        - list [ref=e133]:
+          - listitem [ref=e134]:
+            - link [ref=e135] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/den-rozhdeniya/
+              - heading "Дни рождения" [level=3] [ref=e136]
+              - paragraph [ref=e137]: Праздник для близких с мастер-классом и ужином.
+          - listitem [ref=e140]:
+            - link [ref=e141] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/romanticheskiy-uzhin/
+              - heading "Романтический ужин" [level=3] [ref=e142]
+              - paragraph [ref=e143]: Ужин с кулинарным мастер-классом для двоих.
+          - listitem [ref=e146]:
+            - link [ref=e147] [cursor=pointer]:
+              - /url: /arenda/
+              - heading "Аренда студии" [level=3] [ref=e148]
+              - paragraph [ref=e149]: Кухня для съёмок, своего мастер-класса или встречи.
+    - region "Авторские меню" [ref=e152]:
+      - img "Паста с томатами и зеленью" [ref=e154]
+      - generic [ref=e156]:
+        - paragraph [ref=e157]: Меню
+        - heading "Авторские меню" [level=2] [ref=e158]: Авторскиеменю
+        - paragraph [ref=e159]: Взрослые и детские наборы, авторские блюда, стейки и закуски.
+        - link "Посмотреть меню" [ref=e160] [cursor=pointer]:
+          - /url: /menu/
+    - region "Праздники в стиле Ти-Бон" [ref=e163]:
+      - img "Участники мероприятия ивент-компании «Друзья» в студии TIBON" [ref=e165]
+      - generic [ref=e167]:
+        - paragraph [ref=e168]: События
+        - heading "Праздники в стиле Ти-Бон" [level=2] [ref=e169]: Праздникив стиле Ти-Бон
+        - paragraph [ref=e170]: Дни рождения, романтические ужины, семейные встречи и корпоративы за общим столом.
+        - link "Организовать праздник" [ref=e171] [cursor=pointer]:
+          - /url: /zayavka/
+        - link "Дополнить программу" [ref=e174] [cursor=pointer]:
+          - /url: /dop-uslugi/
+    - region "Забронируйте дату" [ref=e177]:
+      - generic [ref=e179]:
+        - paragraph [ref=e180]: Бронирование
+        - heading "Забронируйте дату" [level=2] [ref=e181]: Забронируйтедату
+        - paragraph [ref=e182]: Расскажите о своём поводе. Обсудим формат, меню и дату.
+        - generic [ref=e183]:
+          - link "Забронировать" [ref=e184] [cursor=pointer]:
+            - /url: /zayavka/
+          - link "57-69-90" [ref=e187] [cursor=pointer]:
+            - /url: tel:+73412576990
+  - contentinfo [ref=e188]:
+    - generic [ref=e189]:
+      - link "TIBON — главная" [ref=e191] [cursor=pointer]:
+        - /url: /
+        - img "Логотип кулинарной студии TIBON" [ref=e192]
+      - navigation "Навигация в подвале" [ref=e193]:
+        - list [ref=e194]:
+          - listitem [ref=e195]:
+            - link "Для взрослых" [ref=e196] [cursor=pointer]:
+              - /url: /dlya-vzroslyh/
+          - listitem [ref=e197]:
+            - link "Для детей" [ref=e198] [cursor=pointer]:
+              - /url: /dlya-detey/
+          - listitem [ref=e199]:
+            - link "Аренда студии" [ref=e200] [cursor=pointer]:
+              - /url: /arenda/
+          - listitem [ref=e201]:
+            - link "Меню" [ref=e202] [cursor=pointer]:
+              - /url: /menu/
+          - listitem [ref=e203]:
+            - link "Дополнительные услуги" [ref=e204] [cursor=pointer]:
+              - /url: /dop-uslugi/
+          - listitem [ref=e205]:
+            - link "Контакты" [ref=e206] [cursor=pointer]:
+              - /url: /contact/
+      - generic [ref=e208]:
+        - link "57-69-90" [ref=e209] [cursor=pointer]:
+          - /url: tel:+73412576990
+        - generic [ref=e210]: Удмуртская Республика, Завьяловский район, село Первомайский, ул. Архитектора Сергея Макарова, 2/4, офис 3
+        - generic [ref=e211]: Ежедневно 10:00–23:00, по записи
+      - generic [ref=e212]:
+        - navigation "Правовая информация" [ref=e213]:
+          - link "Политика обработки персональных данных" [ref=e214] [cursor=pointer]:
+            - /url: /politika-konfidencialnosti/
+        - generic [ref=e215]:
+          - paragraph [ref=e216]: © TIBON · ИП Исмагилов Р.С.
+          - paragraph [ref=e217]: "ОГРНИП: 325180000086978"

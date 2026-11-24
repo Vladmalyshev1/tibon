@@ -5,21 +5,16 @@ import { FinalCtaSection } from "../components/home/FinalCtaSection";
 import { HeroSection } from "../components/home/HeroSection";
 import { CallbackForm } from "../components/pages/CallbackForm";
 import { studioContact } from "../data/business";
-import { founderImage, homeHeading } from "../data/home";
+import { loadPublicPage, socialPreviewMeta } from "../lib/pageMeta";
 import type { Route } from "./+types/home";
 
 const [opensAt, closesAt] = studioContact.hours.match(/\d{2}:\d{2}/g) ?? [];
 
-export function loader() {
-  const configuredUrl = process.env.PUBLIC_SITE_ORIGIN;
-  const url = configuredUrl ? URL.parse(configuredUrl) : null;
-  const origin = url && ["http:", "https:"].includes(url.protocol) ? url.origin : null;
-  return { origin };
-}
+export const loader = loadPublicPage;
 
 export function meta({ data }: Route.MetaArgs) {
-  const title = `${homeHeading} — TIBON`;
-  const description = "Кулинарные мастер-классы для взрослых и детей, частные праздники и корпоративы в студии Рената Исмагилова.";
+  const title = "Кулинарная студия в Ижевске — TIBON";
+  const description = "Мастер-классы с шефом Ренатом Исмагиловым, детские праздники, корпоративы и аренда кухни в Ижевске.";
   const canonical = data?.origin ? new URL("/", data.origin).href : null;
   return [
     { title },
@@ -34,8 +29,7 @@ export function meta({ data }: Route.MetaArgs) {
     ...(canonical ? [
       { tagName: "link" as const, rel: "canonical", href: canonical },
       { property: "og:url", content: canonical },
-      { property: "og:image", content: new URL(founderImage.src, canonical).href },
-      { property: "og:image:alt", content: founderImage.alt },
+      ...socialPreviewMeta("/", canonical),
     ] : []),
   ];
 }

@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
-import { adultGroup, formatPrice, requestAction, romanticDinner, servicePages, studioRules } from "../../data/business";
+import { Link } from "react-router";
+import { adultGroup, formatPrice, requestActionFor, romanticDinner, servicePages, studioRules, type RequestFormat } from "../../data/business";
 import { homeImages } from "../../data/home";
 import type { MenuType } from "../../data/menu";
 import { adultsBreadcrumb } from "../navigation/Breadcrumbs";
@@ -9,10 +10,9 @@ import { ImageTextSection } from "./ImageTextSection";
 import { PageHero } from "./PageHero";
 import { PageSection } from "./PageSection";
 
-type PageKey = keyof typeof servicePages;
 type ServiceHeroProps = Omit<ComponentProps<typeof PageHero>, "title" | "description" | "breadcrumbs">;
 
-export function ServiceHero({ page, action = requestAction, ...props }: ServiceHeroProps & { page: PageKey }) {
+export function ServiceHero({ page, action = requestActionFor(page), ...props }: ServiceHeroProps & { page: RequestFormat }) {
   const { title, description, crumb } = servicePages[page];
   const home = { label: "Главная", to: "/" };
   const breadcrumbs = ["corporate", "birthday", "romantic"].includes(page)
@@ -77,7 +77,7 @@ export function MenuTeaser({ type = "adults" }: { type?: MenuType }) {
 
 export const romanticDinnerQuestions = [
   { id: "dinner-guests", question: "На сколько гостей рассчитан романтический ужин?", answer: <p>{romanticDinner.guests}.</p> },
-  { id: "dinner-menu", question: "Что будем готовить на романтическом ужине?", answer: <p>Формат включает три блюда. Конкретное меню ужина уточните при обращении в студию.</p> },
+  { id: "dinner-menu", question: "Что будем готовить на романтическом ужине?", answer: <p>Формат включает три блюда. Конкретное меню ужина можно <Link className="underline" to="/contact/">уточнить у студии</Link>.</p> },
 ];
 
 export function BookingFAQ({ kids = false, includeRomanticDinner = false }: { kids?: boolean; includeRomanticDinner?: boolean }) {

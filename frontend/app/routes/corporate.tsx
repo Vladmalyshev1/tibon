@@ -1,4 +1,4 @@
-import { adultGroup, requestAction, servicePages } from "../data/business";
+import { adultGroup, requestActionFor, servicePages } from "../data/business";
 import { preparationImage } from "../data/home";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { AdultGroupFacts, BookingFAQ, RelatedFormats, ServiceHero } from "../components/pages/ServiceContent";
@@ -25,7 +25,7 @@ export default function Corporate() {
       </PageSection>
       <BookingFAQ />
       <RelatedFormats except="corporate" />
-      <PageCTA title="Обсудить корпоратив" description="Подготовьте дату встречи и размер команды." action={requestAction} layout="inline" />
+      <PageCTA title="Обсудить корпоратив" description="Подготовьте дату встречи и размер команды." action={requestActionFor("corporate")} layout="inline" />
     </main>
   );
 }

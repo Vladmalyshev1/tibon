@@ -90,6 +90,10 @@ class Lead(Base):
     )
     comment: Mapped[str | None] = mapped_column(String(1000))
     consent: Mapped[bool]
+    consent_version: Mapped[str | None] = mapped_column(String(64))
+    consented_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     idempotency_key: Mapped[UUID | None] = mapped_column(Uuid)
     status: Mapped[LeadStatus] = mapped_column(
         Enum(

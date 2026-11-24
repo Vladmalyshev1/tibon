@@ -1,6 +1,6 @@
 import re
 from datetime import date as CalendarDate
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -17,6 +17,10 @@ from pydantic import (
 from app.models.lead import LeadFormat, LeadSource
 
 STUDIO_TIMEZONE = ZoneInfo("Europe/Samara")
+MENU_FORMATS = {
+    LeadSource.MENU_ADULTS: LeadFormat.ADULTS,
+    LeadSource.MENU_KIDS: LeadFormat.KIDS,
+}
 
 
 class LeadCreate(BaseModel):
@@ -34,6 +38,7 @@ class LeadCreate(BaseModel):
         Annotated[str, StringConstraints(strip_whitespace=True, max_length=1000)] | None
     ) = None
     consent: StrictBool
+    consent_version: Literal["lead-consent-v1"] | None = None
 
     @field_validator("name", "comment")
     @classmethod
@@ -57,12 +62,21 @@ class LeadCreate(BaseModel):
     def normalize_comment(cls, value: str | None) -> str | None:
         return value or None
 
-    @field_validator("date", "guests", "source", "comment")
+    @field_validator("date", "guests", "comment")
     @classmethod
     def reject_callback_details(cls, value: object, info: ValidationInfo) -> object:
         if value is not None and info.data.get("format") == LeadFormat.CALLBACK:
             raise ValueError("Callback requests do not accept event or menu details")
         return value
+
+    @field_validator("source")
+    @classmethod
+    def require_matching_menu_format(
+        cls, source: LeadSource | None, info: ValidationInfo
+    ) -> LeadSource | None:
+        if source is not None and info.data.get("format") != MENU_FORMATS[source]:
+            raise ValueError("Menu source must match the request format")
+        return source
 
     @field_validator("consent")
     @classmethod

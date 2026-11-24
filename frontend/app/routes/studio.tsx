@@ -3,9 +3,15 @@ import { PageSection } from "../components/pages/PageSection";
 import { ButtonLink } from "../components/ui/Button";
 import { founderImage, homeHeading } from "../data/home";
 import { studioContact } from "../data/business";
-import { placeholderMeta } from "../lib/pageMeta";
+import { pageMeta } from "../lib/pageMeta";
 
-export function meta() { return placeholderMeta("О студии"); }
+export function meta() {
+  return pageMeta({
+    title: "О студии Рената Исмагилова",
+    description: "Как проходят кулинарные мастер-классы с шефом в студии TIBON и как добраться до неё в селе Первомайском.",
+    noIndex: true,
+  });
+}
 export default function Studio() {
   return (
     <main id="main-content" className="cinematic-page studio-page" tabIndex={-1}>

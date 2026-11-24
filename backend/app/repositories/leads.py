@@ -27,6 +27,7 @@ async def insert_lead(session: AsyncSession, lead: Lead) -> UUID | None:
         source=lead.source,
         comment=lead.comment,
         consent=lead.consent,
+        consent_version=lead.consent_version,
         idempotency_key=lead.idempotency_key,
     )
     if lead.idempotency_key is not None:

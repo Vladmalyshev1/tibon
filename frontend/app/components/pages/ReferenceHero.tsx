@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import { requestAction, servicePages } from "../../data/business";
+import { requestActionFor, servicePages } from "../../data/business";
 import { Breadcrumbs } from "../navigation/Breadcrumbs";
 import { ButtonLink } from "../ui/Button";
 import { LineIcon } from "../ui/LineIcon";
@@ -14,6 +14,7 @@ export function ReferenceHero({ page, lines, image, caption, children }: {
 }) {
   const headingId = useId();
   const { crumb, description } = servicePages[page];
+  const action = requestActionFor(page);
 
   return (
     <section className={`hero reference-hero reference-hero-${page}`} aria-labelledby={headingId}>
@@ -31,7 +32,7 @@ export function ReferenceHero({ page, lines, image, caption, children }: {
         ))}</h1>
         <p className="type-lead">{description}</p>
         {children}
-        <ButtonLink to={requestAction.to} size="lg">{requestAction.label} <LineIcon name="arrow" /></ButtonLink>
+        <ButtonLink to={action.to} size="lg">{action.label} <LineIcon name="arrow" /></ButtonLink>
       </div>
     </section>
   );

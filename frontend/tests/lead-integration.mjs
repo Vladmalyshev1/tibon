@@ -202,6 +202,7 @@ try {
   assert.equal(requests[0].headers()["idempotency-key"], requests[1].headers()["idempotency-key"]);
   assert.deepEqual(requests[1].postDataJSON(), {
     name: "TIBON synthetic callback", phone: "+70000000703", consent: true, format: "callback",
+    consent_version: "lead-consent-v1",
   });
   console.log("Callback: mobile input, paste, deletion, consent, HTTP 503, duplicate protection and real API save pass.");
 } finally {

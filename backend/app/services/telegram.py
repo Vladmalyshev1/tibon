@@ -50,11 +50,19 @@ def notification_text(lead: Lead) -> str:
 
 
 class TelegramDeliveryError(Exception):
-    def __init__(self, code: str, *, retry: bool, retry_after: int = 0):
+    def __init__(
+        self,
+        code: str,
+        *,
+        retry: bool,
+        retry_after: int = 0,
+        exception_class: str | None = None,
+    ):
         super().__init__(code)
         self.code = code
         self.retry = retry
         self.retry_after = retry_after
+        self.exception_class = exception_class
 
 
 def telegram_http_client(
@@ -85,8 +93,10 @@ class TelegramClient:
                 response = await self.http.post(
                     f"/bot{self._token}/{method}", json=payload
                 )
-        except (TimeoutError, httpx.RequestError):
-            raise TelegramDeliveryError("network", retry=True) from None
+        except (TimeoutError, httpx.RequestError) as error:
+            raise TelegramDeliveryError(
+                "network", retry=True, exception_class=type(error).__name__
+            ) from None
 
         try:
             data = response.json()

@@ -21,9 +21,8 @@ ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
 def test_migration_sql_can_be_generated_without_database(capsys):
     config = Config(str(ALEMBIC_INI))
-    assert (
-        ScriptDirectory.from_config(config).get_current_head()
-        == "0004_callback_leads"
+    assert ScriptDirectory.from_config(config).get_current_head() == (
+        "0005_lead_consent_version"
     )
     command.upgrade(config, "head", sql=True)
     sql = capsys.readouterr().out
@@ -32,6 +31,8 @@ def test_migration_sql_can_be_generated_without_database(capsys):
     assert "UNIQUE (idempotency_key)" in sql
     assert "CREATE TABLE telegram_notifications" in sql
     assert "ADD CONSTRAINT ck_leads_callback_details" in sql
+    assert "ADD COLUMN consent_version VARCHAR(64)" in sql
+    assert "ALTER COLUMN consented_at SET DEFAULT now()" in sql
 
 
 @pytest.mark.skipif(
@@ -85,12 +86,13 @@ async def check_schema(settings, schema):
             row = (
                 await connection.execute(
                     text(
-                        "SELECT id, idempotency_key, guests, source FROM leads WHERE id = :id"
+                        "SELECT id, idempotency_key, guests, source, consent_version, "
+                        "consented_at FROM leads WHERE id = :id"
                     ),
                     {"id": existing_id},
                 )
             ).one()
-            assert row == (existing_id, None, None, None)
+            assert row == (existing_id, None, None, None, None, None)
             assert (
                 await connection.scalar(
                     text("SELECT count(*) FROM telegram_notifications")
@@ -108,6 +110,8 @@ async def check_schema(settings, schema):
             assert isinstance(lead.id, UUID)
             assert lead.status == LeadStatus.NEW
             assert lead.created_at == lead.updated_at
+            assert lead.consent_version is None
+            assert lead.consented_at == lead.created_at
             assert lead.created_at.utcoffset() is not None
             assert lead.event_date is None and lead.comment is None
             await session.execute(text("SELECT pg_sleep(0.01)"))

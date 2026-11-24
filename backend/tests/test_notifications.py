@@ -23,6 +23,7 @@ from app.repositories.notifications import (
     retry_failed_notification,
 )
 from app.schemas.lead import LeadCreate
+from app.services import notifications as worker_service
 from app.services.leads import SubmissionUnavailable, submit_lead
 from app.services.notifications import deliver_next
 from app.services.telegram import (
@@ -337,14 +338,16 @@ async def make_due(engine, lead_id):
         )
 
 
-def test_worker_backoff_exhaustion_and_manual_recovery(postgres_schema):
+def test_worker_backoff_exhaustion_and_manual_recovery(postgres_schema, caplog):
     settings, scoped_engine = postgres_schema
     attempts = iter(range(1, MAX_ATTEMPTS + 2))
+    caplog.set_level(logging.INFO, logger=worker_service.__name__)
 
     def mock(request):
         attempt = next(attempts)
         if attempt == 1:
-            raise httpx.ConnectError("Synthetic network failure", request=request)
+            content = json.loads(request.content)["text"]
+            raise httpx.ConnectError(f"{request.url} {content}", request=request)
         if attempt == 2:
             return httpx.Response(
                 429, json={"ok": False, "parameters": {"retry_after": 75}}
@@ -390,6 +393,69 @@ def test_worker_backoff_exhaustion_and_manual_recovery(postgres_schema):
             await engine.dispose()
 
     asyncio.run(run())
+    assert [
+        (record.levelname, record.getMessage())
+        for record in caplog.records
+        if record.name == worker_service.__name__
+    ] == [
+        ("ERROR", "Notification failed: network (ConnectError)"),
+        ("ERROR", "Notification failed: rate_limited"),
+        *[("ERROR", "Notification failed: telegram_unavailable")] * (MAX_ATTEMPTS - 2),
+        ("WARNING", "Notification permanently failed"),
+        ("INFO", "Notification sent"),
+    ]
+    for private_value in (TOKEN, "api.telegram.org", PAYLOAD.name, PAYLOAD.phone):
+        assert private_value not in caplog.text
+
+
+def test_worker_logs_lifecycle_without_logging_empty_polls(
+    postgres_schema, monkeypatch, caplog
+):
+    settings, scoped_engine = postgres_schema
+    caplog.set_level(logging.INFO, logger=worker_service.__name__)
+
+    async def run():
+        engine = scoped_engine(settings)
+        two_polls = asyncio.Event()
+        polls = 0
+
+        async def observe_poll(*args):
+            nonlocal polls
+            assert not await deliver_next(*args)
+            polls += 1
+            if polls == 2:
+                two_polls.set()
+            return False
+
+        def mock(_request):
+            pytest.fail("An empty queue must not call Telegram")
+
+        monkeypatch.setattr(worker_service, "deliver_next", observe_poll)
+        try:
+            async with telegram_http_client(transport=httpx.MockTransport(mock)) as http:
+                telegram = TelegramClient(http, TOKEN)
+                task = asyncio.create_task(
+                    worker_service.run_worker(engine, telegram, CHAT_ID)
+                )
+                try:
+                    await asyncio.wait_for(two_polls.wait(), timeout=5)
+                finally:
+                    task.cancel()
+                    with pytest.raises(asyncio.CancelledError):
+                        await task
+        finally:
+            await engine.dispose()
+
+    asyncio.run(run())
+    assert [
+        (record.levelname, record.getMessage())
+        for record in caplog.records
+        if record.name == worker_service.__name__
+    ] == [
+        ("INFO", "Telegram Worker started"),
+        ("INFO", "Database connected"),
+        ("INFO", "Worker stopped"),
+    ]
 
 
 def test_transient_failure_recovers_automatically(postgres_schema):
@@ -425,7 +491,9 @@ def test_transient_failure_recovers_automatically(postgres_schema):
     asyncio.run(run())
 
 
-def test_expired_lease_is_reclaimed_and_stale_worker_cannot_finish(postgres_schema):
+def test_expired_lease_is_reclaimed_and_stale_worker_cannot_finish(
+    postgres_schema, caplog
+):
     settings, scoped_engine = postgres_schema
 
     async def run():
@@ -447,7 +515,7 @@ def test_expired_lease_is_reclaimed_and_stale_worker_cannot_finish(postgres_sche
             assert current is not None and current.attempt == 2
             assert current.lease_id != old.lease_id
             async with AsyncSession(engine) as session, session.begin():
-                await finish_notification(session, old)
+                assert await finish_notification(session, old) is None
             assert (await delivery_status(engine, lead_id))["status"] == "sending"
             async with engine.begin() as connection:
                 await connection.execute(
@@ -465,3 +533,4 @@ def test_expired_lease_is_reclaimed_and_stale_worker_cannot_finish(postgres_sche
             await engine.dispose()
 
     asyncio.run(run())
+    assert caplog.messages.count("Notification permanently failed") == 1

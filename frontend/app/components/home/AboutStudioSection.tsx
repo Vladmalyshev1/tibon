@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { preparationImage } from "../../data/home";
 import { PhotoImage } from "../ui/PhotoTile";
 
@@ -9,7 +10,7 @@ export function AboutStudioSection() {
         <div className="home-scene-copy">
           <p className="cinematic-kicker">О студии</p>
           <h2 id="about-title" className="type-h2">Больше, чем<br />просто готовка</h2>
-          <p className="home-summary">В студии Рената Исмагилова гости готовят вместе с шефом. Он показывает приёмы, помогает с блюдами, а за ужином можно попробовать всё, что приготовили.</p>
+          <p className="home-summary">В студии Рената Исмагилова <Link className="underline" to="/contact/">в Ижевске</Link> гости готовят вместе с шефом, а за ужином пробуют то, что приготовили.</p>
         </div>
       </div>
     </section>

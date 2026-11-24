@@ -31,6 +31,8 @@ class Settings(EnvironmentSettings):
     ] = "prefer"
     cors_origins: list[str] = Field(default_factory=list)
     trusted_proxy_ips: list[IPvAnyAddress] = Field(default_factory=list)
+    api_docs_enabled: bool = True
+    database_health_enabled: bool = True
     menu_pdf_dir: Path = Path(__file__).resolve().parents[1] / "private-menus"
 
     @field_validator("cors_origins")

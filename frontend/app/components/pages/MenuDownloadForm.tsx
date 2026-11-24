@@ -1,11 +1,13 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
-import { menuLeadSchema } from "../../data/lead";
+import { studioContact } from "../../data/business";
+import { menuLeadSchema, type CallbackFields } from "../../data/lead";
 import type { MenuType } from "../../data/menu";
-import { downloadMenuPdf, submitLead } from "../../lib/leadApi";
+import { downloadMenuPdf, leadSubmissionErrors, serializeLead, submitLead } from "../../lib/leadApi";
 import { useHydrated } from "../../lib/useHydrated";
 import { Button } from "../ui/Button";
-import { IconInputControl } from "./IconInputControl";
+import { CallbackPhoneInput } from "./CallbackPhoneInput";
+import { LeadField } from "./LeadField";
 import { LineIcon } from "../ui/LineIcon";
 
 const menus = {
@@ -13,16 +15,37 @@ const menus = {
   kids: "Скачать детское меню",
 };
 
+const menuRequestErrors = {
+  ...leadSubmissionErrors,
+  validation: "Не удалось проверить данные для скачивания. Проверьте форму и попробуйте снова.",
+  unavailable: "Сервис скачивания временно недоступен. Данные остались в форме. Попробуйте ещё раз.",
+};
+
 export function MenuDownloadForm({ current }: { current: MenuType }) {
   const labelId = useId();
   const alternate = current === "adults" ? "kids" : "adults";
   const enabled = useHydrated();
-  const [fields, setFields] = useState({ name: "", phone: "", consent: false });
+  const [fields, setFields] = useState({ name: "", phone: "+7", consent: false });
+  const [touched, setTouched] = useState({ name: false, phone: false, consent: false });
+  const [serverErrors, setServerErrors] = useState<Partial<Record<keyof CallbackFields, string>>>({});
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<{ message: string; error: boolean }>();
   const inFlight = useRef(false);
   const attempts = useRef(new Map<string, { key: string; id?: string }>());
   const details = menuLeadSchema.safeParse(fields);
+  const issues = details.success ? [] : details.error.issues;
+  const nameIssue = issues.find(issue => issue.path[0] === "name");
+  const phoneIssue = issues.find(issue => issue.path[0] === "phone");
+  const nameError = serverErrors.name ?? (touched.name ? nameIssue?.message : undefined);
+  const phoneError = serverErrors.phone ?? (touched.phone && phoneIssue ? "Введите 10 цифр после +7." : undefined);
+  const consentError = serverErrors.consent ?? (!fields.consent && (touched.consent || (!nameIssue && !phoneIssue))
+    ? "Чтобы скачать меню, отметьте согласие на обработку данных." : undefined);
+
+  function updateField<K extends keyof CallbackFields>(field: K, value: CallbackFields[K]) {
+    setFields(previous => ({ ...previous, [field]: value }));
+    setServerErrors(previous => previous[field] ? { ...previous, [field]: undefined } : previous);
+    setFeedback(undefined);
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,10 +53,11 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
     const button = (event.nativeEvent as SubmitEvent).submitter;
     const type = button instanceof HTMLButtonElement && (button.value === "kids" || button.value === "adults")
       ? button.value : current;
-    const body = JSON.stringify({ ...details.data, format: type, source: `menu_${type}` });
+    const body = serializeLead({ ...details.data, format: type, source: `menu_${type}` });
     inFlight.current = true;
     setBusy(true);
     setFeedback(undefined);
+    setServerErrors({});
     try {
       const known = attempts.current.get(body);
       const attempt = known ?? { key: crypto.randomUUID() };
@@ -46,10 +70,14 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
       if (!attempt.id) {
         const result = await submitLead(body, attempt.key);
         if (result.kind !== "success") {
-          const message = result.kind === "limited"
-            ? "Слишком много запросов. Подождите минуту и попробуйте снова."
-            : "Не удалось сохранить запрос. Проверьте данные и попробуйте снова.";
-          setFeedback({ message, error: true });
+          if (result.kind === "validation") {
+            setServerErrors({
+              name: result.errors.name ? "Проверьте имя. Введите от 2 до 80 символов." : undefined,
+              phone: result.errors.phone ? "Сервер не принял номер. Проверьте 10 цифр после +7." : undefined,
+              consent: result.errors.consent ? "Сервер не принял согласие. Снимите отметку и поставьте её снова." : undefined,
+            });
+          }
+          setFeedback({ message: menuRequestErrors[result.kind], error: true });
           return;
         }
         attempt.id = result.id;
@@ -78,32 +106,33 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
 
   return (
     <form className="lead-form menu-download-form" method="post" aria-busy={busy} aria-describedby={labelId} onSubmit={submit} noValidate>
-      <p id={labelId} className="menu-download-description">Укажите имя и российский номер телефона, чтобы скачать PDF.</p>
-      <noscript><p>Для скачивания меню включите JavaScript.</p></noscript>
+      <p id={labelId} className="menu-download-description">Укажите имя и российский номер телефона, затем отметьте согласие.</p>
+      <noscript><p>Для скачивания меню включите JavaScript или позвоните <a className="underline" href={studioContact.phone.href}>{studioContact.phone.label}</a>.</p></noscript>
       <fieldset className="lead-fields" disabled={!enabled || busy}>
-        <label className="lead-field">
-          <span>Имя <span className="menu-required">*</span></span>
-          <IconInputControl icon="user">
-            <input autoComplete="name" required maxLength={80} value={fields.name}
-              placeholder="Ваше имя"
-              onChange={event => setFields({ ...fields, name: event.currentTarget.value })} />
-          </IconInputControl>
-        </label>
-        <label className="lead-field">
-          <span>Телефон <span className="menu-required">*</span></span>
-          <IconInputControl icon="phone">
-            <input type="tel" autoComplete="tel" required maxLength={24} value={fields.phone}
-              placeholder="+7 (___) ___-__-__"
-              onChange={event => setFields({ ...fields, phone: event.currentTarget.value })} />
-          </IconInputControl>
-        </label>
+        <LeadField id={`${labelId}-name`} label={<>Имя <span className="menu-required">*</span></>} error={nameError} icon="user">
+          <input id={`${labelId}-name`} autoComplete="name" required maxLength={80} value={fields.name} placeholder="Ваше имя"
+            aria-invalid={nameError ? true : undefined} aria-describedby={nameError ? `${labelId}-name-error` : undefined}
+            onBlur={() => setTouched(previous => ({ ...previous, name: true }))}
+            onChange={event => updateField("name", event.currentTarget.value)} />
+        </LeadField>
+        <LeadField id={`${labelId}-phone`} label={<>Телефон <span className="menu-required">*</span></>} error={phoneError} icon="phone">
+          <CallbackPhoneInput id={`${labelId}-phone`} required value={fields.phone} placeholder="+7 (___) ___-__-__"
+            aria-invalid={phoneError ? true : undefined} aria-describedby={phoneError ? `${labelId}-phone-error` : undefined}
+            onBlur={() => setTouched(previous => ({ ...previous, phone: true }))}
+            onValueChange={phone => updateField("phone", phone)} />
+        </LeadField>
         <div className="menu-consent">
           <label className="lead-consent">
-            <input type="checkbox" required checked={fields.consent} aria-describedby={`${labelId}-policy`}
-              onChange={event => setFields({ ...fields, consent: event.currentTarget.checked })} />
+            <input type="checkbox" required checked={fields.consent} aria-invalid={consentError ? true : undefined}
+              aria-describedby={consentError ? `${labelId}-policy ${labelId}-consent-error` : `${labelId}-policy`}
+              onChange={event => {
+                setTouched(previous => ({ ...previous, consent: true }));
+                updateField("consent", event.currentTarget.checked);
+              }} />
             <span>Согласен на обработку персональных данных для ответа на запрос *</span>
           </label>
           <Link id={`${labelId}-policy`} to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
+          {consentError ? <p id={`${labelId}-consent-error`} className="lead-error">{consentError}</p> : null}
         </div>
         <Button type="submit" size="lg" value={current} className="menu-primary-download" disabled={!enabled || busy || !details.success}>
           {menus[current]} <LineIcon name="download" />

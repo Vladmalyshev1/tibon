@@ -103,7 +103,8 @@ def main() -> int:
     retry.add_argument("--lead-id", type=UUID, required=True)
     commands.add_parser("chat-ids", help="List chat IDs with recent /start messages")
     args = parser.parse_args()
-    logging.basicConfig(level=logging.WARNING)
+    if args.command == "run":
+        logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
     try:
         return asyncio.run(run_command(args))
     except KeyboardInterrupt:

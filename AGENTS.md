@@ -1,169 +1,91 @@
-# TIBON PROJECT — AGENTS.md
+IBON — AGENTS.md
+1. Mission and standing instructions
+Maintain and improve the existing TIBON culinary studio website. The website is a real application, not a static design prototype.
 
-## 1. Project Goal
+Work on the current user task only. This file provides lasting project-wide rules; it is not a milestone, a backlog, or permission to redesign unrelated pages. Do not require changes to this file before starting a new task.
 
-Build a modern, premium culinary studio website inspired by https://ti-bon.ru/.
+The current explicit user request determines the permitted scope. When the user asks for a change to a route, component, text, workflow, design, API or backend behavior, that request authorizes the corresponding changes within its stated scope. Do not use older milestones or superseded documentation to block a new explicit task.
+2. Instruction and source priority
+For each task, resolve conflicts in this order:
+1. The current explicit user request and its attached images/mockups.
+2. Other user-approved design references specifically relevant to that task.
+3. Verified business facts, existing production behavior, API contracts and security/privacy requirements (unless the current task explicitly changes them).
+4. This AGENTS.md and the existing project architecture and conventions.
+5. Historical documentation and older examples, which are context, not binding visual authority.
+When a new request conflicts with existing behavior or a technical contract, implement the requested change coherently across affected layers if it is in scope; otherwise identify the dependency or blocker. Do not silently preserve outdated behavior or invent backend support. Ask only when an essential decision cannot safely be inferred.
+3. Project architecture
+- Frontend: React 19, TypeScript, Vite, React Router v7 Framework Mode with SSR; existing CSS/Tailwind setup, Framer Motion where already used, React Hook Form and Zod.
+- Backend: Python, FastAPI, SQLAlchemy 2, PostgreSQL, Alembic and Pydantic.
+- Integrations: Telegram notification worker and outbox, lead submission, protected PDF-menu download.
+- Testing: Vitest, React Testing Library, Pytest, Playwright; existing build, lint and SSR checks.
+Inspect actual configuration before relying on a version, command, path or library. Prefer existing patterns and dependencies. Do not upgrade dependencies or add abstractions without a concrete need. Keep routes, SSR, SEO, forms and integrations working unless the task explicitly changes them.
+4. Approved visual language
+Dark Cinematic Gastronomy is the default brand direction for all public-facing pages:
+- Dark foundations: black #000000, graphite #151515, charcoal #222222; white/soft-gray typography; brand red #DD183B and deep red #CC1939.
+- Elegant serif display typography and restrained sans-serif interface text. Consistent fluid type scales, spacing, content widths, buttons and shared navigation.
+- Strong gastronomic photography, controlled warm lighting, depth and deliberate contrast; distinctive, page-appropriate compositions rather than generic templates.
+- Responsive, accessible layouts; keyboard interaction, focus styles and prefers-reduced-motion.
+Task-specific approved mockups are the primary visual target for the named pages. Inspect each relevant image and reproduce its structure, composition, proportions, typography, imagery, color and responsive intent as closely as practicable. Mockups do not authorize inventing business facts or replacing working UI with an image.
 
-Project scope:
-- Responsive multi-page website.
-- SEO-friendly public pages with SSR.
-- FastAPI backend and PostgreSQL database.
-- Telegram notifications for saved leads.
-- Lead management.
-- Automated testing.
-- Docker deployment.
+Default reference locations (use only those relevant to the current task):
+- docs/references/chef-hero-reference.png — historical homepage header/hero reference.
+- docs/references/site-concept.png — historical homepage-wide concept montage, not a literal two-column layout.
+- docs/references/menu-reference.png — historical menu-page concept.
+- docs/references/pages/ — subsequent page-specific approved mockups, when present.
+Do not assume an old reference remains authoritative over a newer user request or over a newer approved implementation. If a page has no specific mockup, take its visual language from the latest approved, working site components. Do not independently switch to a light/cream editorial style or redesign approved pages without being asked.
 
-Do not copy the reference website's code, content, or design verbatim.
+Use authentic TIBON photos/logos where possible. Never treat generated people, locations, reviews or events as authentic. Do not use an entire mockup screenshot as a page background or as a replacement for semantic, functioning UI. Flag missing source assets and make the best honest implementation possible.
+5. Start-of-task workflow
+1. Inspect git status; preserve user changes. Identify the precise routes, components, assets, tests and contracts involved.
+2. Read only relevant current files and any applicable design reference. Do not repeatedly scan the entire repository.
+3. Discover and use installed, relevant skills and MCP tools when they materially help (e.g. frontend-design, UI/UX, accessibility, Playwright). Never claim a tool or skill was used if unavailable. Skills are advisory; explicit user-approved designs and product behavior take precedence.
+4. Plan the smallest coherent implementation, including any necessary frontend/backend integration changes explicitly requested.
+5. Implement changes in logical passes and inspect the resulting diff. Do not expand scope for unrelated cleanup.
+6. Test changed behavior, then report exact results and remaining issues.
+Use one primary agent by default. Delegate only independent work with clear file ownership; avoid multiple agents editing the same files and repetitive audits.
+6. UI implementation and visual validation
+For UI tasks:
+- Reuse shared components/tokens where practical; keep header size, navigation, fonts and spacing consistent between routes.
+- Preserve a page's distinctive composition when changing shared typography or controls.
+- Use proper React/HTML elements, not flattened screenshots. Maintain meaningful alt text and accessible interaction.
+- Avoid layout shifts from images/fonts; check fixed/sticky navigation and responsive cropping.
+- Use the existing development server (npm run dev from frontend/) for hot reload when appropriate; do not unnecessarily start duplicate servers.
+When a visual change is significant and browser tooling is available:
+1. Run the actual site in Playwright or an available browser MCP.
+2. Capture and inspect screenshots at 1440px desktop and 390px mobile on changed pages; check 320px, 768px and 1024px for overflow and layout problems.
+3. Compare each page with its latest approved mockup, or, if none exists, with the approved site's shared visual language.
+4. Fix significant differences, then recheck. Validate layout, headline wrapping, font loading, image crops, header consistency, contrast, focus, interaction and reduced motion.
+5. Do not claim pixel-perfect fidelity or successful visual validation without inspecting the actual result. Describe remaining differences and missing assets.
+For small text-only or backend-only changes, perform proportional, targeted checks rather than unnecessary full visual audits.
+7. Functional integrity and privacy
+- Preserve functional forms, validations, consent, lead persistence, Telegram outbox/worker and PDF delivery unless explicitly changed by the user.
+- If a task changes a form's fields or purpose, trace the full flow: UI validation → API schema → database constraints/migration if necessary → notification content → automated tests. Do not send fake values to satisfy obsolete required fields.
+- Send personal data to Telegram only through the established backend/worker, never from browser code with a bot token.
+- Never fake successful submissions, messages or downloads. Distinguish a successfully saved lead from confirmed Telegram delivery.
+- Keep .env, credentials, tokens, personal customer data and private PDFs out of Git and public assets. Avoid sensitive logging.
+- Treat prices, contacts, schedules, operator/legal details, claims, photos and social links as verified data; do not invent or silently replace them.
+- Drafted legal content requires verified facts and user/legal review; do not present it as approved legal advice.
+- If preparing a public frontend-only demo, clearly separate nonfunctional demo interactions from live data collection.
+8. Git and change safety
+- Check git status before editing and inspect git diff when finished.
+- Never discard unrelated user changes.
+- Never run git reset --hard, git clean, force-push or destructive file operations without explicit approval.
+- Do not automatically commit, amend, push, deploy or alter production systems unless the current user task explicitly requests it.
+- Do not delete a working route, API, asset, dataset or integration unless explicitly requested. When removing a page, verify internal links, navigation, sitemap, SEO and appropriate 404/redirect behavior.
+9. Quality gates
+Choose checks proportionate to the actual changes. Run applicable ones, not merely list them:
+- TypeScript / lint and relevant Vitest tests for frontend changes.
+- Production build and SSR/hydration checks when public frontend behavior changes.
+- Pytest and migration/integration checks when backend or data contracts change.
+- Browser/Playwright checks for visual, responsive or interactive tasks.
+- Regression checks for shared header/navigation, forms, menu PDF and approved pages affected by global styles.
+Never claim a check passed if it was not run. Record any missing environment, unavailable MCP, disabled service or unverified production delivery.
+10. Documentation and final report
+Update only documentation materially affected by the task. Keep older documentation historical rather than allowing it to override approved current behavior. Do not generate long documents or milestone plans by default.
 
-## 2. Technology Stack
-
-Frontend:
-- React 19, TypeScript, Vite.
-- React Router v7 Framework Mode with SSR.
-- Tailwind CSS.
-- Framer Motion.
-- React Hook Form and Zod.
-
-Backend:
-- Python, FastAPI.
-- SQLAlchemy 2, PostgreSQL.
-- Alembic, Pydantic.
-
-Testing:
-- Vitest, React Testing Library.
-- Pytest, Playwright.
-
-Follow existing project versions and configuration. Do not upgrade dependencies without a reason.
-
-## 3. Development Principles
-
-1. Read `docs/PROJECT_STATUS.md` before starting a milestone.
-2. Inspect relevant existing code before modifying it.
-3. Follow `docs/ARCHITECTURE.md` and established conventions.
-4. Reuse components and avoid duplication.
-5. Use strict TypeScript and validate external input.
-6. Keep secrets and environment files out of Git.
-7. Do not invent business information, prices, contacts, reviews, or legal details.
-8. Use temporary frontend content only when clearly identified as placeholder content.
-9. Never simulate successful production operations without a real implementation.
-10. Avoid unfinished functionality and unnecessary TODOs.
-11. Preserve existing functionality unless the task explicitly requires changing it.
-12. Implement only the assigned milestone.
-
-## 4. Design and Content
-
-Design requirements are defined in:
-- `docs/DESIGN_SYSTEM.md`
-- `docs/COMPONENT_SPECIFICATION.md`
-- `docs/PAGE_SPECIFICATION.md`
-
-M4.2 — Dark Cinematic Visual Alignment uses the approved **Dark Cinematic Gastronomy** direction. [Site concept](docs/references/site-concept.png) governs the homepage composition and visual rhythm. [Chef hero](docs/references/chef-hero-reference.png) governs the first screen and takes precedence over the hero pictured in the site concept. These are approved target compositions.
-
-The current approved brief and its reference compositions take precedence over older visual rules. The homepage uses predominantly black, graphite and charcoal surfaces, cinematic food photography, large serif headings, white text and red accents. The desktop hero places the chef on the left and the large heading on the right, with a food close-up and dramatic lighting. Keep the dark composition when adapting it for phones. Never revert automatically to a light Premium Editorial theme. A change in direction requires explicit user approval.
-
-Use licensed images and document their sources.
-
-Preserve:
-- Responsive behavior.
-- Accessibility and keyboard navigation.
-- Reduced-motion support.
-- SSR and SEO.
-- Existing routes and navigation.
-
-Do not introduce a new design direction without an explicit task.
-
-## 5. Agent Coordination
-
-Use one main agent by default.
-
-Subagents are optional and should be used only when:
-- Tasks are genuinely independent.
-- File ownership is clearly separated.
-- Delegation provides meaningful value.
-
-Do not assign multiple agents to modify the same files concurrently.
-
-Avoid repeated repository analysis between agents.
-
-## 6. Git Safety
-
-1. Inspect `git status` before modifying files.
-2. Never discard user changes.
-3. Never use `git reset --hard` or `git clean` without explicit approval.
-4. Never force push.
-5. Never amend existing commits without permission.
-6. Inspect `git diff` before finishing.
-7. Never commit secrets or `.env` files.
-8. Do not commit or push automatically unless the user explicitly requests it.
-9. Keep milestone changes separate from unrelated modifications.
-
-## 7. Quality Gates
-
-Before declaring a milestone complete:
-
-1. Run relevant targeted tests.
-2. Run lint and TypeScript checks.
-3. Run production build.
-4. Verify SSR when public pages are affected.
-5. Check responsive behavior when UI is affected.
-6. For M4.2 implementation, capture desktop and mobile screenshots and compare the hero with the approved chef reference and the full homepage with the approved site concept. Record widths, screenshot paths and any deliberate mobile adaptations. The supplied compositions are desktop references.
-7. Inspect Git diff.
-8. Update relevant documentation.
-9. Report actual results.
-
-Never claim a test passed unless it was executed.
-
-## 8. Token Efficiency
-
-1. Read only files relevant to the task.
-2. Do not repeatedly scan the repository.
-3. Do not reread unchanged files without a reason.
-4. Do not repeat project requirements already documented.
-5. Reuse existing implementations.
-6. Avoid unnecessary dependencies and abstractions.
-7. Run targeted checks during implementation.
-8. Run full checks at milestone boundaries.
-9. Keep reports concise.
-10. Do not print large source files in reports.
-11. Store persistent decisions in documentation rather than repeating them in prompts.
-
-## 9. Documentation
-
-Maintain:
-- `docs/PROJECT_STATUS.md` — milestone status and blockers.
-- `docs/ARCHITECTURE.md` — architectural decisions.
-- `docs/API.md` — backend contracts.
-- `docs/DESIGN_SYSTEM.md` — current visual system.
-- `docs/COMPONENT_SPECIFICATION.md` — UI components.
-
-Update documentation only when implementation or decisions change.
-
-## 10. Communication
-
-Work autonomously within the approved scope.
-
-Final report:
-- Implemented changes.
-- Important files changed.
-- Tests executed and results.
-- Remaining blockers.
-
-Do not silently skip requirements.
-
-## 11. Milestone Status
-
-Completed:
-- M0 — Project setup.
-- M1 — Reference audit.
-- M2 — Initial design system.
-- M3 — Frontend scaffold.
-- M4 — Homepage implementation.
-- M4.1 — Dark Culinary Redesign.
-- M5.1–M5.3 — Internal pages and public forms.
-- M6.1–M6.3 — Backend, lead submission, and integration QA.
-- M7 — Telegram Notifications and Menu Lead Capture.
-
-Current:
-- M4.2 — Dark Cinematic Visual Alignment. **In progress.** The current assignment is documentation only. Begin UI implementation only on a subsequent explicit assignment. Preserve architecture, API, backend, forms, routes and functional contracts.
-
-Do not start future milestones without explicit user approval.
+Finish with a concise report containing:
+- What changed and which routes/files were affected.
+- Tests/browser widths actually checked and whether they passed.
+- Screenshots or comparison locations for significant visual tasks.
+- Remaining discrepancies, missing assets or blockers.
+Do not stop after one page if the current task explicitly asks to finish multiple pages. Conversely, do not edit additional pages just because they exist.
