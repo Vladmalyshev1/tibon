@@ -8,7 +8,7 @@
 
 </div>
 
-![Главная страница ТИ-БОН](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/home.jpg)
+![Главная страница ТИ-БОН](https://github.com/Vladmalyshev1/photo/blob/main/home.jpg)
 
 ## О проекте
 
