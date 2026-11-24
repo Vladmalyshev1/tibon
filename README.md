@@ -24,31 +24,31 @@
 
 Кинематографичная обложка, шеф, переходы к основным программам и преимуществам студии.
 
-![Главная — TIBON](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/home.jpg)
+![Главная — TIBON](https://github.com/Vladmalyshev1/photo/blob/main/home.jpg)
 
 ### Мастер-классы для взрослых
 
 Описание форматов и поводов для мероприятий.
 
-![Для взрослых — TIBON](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/adults.jpg)
+![Для взрослых — TIBON](https://github.com/Vladmalyshev1/photo/blob/main/adults.jpg)
 
 ### Детские мероприятия
 
 Страница детских кулинарных мастер-классов.
 
-![Для детей — TIBON](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/kids.jpg)
+![Для детей — TIBON](https://github.com/Vladmalyshev1/photo/blob/main/kids.jpg)
 
 ### Аренда студии
 
 Форматы использования помещения и условия аренды.
 
-![Аренда — TIBON](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/rental.jpg)
+![Аренда — TIBON](https://github.com/Vladmalyshev1/photo/blob/main/rental.jpg)
 
 ### Контакты
 
 Адрес, телефон и карта для планирования маршрута.
 
-![Контакты — TIBON](https://raw.githubusercontent.com/Vladmalyshev1/photo/main/contacts.jpg)
+![Контакты — TIBON](https://github.com/Vladmalyshev1/photo/blob/main/contacts.jpg)
 
 ## Возможности
 
