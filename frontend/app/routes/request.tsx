@@ -1,6 +1,6 @@
 import { LeadForm } from "../components/pages/LeadForm";
 import { ButtonLink } from "../components/ui/Button";
-import { LineIcon } from "../components/ui/LineIcon";
+import { StudioPhones } from "../components/ui/StudioPhones";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { getRequestFormat, studioContact } from "../data/business";
 import type { Route } from "./+types/request";
@@ -28,7 +28,7 @@ export default function Request({ loaderData: { format } }: Route.ComponentProps
             <h1 id="request-title" className="type-display">Оставить заявку</h1>
             <p className="type-lead">Заполните форму или позвоните в студию, чтобы согласовать дату и формат мероприятия.</p>
             <div className="request-contact">
-              <a className="button-outline button-md" href={studioContact.phone.href}><LineIcon name="phone" /> Позвонить · {studioContact.phone.label}</a>
+              <StudioPhones linkClassName="button-outline button-md" />
               <p>{studioContact.hours}</p>
             </div>
           </section>

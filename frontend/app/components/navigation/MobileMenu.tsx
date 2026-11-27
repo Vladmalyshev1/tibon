@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import { mobileMenuMotion } from "../../lib/animations";
 import { BrandMark } from "../ui/BrandMark";
-import { studioContact } from "../../data/business";
+import { StudioPhones } from "../ui/StudioPhones";
 import type { NavigationItem } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 
@@ -55,7 +55,7 @@ export function MobileMenu({ items, onClose }: MobileMenuProps) {
         </div>
         <MobileNavigation items={items} onNavigate={onClose} />
         <div className="mobile-menu-actions">
-          <a className="header-phone" href={studioContact.phone.href}>Позвонить · {studioContact.phone.label}</a>
+          <StudioPhones className="header-phone" />
         </div>
       </motion.div>
     </dialog>

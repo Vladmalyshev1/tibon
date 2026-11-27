@@ -2,6 +2,7 @@ import { informationPages, studioContact } from "../data/business";
 import { loadPublicPage, serviceMeta } from "../lib/pageMeta";
 import { Breadcrumbs } from "../components/navigation/Breadcrumbs";
 import { LineIcon } from "../components/ui/LineIcon";
+import { StudioPhones } from "../components/ui/StudioPhones";
 import { useCookieConsent } from "../lib/cookieConsent";
 import type { Route } from "./+types/contact";
 
@@ -19,7 +20,7 @@ export function meta({ data }: Route.MetaArgs) {
       url: new URL("/", data.origin).href,
       name: "TIBON",
       description: `Кулинарная студия. ${studioContact.hours}.`,
-      telephone: studioContact.phone.href.replace(/^tel:/, ""),
+      telephone: studioContact.phones.map(({ href }) => href.slice(4)),
       address: { "@type": "PostalAddress", ...studioContact.postalAddress },
     },
   }];
@@ -44,7 +45,7 @@ export default function Contact() {
             <dl className="reference-contact-facts">
               <div>
                 <dt><LineIcon name="phone" />Телефон</dt>
-                <dd><a className="reference-contact-phone" href={studioContact.phone.href}>{studioContact.phone.label}</a></dd>
+                <dd><StudioPhones linkClassName="reference-contact-phone" showIcons={false} /></dd>
               </div>
               <div>
                 <dt><LineIcon name="pin" />Адрес</dt>
@@ -60,7 +61,7 @@ export default function Contact() {
                 <li key={href}>
                   <a href={href} target="_blank" rel="noopener noreferrer"
                     aria-label={`${label} (откроется в новой вкладке)`}>
-                    {icon ? <img src={icon} width={36} height={36} alt="" /> : <LineIcon name={label === "Telegram" ? "telegram" : "vk"} />}
+                    {icon ? <img src={icon} width={36} height={36} alt="" /> : <LineIcon name="vk" />}
                     {label}
                   </a>
                 </li>

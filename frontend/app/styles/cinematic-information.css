@@ -162,13 +162,6 @@
 
 .privacy-document > * { max-width: 47rem; }
 
-.privacy-document .privacy-status {
-  margin: 0 0 clamp(1.75rem, 4vw, 3rem);
-  border-inline-start: 2px solid var(--color-brand-red);
-  padding: 0.9rem 1.1rem;
-  background: var(--cinematic-panel);
-}
-
 .privacy-document section {
   border-block-start: 1px solid var(--cinematic-line);
   padding-block: clamp(1.15rem, 3vw, 2rem);

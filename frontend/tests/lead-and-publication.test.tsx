@@ -78,7 +78,7 @@ describe("lead submission", () => {
       headers: { "Content-Type": "application/json", "Idempotency-Key": expect.any(String) },
       body: JSON.stringify({
         name: "Анна", phone: "+79123456789", format: "birthday", consent: true,
-        consent_version: "lead-consent-v1",
+        consent_version: "lead-consent-v2",
       }),
     }));
     resolve(Response.json(result, { status: 201 }));
@@ -216,7 +216,7 @@ describe("lead submission", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Запрос сохранён");
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
       source: "menu_kids", format: "kids", phone: "+79123456789", consent: true,
-      consent_version: "lead-consent-v1",
+      consent_version: "lead-consent-v2",
     });
     const key = fetchMock.mock.calls[0][1].headers["Idempotency-Key"];
     await user.click(kids);

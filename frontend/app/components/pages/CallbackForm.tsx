@@ -107,7 +107,8 @@ export function CallbackForm() {
         <div className="callback-consent">
           <label className="lead-consent" htmlFor="callback-consent">
             <input {...fieldProps("consent")} {...register("consent")} type="checkbox" />
-            <span>Согласен на обработку персональных данных для обратного звонка *</span>
+            <span>Согласен на обработку имени и телефона ИП Исмагиловым Р. С. для обратного звонка, включая возможную
+              передачу этих данных через ВКонтакте (VK) для уведомления оператора. *</span>
           </label>
           {errors.consent ? <p id="callback-consent-error" className="lead-error">{errors.consent.message}</p> : null}
           <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>

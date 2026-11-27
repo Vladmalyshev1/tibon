@@ -1,0 +1,14 @@
+[Unit]
+Description=TIBON lead retention
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=postgres
+EnvironmentFile=/etc/tibon/retention.env
+ExecStart=/usr/bin/psql --no-psqlrc --quiet --dbname=tibon --set=apply=${TIBON_RETENTION_APPLY} --set=not_before=${TIBON_RETENTION_NOT_BEFORE} --file=/srv/tibon/current/infra/lead-retention.sql
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+UMask=0077

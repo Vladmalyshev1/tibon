@@ -1,9 +1,17 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
+import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { chromium } from "@playwright/test";
 import { JSDOM } from "jsdom";
+
+const phones = [
+  ["tel:+73412576990", "57-69-90"],
+  ["tel:+79821176990", "+7 (982) 117-69-90"],
+];
+const dinnerPrice = /от 14\s000\s₽/;
+const bookingRule = "Свою еду, напитки и фрукты приносить нельзя.";
 
 const probe = createServer();
 await new Promise((resolve, reject) => {
@@ -83,7 +91,7 @@ try {
     "/dlya-vzroslyh/": /от 3\s300\s₽ за человека/,
     "/dlya-vzroslyh/korporativ/": /от 3\s300\s₽ за человека/,
     "/dlya-vzroslyh/den-rozhdeniya/": /от 3\s300\s₽ за человека/,
-    "/dlya-vzroslyh/romanticheskiy-uzhin/": /от 18\s000\s₽/,
+    "/dlya-vzroslyh/romanticheskiy-uzhin/": dinnerPrice,
     "/dlya-detey/": /от 2\s200\s₽ за ребёнка/,
     "/arenda/": /<dd><strong>3\s000\s₽<\/strong> <span>в час<\/span><\/dd>.*<dd><strong>6\s000\s₽<\/strong> <span>в час<\/span><\/dd>/,
     "/menu/": /Скачать взрослое меню/,
@@ -129,8 +137,8 @@ try {
       assert.match(html, /<fieldset class="lead-fields" disabled=""/);
     } else if (path === "/politika-konfidencialnosti/") {
       assert.match(html, /name="robots" content="noindex, nofollow"/);
-      assert.match(html, /Проект для согласования/);
-      assert.match(html, /11\. Изменение политики/);
+      assert.doesNotMatch(html, /Проект для согласования|Требуется согласование/);
+      assert.match(html, /8\. Обновления политики/);
     } else if (path === "/o-studii/") {
       assert.match(html, /name="robots" content="noindex, nofollow"/);
       assert.doesNotMatch(html, /rel="canonical"/);
@@ -160,7 +168,7 @@ try {
         url: "https://tibon.example/",
         name: "TIBON",
         description: "Кулинарная студия. Ежедневно 10:00–23:00, по записи.",
-        telephone: "+73412576990",
+        telephone: phones.map(([href]) => href.slice(4)),
         address: {
           "@type": "PostalAddress", addressRegion: "Удмуртская Республика", addressLocality: "село Первомайский",
           streetAddress: "ул. Архитектора Сергея Макарова, 2/4, офис 3", addressCountry: "RU",
@@ -170,17 +178,28 @@ try {
       assert.equal(structuredData.length, 0, path);
     }
     if (path === "/dlya-vzroslyh/") {
+      assert.match(document.querySelector("#romantic").textContent, dinnerPrice);
+      assert.ok(document.querySelector("main").textContent.includes(bookingRule));
       for (const target of Object.keys(serviceFormats).filter(path => path.startsWith("/dlya-vzroslyh/") && path !== "/dlya-vzroslyh/")) {
         assert.ok(document.querySelector(`main .adult-events a[href="${target}"]`), target);
       }
     }
+    if (serviceFormats[path] === "romantic") {
+      for (const selector of ["title", "main"]) assert.match(document.querySelector(selector).textContent, dinnerPrice);
+      assert.match(document.querySelector('meta[name="description"]').content, dinnerPrice);
+    }
+    if (path === "/dop-uslugi/") assert.match(document.querySelector("main").textContent, /от 5\s100\s₽ в час/);
     if (["/menu/", "/dop-uslugi/"].includes(path)) {
       for (const target of ["/dlya-vzroslyh/", "/dlya-detey/"]) {
         assert.ok(document.querySelector(`main a[href="${target}"]`), `${path} → ${target}`);
       }
     }
-    const phone = document.querySelector('header a[href="tel:+73412576990"]');
-    assert.equal(phone?.textContent.trim(), "57-69-90", `${path} should SSR a callable phone link`);
+    for (const block of ["header", "footer", ...(["/contact/", "/zayavka/"].includes(path) ? ["main"] : [])]) {
+      const links = [...document.querySelectorAll(`${block} .studio-phones a`)];
+      assert.deepEqual(links.map(link => [link.getAttribute("href"), link.textContent.trim()]), phones, `${path} ${block}`);
+    }
+    assert.doesNotMatch(html, /https?:\/\/t\.me\//i, path);
+    if (path !== "/politika-konfidencialnosti/") assert.doesNotMatch(html, /Telegram/i, path);
     if (servicePages[path] || path === "/contact/") {
       const preview = document.querySelector('meta[property="og:image"]')?.getAttribute("content");
       assert.match(preview ?? "", /^https:\/\/tibon\.example\/images\/og\/[a-z]+\.jpg$/, path);
@@ -272,7 +291,7 @@ try {
       if (href.startsWith("#")) {
         assert.equal(await page.locator(href).count(), 1);
       } else if (href.startsWith("tel:")) {
-        assert.equal(href, "tel:+73412576990");
+        assert(phones.some(([phoneHref]) => phoneHref === href), href);
       } else {
         assert.equal((await fetch(new URL(href, baseUrl))).status, 200, href);
       }
@@ -312,6 +331,8 @@ try {
     const navigationLabels = ["Для взрослых", "Для детей", "Аренда студии", "Меню", "Доп. услуги", "Контакты"];
     const labels = nav => nav.getByRole("link").evaluateAll(links => links.map(link => link.firstChild.textContent.trim()));
     assert.deepEqual(await labels(menu.getByRole("navigation")), navigationLabels);
+    assert.deepEqual(await menu.locator(".studio-phones a").evaluateAll(links =>
+      links.map(link => [link.getAttribute("href"), link.textContent.trim()])), phones);
     await page.keyboard.press("Escape");
     await menu.waitFor({ state: "hidden" });
     assert.equal(await page.locator("#mobile-menu-trigger").evaluate(button => button === document.activeElement), true);
@@ -359,7 +380,41 @@ try {
     assert.match(await page.locator(".menu-primary-download").innerText(), /Скачать детское меню/);
     await page.getByRole("link", { name: "Политика обработки персональных данных" }).first().click();
     await page.getByRole("heading", { level: 1, name: "Политика обработки персональных данных" }).waitFor();
-    assert.equal(await page.locator(".privacy-document h2").count(), 11);
+    const privacy = await page.locator(".privacy-document").innerText();
+    assert.match(privacy, /ВКонтакте \(VK\)/);
+    assert.match(privacy, /один календарный месяц с даты поступления/);
+    assert.doesNotMatch(privacy, /Проект для согласования|Требуется согласование/);
+
+    const screenshotDir = process.env.TIBON_SCREENSHOT_DIR;
+    const assertPhoneStack = async (block, width) => {
+      const links = await block.locator(".studio-phones a").all();
+      assert.equal(links.length, 2, `Phone count at ${width}px`);
+      const [first, second] = await Promise.all(links.map(link => link.boundingBox()));
+      assert(first && second, `Phone links visible at ${width}px`);
+      assert(Math.abs(first.x - second.x) < 1, `Phone links aligned at ${width}px`);
+      const gap = second.y - first.y - first.height;
+      assert(gap >= 4 && gap <= 6, `Phone links have a 4–6px gap at ${width}px`);
+      assert(first.x >= 0 && second.x + second.width <= width, `Phones fit at ${width}px`);
+    };
+    for (const width of [320, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${baseUrl}/contact/`, { waitUntil: "networkidle" });
+      assert.equal(await hasNoHorizontalOverflow(), true, `Contact overflow at ${width}px`);
+      assert.deepEqual(await page.locator(".reference-socials a").allTextContents(), ["ВКонтакте", "MAX", "Instagram"]);
+      for (const block of ["header", "main", "footer"]) await assertPhoneStack(page.locator(block), width);
+      if (screenshotDir && [390, 1440].includes(width)) {
+        await page.screenshot({ path: join(screenshotDir, `contacts-${width}.png`), fullPage: true });
+      }
+      if (width < 1024) {
+        await page.getByRole("button", { name: "Открыть меню" }).click();
+        await assertPhoneStack(menu, width);
+        if (screenshotDir && width === 390) {
+          await page.screenshot({ path: join(screenshotDir, "mobile-menu-390.png") });
+        }
+        await page.keyboard.press("Escape");
+        await menu.waitFor({ state: "hidden" });
+      }
+    }
 
     assert.deepEqual(pageErrors, []);
     console.log("Chromium: 8 widths, images, links, request CTA, gallery removal, fonts, mobile navigation, breadcrumbs and console pass.");
@@ -368,10 +423,11 @@ try {
       const visit = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion: "reduce" });
       try {
         await visit.goto(`${baseUrl}/menu/`);
-        const banner = visit.getByRole("complementary", { name: "Мы используем cookie" });
+        const banner = visit.getByRole("complementary", { name: "Настройки cookie" });
         const accept = banner.getByRole("button", { name: "Принять" });
         const reject = banner.getByRole("button", { name: "Отклонить" });
         await banner.waitFor();
+        assert.match(await banner.innerText(), /загрузится карта Яндекса/);
         for (const choice of [accept, reject]) {
           const box = await choice.boundingBox();
           assert(box?.width >= 44 && box.height >= 44, `Consent target at ${width}px`);

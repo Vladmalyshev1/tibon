@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import json
 import logging
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from asyncpg import PostgresError
 from pydantic import ValidationError
@@ -10,16 +10,17 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from app.config import Settings, TelegramSettings
+from app.config import NotificationSettings, Settings
 from app.database import create_database_engine
 from app.models import TelegramNotification
 from app.repositories.notifications import retry_failed_notification
-from app.services.notifications import run_worker
-from app.services.telegram import (
-    TelegramClient,
-    TelegramDeliveryError,
-    telegram_http_client,
+from app.services.notification_providers import (
+    NotificationConfigurationError,
+    NotificationDeliveryError,
+    create_notification_provider,
+    notification_http_client,
 )
+from app.services.notifications import run_worker
 
 
 async def delivery_status(engine: AsyncEngine, lead_id: UUID | None) -> dict:
@@ -72,27 +73,29 @@ async def run_command(args: argparse.Namespace) -> int:
         finally:
             await engine.dispose()
 
-    settings = TelegramSettings()
-    if settings.telegram_bot_token is None or (
-        args.command == "run" and settings.telegram_chat_id is None
-    ):
-        print("Set TELEGRAM_BOT_TOKEN and, for delivery, TELEGRAM_CHAT_ID.")
-        return 2
-    async with telegram_http_client() as http:
-        telegram = TelegramClient(http, settings.telegram_bot_token.get_secret_value())
-        if args.command == "chat-ids":
-            print(json.dumps(await telegram.chat_ids()))
+    try:
+        settings = NotificationSettings()
+    except ValidationError:
+        raise NotificationConfigurationError(
+            "Set NOTIFICATION_PROVIDER to vk or max and check worker configuration."
+        ) from None
+    ca_file = settings.max_ca_file if settings.notification_provider == "max" else None
+    async with notification_http_client(ca_file=ca_file) as http:
+        provider = create_notification_provider(settings, http)
+        if args.command == "test-send":
+            await provider.send_message(uuid4(), "TIBON: тест доставки уведомлений.")
+            print(f"Test notification accepted by {provider.name}.")
             return 0
         engine = create_database_engine(Settings())
         try:
-            await run_worker(engine, telegram, settings.telegram_chat_id)
+            await run_worker(engine, provider)
         finally:
             await engine.dispose()
     return 0
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Manage TIBON Telegram delivery.")
+    parser = argparse.ArgumentParser(description="Manage TIBON notifications.")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("run", help="Run the delivery worker")
     status = commands.add_parser("status", help="Inspect delivery counts or one lead")
@@ -101,7 +104,9 @@ def main() -> int:
         "retry", help="Queue a failed notification for another delivery cycle"
     )
     retry.add_argument("--lead-id", type=UUID, required=True)
-    commands.add_parser("chat-ids", help="List chat IDs with recent /start messages")
+    commands.add_parser(
+        "test-send", help="Send synthetic text without opening the database"
+    )
     args = parser.parse_args()
     if args.command == "run":
         logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
@@ -109,12 +114,17 @@ def main() -> int:
         return asyncio.run(run_command(args))
     except KeyboardInterrupt:
         return 0
+    except NotificationConfigurationError as error:
+        print(f"Notification configuration error: {error}")
+        return 2
+    except NotificationDeliveryError as error:
+        print(f"Notification delivery failed: {error.code}")
+        return 1
     except (
         ValidationError,
         OSError,
         PostgresError,
         SQLAlchemyError,
-        TelegramDeliveryError,
     ):
         print(
             "Notification command failed. Check the configuration and service availability."

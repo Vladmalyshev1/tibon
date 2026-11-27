@@ -38,7 +38,7 @@ class LeadCreate(BaseModel):
         Annotated[str, StringConstraints(strip_whitespace=True, max_length=1000)] | None
     ) = None
     consent: StrictBool
-    consent_version: Literal["lead-consent-v1"] | None = None
+    consent_version: Literal["lead-consent-v1", "lead-consent-v2"] | None = None
 
     @field_validator("name", "comment")
     @classmethod

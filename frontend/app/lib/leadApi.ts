@@ -17,7 +17,7 @@ export const leadSubmissionErrors = {
 };
 
 export function serializeLead(draft: Record<string, unknown>) {
-  return JSON.stringify({ ...draft, consent_version: "lead-consent-v1" });
+  return JSON.stringify({ ...draft, consent_version: "lead-consent-v2" });
 }
 
 export function rememberSubmissionKey(attempts: Map<string, string>, body: string) {

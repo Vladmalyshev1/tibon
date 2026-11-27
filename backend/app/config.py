@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -61,27 +60,10 @@ class Settings(EnvironmentSettings):
         )
 
 
-class TelegramSettings(EnvironmentSettings):
-    telegram_bot_token: SecretStr | None = None
-    telegram_chat_id: Annotated[int, Field(gt=-(2**52), lt=2**52)] | None = None
-
-    @field_validator("telegram_bot_token", "telegram_chat_id", mode="before")
-    @classmethod
-    def treat_blank_as_missing(cls, value: object) -> object:
-        return None if isinstance(value, str) and not value.strip() else value
-
-    @field_validator("telegram_bot_token")
-    @classmethod
-    def validate_bot_token(cls, value: SecretStr | None) -> SecretStr | None:
-        if value is not None and not re.fullmatch(
-            r"[0-9]+:[A-Za-z0-9_-]+", value.get_secret_value()
-        ):
-            raise ValueError("Invalid Telegram bot token")
-        return value
-
-    @field_validator("telegram_chat_id")
-    @classmethod
-    def validate_chat_id(cls, value: int | None) -> int | None:
-        if value == 0:
-            raise ValueError("Telegram chat ID cannot be zero")
-        return value
+class NotificationSettings(EnvironmentSettings):
+    notification_provider: Literal["vk", "max"] = "vk"
+    vk_community_token: SecretStr = SecretStr("")
+    vk_peer_id: str = ""
+    max_bot_token: SecretStr = SecretStr("")
+    max_chat_id: str = ""
+    max_ca_file: Path | None = None

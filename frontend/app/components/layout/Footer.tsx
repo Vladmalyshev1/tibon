@@ -3,6 +3,7 @@ import type { MouseEventHandler } from "react";
 import { studioOperator } from "../../data/business";
 import { Container } from "../ui/Container";
 import { BrandMark } from "../ui/BrandMark";
+import { StudioPhones } from "../ui/StudioPhones";
 
 const footerLinks = [
   { label: "Для взрослых", to: "/dlya-vzroslyh/" },
@@ -15,7 +16,6 @@ const footerLinks = [
 
 type FooterProps = {
   contact?: {
-    phone?: { label: string; href: string };
     email?: string;
     address?: string;
     hours?: string;
@@ -41,7 +41,7 @@ export function Footer({ contact, socials = [], cookieBannerOpen, onCookieSettin
           <div className="footer-info">
             {contact ? (
               <address className="footer-contact">
-                {contact.phone ? <a href={contact.phone.href}><span>{contact.phone.label}</span></a> : null}
+                <StudioPhones />
                 {contact.email ? <a href={`mailto:${contact.email}`}><span>{contact.email}</span></a> : null}
                 {contact.address ? <span>{contact.address}</span> : null}
                 {contact.hours ? <span>{contact.hours}</span> : null}

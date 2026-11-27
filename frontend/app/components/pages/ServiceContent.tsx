@@ -84,7 +84,7 @@ export function BookingFAQ({ kids = false, includeRomanticDinner = false }: { ki
   const items = [
     { id: "booking", question: "Как подтвердить бронирование?", answer: <p>{studioRules.booking}</p> },
     { id: "count", question: "До какого срока можно изменить число гостей?", answer: <p>{studioRules.guestCount}</p> },
-    { id: "food", question: kids ? "Можно ли принести свой торт?" : "Можно ли принести еду и напитки?", answer: <p>{studioRules.food}</p> },
+    { id: "food", question: "Можно ли принести еду и напитки?", answer: <p>{studioRules.food}</p> },
   ];
   if (kids) items.push({ id: "parents", question: "Кто отвечает за детей?", answer: <p>{studioRules.parents}</p> });
   if (includeRomanticDinner) items.push(...romanticDinnerQuestions);

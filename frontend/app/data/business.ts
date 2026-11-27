@@ -3,21 +3,25 @@ const addressLocality = "село Первомайский";
 const studioStreet = "ул. Архитектора Сергея Макарова, 2/4";
 const studioOffice = "офис 3";
 const studioBuilding = `${addressRegion}, Завьяловский район, ${addressLocality}, ${studioStreet}`;
-const mapSearch = encodeURIComponent(studioBuilding);
 const studioMapPoint = "53.310386,56.872993";
 
 export const studioOperator = { name: "ИП Исмагилов Р.С.", registrationNumber: "325180000086978" };
 
+const studioPhones = [
+  { label: "57-69-90", href: "tel:+73412576990" },
+  { label: "+7 (982) 117-69-90", href: "tel:+79821176990" },
+] as const;
+
 export const studioContact = {
-  phone: { label: "57-69-90", href: "tel:+73412576990" },
+  phone: studioPhones[0],
+  phones: studioPhones,
   address: `${studioBuilding}, ${studioOffice}`,
   postalAddress: { addressRegion, addressLocality, streetAddress: `${studioStreet}, ${studioOffice}`, addressCountry: "RU" },
   hours: "Ежедневно 10:00–23:00, по записи",
-  mapUrl: `https://yandex.ru/maps/?text=${mapSearch}`,
+  mapUrl: "https://yandex.ru/maps/?indoorLevel=1&ll=53.310613%2C56.872996&mode=poi&poi%5Bpoint%5D=53.310145%2C56.872895&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D137562118087&z=20",
   mapEmbedUrl: `https://yandex.ru/map-widget/v1/?ll=53.27,56.865&z=11&pt=${studioMapPoint}&l=map`,
   socials: [
     { label: "ВКонтакте", href: "https://vk.ru/ti_bon_studio" },
-    { label: "Telegram", href: "https://t.me/Tibon25" },
     { label: "MAX", href: "https://max.ru/u/f9LHodD0cOLGJIMXMm0xJ4xy0ylfANwtci4zF38HkXVIVETBq0J01j8tbc0", icon: "/images/studio/max.svg" },
   ],
 };
@@ -46,6 +50,14 @@ export function getRequestFormat(value: string | null) {
 export function requestActionFor(format: RequestFormat) {
   return { ...requestAction, to: `${requestAction.to}?format=${format}` };
 }
+
+export const romanticDinner = {
+  price: { amount: 14000, from: true } satisfies Price,
+  guests: "Для двоих",
+  rentalDuration: "3 часа",
+  courses: "Три блюда",
+  show: "Шоу с огнём или жидким азотом",
+};
 
 export const servicePages = {
   adults: {
@@ -84,8 +96,8 @@ export const servicePages = {
     path: "/dlya-vzroslyh/romanticheskiy-uzhin/", crumb: "Романтический ужин", title: "Романтический ужин для двоих",
     description: "Гастрономический ужин из трёх блюд с мастер-классом. В формат входят три часа аренды студии и кулинарное шоу.",
     seo: {
-      title: "Романтический ужин для двоих в Ижевске",
-      description: "Ужин из трёх блюд с кулинарным мастер-классом и шоу. В стоимость формата для двоих входят три часа аренды студии.",
+      title: `Романтический ужин для двоих в Ижевске ${formatPrice(romanticDinner.price)}`,
+      description: `Ужин из трёх блюд с кулинарным мастер-классом и шоу ${formatPrice(romanticDinner.price)}. В стоимость входят три часа аренды студии.`,
     },
   },
   rental: {
@@ -125,14 +137,6 @@ export const kidsGroup = {
   cooking: "1,5–2 часа",
 };
 
-export const romanticDinner = {
-  price: { amount: 18000, from: true } satisfies Price,
-  guests: "Для двоих",
-  rentalDuration: "3 часа",
-  courses: "Три блюда",
-  show: "Шоу с огнём или жидким азотом",
-};
-
 export const rentalRates = [
   { id: "weekday", label: "Будние дни", price: { amount: 3000, unit: "час" } },
   { id: "evening-weekend", label: "Вечер и выходные", price: { amount: 6000, unit: "час" } },
@@ -145,7 +149,7 @@ export const rentalUses = [
 ];
 
 export const extraServices = [
-  { id: "mafia", title: "Мафия / Бункер", description: "Игры для компании.", price: { amount: 3500, from: true, unit: "час" } },
+  { id: "mafia", title: "Мафия / Бункер", description: "Игры для компании.", price: { amount: 5100, from: true, unit: "час" } },
   { id: "quiz", title: "Квиз", description: "Командная викторина.", price: { amount: 10000, from: true, unit: "час" } },
   { id: "photo", title: "Фотограф", description: "Фотосъёмка мероприятия.", price: { amount: 4000, from: true, unit: "час" } },
   { id: "animation", title: "Детские аниматоры", description: "Развлечения для детского праздника.", priceNote: "Цена по запросу" },
@@ -154,7 +158,7 @@ export const extraServices = [
 export const studioRules = {
   booking: "Чтобы подтвердить бронирование, студия просит внести 50% предоплаты.",
   guestCount: "Изменить число гостей можно не позднее чем за два дня до мероприятия.",
-  food: "Свою еду, напитки, фрукты и торты приносить нельзя.",
+  food: "Свою еду, напитки и фрукты приносить нельзя.",
   parents: "За детей на мероприятии отвечают родители.",
   participation: "Гости старше пяти лет участвуют в мастер-классе и оплачивают полную стоимость.",
   belongings: "Студия не несёт ответственности за личные вещи гостей.",
@@ -166,7 +170,7 @@ export const studioRules = {
 
 export const informationPages = {
   contact: {
-    path: "/contact/", title: "Контакты", description: "Телефон, адрес и часы работы по записи. Карта проезда до кулинарной студии в селе Первомайском.",
+    path: "/contact/", title: "Контакты", description: "Телефоны, адрес и часы работы по записи. Карта проезда до кулинарной студии в селе Первомайском.",
     seo: { title: "Контакты кулинарной студии в Ижевске" },
   },
 };

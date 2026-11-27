@@ -1,4 +1,4 @@
-import { studioContact } from "../../data/business";
+import { StudioPhones } from "../ui/StudioPhones";
 import { ButtonLink } from "../ui/Button";
 import { LineIcon } from "../ui/LineIcon";
 
@@ -12,7 +12,7 @@ export function FinalCtaSection() {
           <p className="home-summary">Расскажите о своём поводе. Обсудим формат, меню и дату.</p>
           <div className="final-cta-actions">
             <ButtonLink to="/zayavka/" size="lg">Забронировать <LineIcon name="arrow" /></ButtonLink>
-            <a href={studioContact.phone.href}>{studioContact.phone.label}</a>
+            <StudioPhones />
           </div>
         </div>
       </div>

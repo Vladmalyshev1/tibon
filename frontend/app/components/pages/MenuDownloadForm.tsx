@@ -1,6 +1,6 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
-import { studioContact } from "../../data/business";
+import { StudioPhones } from "../ui/StudioPhones";
 import { menuLeadSchema, type CallbackFields } from "../../data/lead";
 import type { MenuType } from "../../data/menu";
 import { downloadMenuPdf, leadSubmissionErrors, serializeLead, submitLead } from "../../lib/leadApi";
@@ -107,7 +107,10 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
   return (
     <form className="lead-form menu-download-form" method="post" aria-busy={busy} aria-describedby={labelId} onSubmit={submit} noValidate>
       <p id={labelId} className="menu-download-description">Укажите имя и российский номер телефона, затем отметьте согласие.</p>
-      <noscript><p>Для скачивания меню включите JavaScript или позвоните <a className="underline" href={studioContact.phone.href}>{studioContact.phone.label}</a>.</p></noscript>
+      <noscript>
+        <p>Для скачивания меню включите JavaScript или позвоните в студию.</p>
+        <StudioPhones linkClassName="underline" />
+      </noscript>
       <fieldset className="lead-fields" disabled={!enabled || busy}>
         <LeadField id={`${labelId}-name`} label={<>Имя <span className="menu-required">*</span></>} error={nameError} icon="user">
           <input id={`${labelId}-name`} autoComplete="name" required maxLength={80} value={fields.name} placeholder="Ваше имя"
@@ -129,7 +132,8 @@ export function MenuDownloadForm({ current }: { current: MenuType }) {
                 setTouched(previous => ({ ...previous, consent: true }));
                 updateField("consent", event.currentTarget.checked);
               }} />
-            <span>Согласен на обработку персональных данных для ответа на запрос *</span>
+            <span>Согласен на обработку имени, телефона и вида меню ИП Исмагиловым Р. С. для предоставления меню и ответа
+              на запрос, включая возможную передачу этих данных через ВКонтакте (VK) для уведомления оператора. *</span>
           </label>
           <Link id={`${labelId}-policy`} to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
           {consentError ? <p id={`${labelId}-consent-error`} className="lead-error">{consentError}</p> : null}

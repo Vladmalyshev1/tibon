@@ -26,10 +26,10 @@ export function CookieConsentBanner({ pending, settingsOpen, onClose }: {
       }}>
       <div className="cookie-banner-inner">
         <div className="cookie-banner-copy">
-          <h2 ref={heading} id="cookie-consent-title" tabIndex={-1}>Мы используем cookie</h2>
+          <h2 ref={heading} id="cookie-consent-title" tabIndex={-1}>Настройки cookie</h2>
           <p>
-            Мы используем необходимые файлы cookie для работы сайта, а с вашего разрешения — дополнительные cookie для улучшения его работы и анализа посещений.
-            {" "}Если вы оставите заявку, мы обработаем указанные вами имя и телефон, чтобы связаться с вами.
+            Сайт запоминает ваш выбор в браузере. Если вы примете дополнительные cookie, на странице контактов
+            загрузится карта Яндекса. При отказе вы сможете открыть карту по ссылке.
             {" "}Подробнее — в <Link to="/politika-konfidencialnosti/">Политике обработки персональных данных</Link>.
           </p>
         </div>

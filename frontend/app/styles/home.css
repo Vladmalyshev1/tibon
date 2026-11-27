@@ -251,7 +251,7 @@
 }
 .final-cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.5rem; }
 .final-cta-actions .button-primary { padding-inline: 1.75rem; border-radius: 0.85rem; }
-.final-cta-actions > a:not(.button-primary) { display: inline-flex; min-height: var(--tap-min); align-items: center; white-space: nowrap; }
+.final-cta-actions .studio-phones > a { display: flex; min-height: 24px; align-items: center; }
 
 @media (width < 48rem) {
   .directions-grid, .occasions-list { grid-template-columns: minmax(0, 1fr); }

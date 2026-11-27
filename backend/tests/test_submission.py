@@ -59,6 +59,21 @@ def test_validation_errors_omit_submitted_input(client, changes, missing, errors
     assert result.headers["cache-control"] == "no-store"
 
 
+@pytest.mark.parametrize("version", [None, "lead-consent-v1", "lead-consent-v2"])
+def test_preserves_submitted_consent_version(client, monkeypatch, version):
+    lead_id = uuid4()
+
+    async def save(_engine, payload, _idempotency_key):
+        assert payload.consent_version == version
+        return lead_id, True
+
+    monkeypatch.setattr("app.api.leads.submit_lead", save)
+    data = DRAFT if version is None else DRAFT | {"consent_version": version}
+    response = client.post(PATH, json=data)
+    assert response.status_code == 201
+    assert response.json() == {"id": str(lead_id)}
+
+
 def test_malformed_json_and_invalid_key_are_sanitized(client):
     malformed = client.post(
         PATH, content='{"private value":', headers={"Content-Type": "application/json"}

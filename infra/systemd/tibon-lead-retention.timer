@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily TIBON lead retention check
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 Europe/Samara
+Persistent=true
+
+[Install]
+WantedBy=timers.target

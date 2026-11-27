@@ -268,7 +268,7 @@
 .reference-contact-facts dt { color: #c9c3bf; font-size: var(--text-body-s); }
 .reference-contact-facts dd { margin: 0.15rem 0 0; font-size: var(--text-lead); line-height: 1.4; }
 .reference-contact-facts dd strong { color: #f64e5f; }
-.reference-contact-facts .line-icon {
+.reference-contact-facts dt .line-icon {
   position: absolute;
   top: 1rem;
   left: 0;
@@ -276,12 +276,12 @@
   height: auto;
   color: #fff;
 }
-.reference-contact-phone { display: inline-flex; min-height: 2.75rem; align-items: center; font-size: clamp(1rem, 0.95rem + 0.25vw, 1.25rem); font-weight: 650; text-decoration: none; }
+.reference-contact-phone { display: inline-flex; min-height: 1.5rem; align-items: center; font-size: clamp(1rem, 0.95rem + 0.25vw, 1.25rem); font-weight: 650; line-height: 1.25; text-decoration: none; }
 
 .reference-socials {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: clamp(1rem, 2vw, 1.7rem) 0 clamp(1.5rem, 3.4vw, 3rem);
   padding: 0;
   list-style: none;

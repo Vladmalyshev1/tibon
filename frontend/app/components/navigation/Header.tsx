@@ -3,8 +3,7 @@ import { Link } from "react-router";
 import { DesktopNavigation, type NavigationItem } from "./DesktopNavigation";
 import { MobileMenu } from "./MobileMenu";
 import { BrandMark } from "../ui/BrandMark";
-import { LineIcon } from "../ui/LineIcon";
-import { studioContact } from "../../data/business";
+import { StudioPhones } from "../ui/StudioPhones";
 
 const navigationItems: readonly NavigationItem[] = [
   { label: "Для взрослых", to: "/dlya-vzroslyh/", section: true },
@@ -26,10 +25,7 @@ export function Header() {
         <div className="header-inner">
           <Link className="brand-mark" to="/" aria-label="TIBON — главная"><BrandMark /></Link>
           <DesktopNavigation items={navigationItems} />
-          <a className="header-phone" href={studioContact.phone.href}>
-            <LineIcon name="phone" />
-            <span>{studioContact.phone.label}</span>
-          </a>
+          <StudioPhones className="header-phone" />
           <button
             id="mobile-menu-trigger"
             className="menu-trigger icon-button"

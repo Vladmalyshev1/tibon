@@ -143,7 +143,9 @@ export function LeadForm({ initialFormat }: { initialFormat?: RequestFormat }) {
         <div>
           <label className="lead-consent" htmlFor="lead-consent">
             <input {...fieldProps("consent")} type="checkbox" required />
-            <span>Согласен на обработку персональных данных для ответа на заявку *</span>
+            <span>Согласен на обработку имени, телефона, формата мероприятия и других заполненных полей
+              ИП Исмагиловым Р. С. для рассмотрения заявки и связи со мной, включая возможную передачу этих данных
+              через ВКонтакте (VK) для уведомления оператора. *</span>
           </label>
           {errors.consent ? <p id="lead-consent-error" className="lead-error">{errors.consent.message}</p> : null}
           <Link to="/politika-konfidencialnosti/">Политика обработки персональных данных</Link>
